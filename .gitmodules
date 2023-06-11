@@ -1,0 +1,3 @@
+[submodule "module/libWinHTTP"]
+	path = module/libWinHTTP
+	url = https://github.com/lambertlulala/libWinHttp
