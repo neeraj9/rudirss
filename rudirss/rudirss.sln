@@ -5,6 +5,8 @@ VisualStudioVersion = 17.6.33723.286
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "librssfetcher", "..\librssfetcher\librssfetcher.vcxproj", "{049772EB-1ED1-4563-920C-41DD8887B26F}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "testLibRSSFetcher", "testLibRSSFetcher\testLibRSSFetcher.vcxproj", "{0AADC087-2F53-4DE1-8698-0E16B78B897C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -21,6 +23,14 @@ Global
 		{049772EB-1ED1-4563-920C-41DD8887B26F}.Release|x64.Build.0 = Release|x64
 		{049772EB-1ED1-4563-920C-41DD8887B26F}.Release|x86.ActiveCfg = Release|Win32
 		{049772EB-1ED1-4563-920C-41DD8887B26F}.Release|x86.Build.0 = Release|Win32
+		{0AADC087-2F53-4DE1-8698-0E16B78B897C}.Debug|x64.ActiveCfg = Debug|x64
+		{0AADC087-2F53-4DE1-8698-0E16B78B897C}.Debug|x64.Build.0 = Debug|x64
+		{0AADC087-2F53-4DE1-8698-0E16B78B897C}.Debug|x86.ActiveCfg = Debug|Win32
+		{0AADC087-2F53-4DE1-8698-0E16B78B897C}.Debug|x86.Build.0 = Debug|Win32
+		{0AADC087-2F53-4DE1-8698-0E16B78B897C}.Release|x64.ActiveCfg = Release|x64
+		{0AADC087-2F53-4DE1-8698-0E16B78B897C}.Release|x64.Build.0 = Release|x64
+		{0AADC087-2F53-4DE1-8698-0E16B78B897C}.Release|x86.ActiveCfg = Release|Win32
+		{0AADC087-2F53-4DE1-8698-0E16B78B897C}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

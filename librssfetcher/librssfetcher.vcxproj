@@ -20,11 +20,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\FeedFetcher.h" />
-    <ClInclude Include="include\HttpClient.h" />
+    <ClInclude Include="include\FeedParser.h" />
+    <ClInclude Include="include\FetchUnit.h" />
     <ClInclude Include="include\HttpGetRequest.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="source\HttpClient.cpp" />
+    <ClCompile Include="source\FeedFetcher.cpp" />
+    <ClCompile Include="source\FetchUnit.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
@@ -87,7 +89,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>include;$(SolutionDir)..\module\libWinHTTP\libWinHttp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\librssfetcher\include;$(SolutionDir)..\module\libWinHTTP\libWinHttp\include;$(SolutionDir)..\module\libmsxml\libmsxml\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -95,11 +97,11 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PreBuildEvent>
-      <Command>$(SolutionDir)build.bat $(SolutionDir)..\module\libWinHTTP\libWinHTTP\libWinHTTP.vcxproj $(Configuration) $(PlatformTarget)</Command>
+      <Command>$(SolutionDir)buildAll.bat $(Configuration) $(PlatformTarget)</Command>
     </PreBuildEvent>
     <Lib>
-      <AdditionalLibraryDirectories>$(SolutionDir)..\module\libWinHTTP\libWinHTTP\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>libWinHTTP.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\module\libWinHTTP\libWinHTTP\$(Configuration);$(SolutionDir)..\module\libmsxml\libmsxml\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libWinHTTP.lib;libmsxml.lib</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -113,7 +115,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>include;$(SolutionDir)..\module\libWinHTTP\libWinHttp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\librssfetcher\include;$(SolutionDir)..\module\libWinHTTP\libWinHttp\include;$(SolutionDir)..\module\libmsxml\libmsxml\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -123,11 +125,11 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PreBuildEvent>
-      <Command>$(SolutionDir)build.bat $(SolutionDir)..\module\libWinHTTP\libWinHTTP\libWinHTTP.vcxproj $(Configuration) $(PlatformTarget)</Command>
+      <Command>$(SolutionDir)buildAll.bat $(Configuration) $(PlatformTarget)</Command>
     </PreBuildEvent>
     <Lib>
-      <AdditionalLibraryDirectories>$(SolutionDir)..\module\libWinHTTP\libWinHTTP\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>libWinHTTP.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\module\libWinHTTP\libWinHTTP\$(Configuration);$(SolutionDir)..\module\libmsxml\libmsxml\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libWinHTTP.lib;libmsxml.lib</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -139,7 +141,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>include;$(SolutionDir)..\module\libWinHTTP\libWinHttp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\librssfetcher\include;$(SolutionDir)..\module\libWinHTTP\libWinHttp\include;$(SolutionDir)..\module\libmsxml\libmsxml\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -147,11 +149,11 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PreBuildEvent>
-      <Command>$(SolutionDir)build.bat $(SolutionDir)..\module\libWinHTTP\libWinHTTP\libWinHTTP.vcxproj $(Configuration) $(PlatformTarget)</Command>
+      <Command>$(SolutionDir)buildAll.bat $(Configuration) $(PlatformTarget)</Command>
     </PreBuildEvent>
     <Lib>
-      <AdditionalLibraryDirectories>$(SolutionDir)..\module\libWinHTTP\libWinHTTP\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>libWinHTTP.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\module\libWinHTTP\libWinHTTP\$(Platform)\$(Configuration);$(SolutionDir)..\module\libmsxml\libmsxml\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libWinHTTP.lib;libmsxml.lib</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -165,7 +167,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>include;$(SolutionDir)..\module\libWinHTTP\libWinHttp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\librssfetcher\include;$(SolutionDir)..\module\libWinHTTP\libWinHttp\include;$(SolutionDir)..\module\libmsxml\libmsxml\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -175,11 +177,11 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PreBuildEvent>
-      <Command>$(SolutionDir)build.bat $(SolutionDir)..\module\libWinHTTP\libWinHTTP\libWinHTTP.vcxproj $(Configuration) $(PlatformTarget)</Command>
+      <Command>$(SolutionDir)buildAll.bat $(Configuration) $(PlatformTarget)</Command>
     </PreBuildEvent>
     <Lib>
-      <AdditionalLibraryDirectories>$(SolutionDir)..\module\libWinHTTP\libWinHTTP\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>libWinHTTP.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\module\libWinHTTP\libWinHTTP\$(Platform)\$(Configuration);$(SolutionDir)..\module\libmsxml\libmsxml\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libWinHTTP.lib;libmsxml.lib</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

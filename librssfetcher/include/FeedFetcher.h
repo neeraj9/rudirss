@@ -1,11 +1,8 @@
 #pragma once
 
-#include <string>
+#include "FetchUnit.h"
 
 class FeedFetcher
 {
 public:
-    virtual ~FeedFetcher() {}
-
-    std::wstring GetFeedData(const std::wstring &feedURL);
 };

@@ -8,11 +8,11 @@
 class HttpGetRequest : public WinHttpRequest<HttpGetRequest>
 {
 public:
-    using FN_ON_READ_COMPLETE = std::function<void(const char*, DWORD)>;
-    using FN_ON_PROCESS_COMPLETE = std::function<void(const void*, DWORD)>;
+    using FN_ON_READ_COMPLETE = std::function<void(const void*, const char*, DWORD)>;
+    using FN_ON_PROCESS_COMPLETE = std::function<void(const void*, bool, DWORD)>;
     using FN_ON_EXCEPTION = std::function<void(const void*, const WINHTTP_ASYNC_RESULT *)>;
 
-private:
+protected:
     WinHttpConnection m_connection;
     bool m_result;
     DWORD m_statusCode;
@@ -21,11 +21,10 @@ private:
     FN_ON_PROCESS_COMPLETE m_onProcessComplete;
     FN_ON_EXCEPTION m_onException;
 
-protected:
     HRESULT GetStatusCode(DWORD& statusCode)
     {
         DWORD statusCodeSize = sizeof(DWORD);
-        HRESULT result = E_FAIL;
+        HRESULT result = S_OK;
         if (!::WinHttpQueryHeaders(m_handle,
             WINHTTP_QUERY_STATUS_CODE | WINHTTP_QUERY_FLAG_NUMBER,
             WINHTTP_HEADER_NAME_BY_INDEX,
@@ -39,7 +38,37 @@ protected:
         return result;
     }
 
-    virtual void OnException(const WINHTTP_ASYNC_RESULT *asyncResult)
+    void Disconnect()
+    {
+		WinHttpSetStatusCallback(m_handle, nullptr, 0, 0);
+        Close();
+        m_connection.Close(); // Close connection handle so that it's reusable next time.
+    }
+
+public:
+    HttpGetRequest() : m_result{ false }, m_statusCode{ 0 }, m_userParam{ nullptr }{ }
+    HttpGetRequest(const HttpGetRequest& rhs) = delete;
+    HttpGetRequest(HttpGetRequest&& rhs) noexcept :
+        m_result{ rhs.m_result }, m_statusCode{ rhs.m_statusCode }, m_userParam{ rhs.m_userParam },
+        m_onReadComplete{ rhs.m_onReadComplete }, m_onProcessComplete{ rhs.m_onProcessComplete },
+        m_onException{ rhs.m_onException }
+    {
+        if (rhs.m_handle)
+        {
+            m_handle = rhs.m_handle;
+            rhs.m_handle = nullptr;
+        }
+
+        if (rhs.m_connection.m_handle)
+        {
+            m_connection.m_handle = rhs.m_connection.m_handle;
+            rhs.m_connection.m_handle = nullptr;
+        }
+    }
+
+    virtual ~HttpGetRequest() { }
+
+    virtual void OnException(const WINHTTP_ASYNC_RESULT* asyncResult)
     {
         if (m_onException)
             m_onException(m_userParam, asyncResult);
@@ -47,21 +76,21 @@ protected:
 
     virtual void OnReadComplete(const void* buffer, DWORD bytesRead)
     {
-        //m_data.insert(m_data.end(), reinterpret_cast<const char*>(buffer), reinterpret_cast<const char*>(buffer) + bytesRead);
         if (m_onReadComplete)
-            m_onReadComplete(reinterpret_cast<const char*>(buffer), bytesRead);
+            m_onReadComplete(m_userParam, reinterpret_cast<const char*>(buffer), bytesRead);
     }
 
     virtual void OnProcessComplete()
     {
         if (m_onProcessComplete)
-            m_onProcessComplete(m_userParam, m_statusCode);
+            m_onProcessComplete(m_userParam, m_result, m_statusCode);
     }
 
     virtual void OnResponseComplete(HRESULT result)
     {
-        Close();
+        Disconnect();
         m_result = S_OK == result;
+        OnProcessComplete();
     }
 
     virtual HRESULT OnCallback(DWORD code, const void* info, DWORD length)
@@ -81,10 +110,10 @@ protected:
         case WINHTTP_CALLBACK_STATUS_HEADERS_AVAILABLE:
         {
             m_statusCode = 0;
-            if (FAILED(GetStatusCode(m_statusCode))
-                || HTTP_STATUS_OK != m_statusCode)
+            auto result = GetStatusCode(m_statusCode);
+            if (FAILED(result))
             {
-                return E_FAIL;
+                return result;
             }
 
             if (!::WinHttpReadData(m_handle, m_buffer.data(), m_buffer.size(), nullptr))
@@ -117,13 +146,11 @@ protected:
         case WINHTTP_CALLBACK_STATUS_REQUEST_ERROR:
         {
             OnException(static_cast<WINHTTP_ASYNC_RESULT*>(const_cast<void*>(info)));
-
             return E_FAIL;
         }
 
         case WINHTTP_CALLBACK_STATUS_HANDLE_CLOSING:
         {
-            OnProcessComplete();
             break;
         }
 
@@ -133,11 +160,6 @@ protected:
 
         return S_OK;
     }
-
-public:
-    HttpGetRequest() : m_result{ false }, m_statusCode{ 0 }, m_userParam{ nullptr }{ }
-
-    virtual ~HttpGetRequest() { }
 
     virtual bool Initialize(const std::wstring& source, const WinHttpSession& session)
     {
@@ -160,7 +182,8 @@ public:
             if (FAILED(result))
                 break;
 
-            result = WinHttpRequest<HttpGetRequest>::Initialize(urlComponents.lpszUrlPath, 0, m_connection);
+            result = WinHttpRequest<HttpGetRequest>::Initialize(urlComponents.lpszUrlPath, nullptr, m_connection,
+                nullptr, nullptr, nullptr, INTERNET_SCHEME_HTTPS == urlComponents.nScheme ? WINHTTP_FLAG_SECURE : 0);
             if (FAILED(result))
                 break;
 
@@ -172,7 +195,7 @@ public:
     virtual bool SendRequest(const void* userParam, FN_ON_READ_COMPLETE onReadComplete,
         FN_ON_PROCESS_COMPLETE onProcessComplete, FN_ON_EXCEPTION onException)
     {
-        m_userParam = const_cast<void *>(userParam);
+        m_userParam = const_cast<void*>(userParam);
         m_onReadComplete = onReadComplete;
         m_onProcessComplete = onProcessComplete;
         m_onException = onException;

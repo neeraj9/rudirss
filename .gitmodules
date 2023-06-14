@@ -1,3 +1,6 @@
 [submodule "module/libWinHTTP"]
 	path = module/libWinHTTP
 	url = https://github.com/lambertlulala/libWinHttp
+[submodule "module/libmsxml"]
+	path = module/libmsxml
+	url = https://github.com/lambertlulala/libmsxml

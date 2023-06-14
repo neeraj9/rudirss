@@ -18,15 +18,21 @@
     <ClInclude Include="include\FeedFetcher.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\HttpClient.h">
+    <ClInclude Include="include\HttpGetRequest.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\HttpGetRequest.h">
+    <ClInclude Include="include\FeedParser.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\FetchUnit.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="source\HttpClient.cpp">
+    <ClCompile Include="source\FeedFetcher.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\FetchUnit.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
