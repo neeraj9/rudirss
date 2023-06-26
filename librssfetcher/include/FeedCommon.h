@@ -19,4 +19,7 @@ namespace FeedCommon
         const WinMSXML::XMLElement& element)>;
     void IterateSiblingElements(const WinMSXML::XMLElement& element, FN_ON_ITERATE_ELEMENT onIterateElement);
     FeedSpecification GetFeedSpecification(const WinMSXML &xml);
+
+    bool Initialize();
+    void Uninitialize();
 };

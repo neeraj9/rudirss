@@ -64,3 +64,13 @@ FeedSpecification FeedCommon::GetFeedSpecification(const WinMSXML &xml)
 
     return spec;
 }
+
+bool FeedCommon::Initialize()
+{
+    return SUCCEEDED(CoInitializeEx(nullptr, COINIT_MULTITHREADED));
+}
+
+void FeedCommon::Uninitialize()
+{
+    CoUninitialize();
+}

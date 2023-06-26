@@ -7,7 +7,7 @@ using namespace FeedCommon;
 
 TEST(TestFeedCommon, TestIterateSiblingElements)
 {
-    ASSERT_TRUE(SUCCEEDED(CoInitializeEx(nullptr, COINIT_MULTITHREADED)));
+    ASSERT_TRUE(FeedCommon::Initialize());
 
     {
         try
@@ -47,12 +47,12 @@ TEST(TestFeedCommon, TestIterateSiblingElements)
         }
     }
 
-    CoUninitialize();
+    FeedCommon::Uninitialize();
 }
 
 TEST(TestFeedCommon, TestGetFeedSpecification)
 {
-    ASSERT_TRUE(SUCCEEDED(CoInitializeEx(nullptr, COINIT_MULTITHREADED)));
+    ASSERT_TRUE(FeedCommon::Initialize());
 
     {
         try
@@ -79,5 +79,5 @@ TEST(TestFeedCommon, TestGetFeedSpecification)
         }
     }
 
-    CoUninitialize();
+    FeedCommon::Uninitialize();
 }
