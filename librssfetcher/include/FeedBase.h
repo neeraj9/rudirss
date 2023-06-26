@@ -3,17 +3,19 @@
 #include "Feed.h"
 #include "FeedData.h"
 #include "libmsxml.h"
+#include "FeedCommon.h"
 
 #include <vector>
 #include <string>
+
+using namespace FeedCommon;
 
 class FeedBase : public Feed
 {
 protected:
     FeedData m_feedInfo;
     std::vector<FeedData> m_feeds;
-
-    virtual void Parse(WinMSXML& xml) = 0;
+    FeedSpecification m_spec;
 
 public:
     FeedBase();
@@ -32,5 +34,10 @@ public:
     virtual void ParseFromString(const std::wstring& xmlString);
     virtual void IterateFeeds(FN_ON_ITERATE_FEED onIterateFeed);
     virtual void ClearEntries();
+
+    virtual void Parse(WinMSXML& xml) = 0;
+
+    void SetSpec(FeedSpecification spec) { m_spec = spec; }
+    FeedSpecification GetSpec() const { return m_spec; }
 };
 

@@ -11,11 +11,10 @@ class RSSFeed : public FeedBase
 protected:
     std::wstring m_version;
 
-    virtual void Parse(WinMSXML &xml);
-
 public:
     RSSFeed();
     virtual ~RSSFeed();
 
+    virtual void Parse(WinMSXML &xml);
     const std::wstring GetVersion() const { return m_version; }
 };

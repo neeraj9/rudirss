@@ -4,9 +4,7 @@
 
 #include <stdexcept>
 
-using namespace FeedCommon;
-
-FeedBase::FeedBase()
+FeedBase::FeedBase(): m_spec(FeedSpecification::None)
 {
 
 }

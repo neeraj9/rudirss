@@ -39,7 +39,9 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="TestAtomFeed.cpp" />
     <ClCompile Include="TestFeedCommon.cpp" />
+    <ClCompile Include="TestFeedData.cpp" />
     <ClCompile Include="TestFeedFetcher.cpp" />
+    <ClCompile Include="TestFeedWorker.cpp" />
     <ClCompile Include="TestFetchUnit.cpp" />
     <ClCompile Include="TestHttpRequest.cpp" />
     <ClCompile Include="pch.cpp">
@@ -49,6 +51,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="TestRSSFeed.cpp" />
+    <ClCompile Include="TestWorker.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\librssfetcher\librssfetcher.vcxproj">

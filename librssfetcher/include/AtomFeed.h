@@ -8,10 +8,9 @@
 
 class AtomFeed : public FeedBase
 {
-protected:
-    virtual void Parse(WinMSXML& xml);
-
 public:
     AtomFeed();
     virtual ~AtomFeed();
+
+    virtual void Parse(WinMSXML& xml);
 };

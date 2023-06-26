@@ -12,6 +12,13 @@ public:
     FeedData() {}
     FeedData(const FeedData& rhs) : m_data{rhs.m_data} {}
     FeedData(FeedData&& rhs) noexcept: m_data{ std::move(rhs.m_data) } {}
+    FeedData& operator=(const FeedData& rhs)
+    {
+        if (this != &rhs)
+            m_data = rhs.m_data;
+
+        return *this;
+    }
     virtual ~FeedData() {}
 
     virtual void SetValue(const std::wstring& name, const std::wstring& value)

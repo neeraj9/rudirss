@@ -23,6 +23,15 @@
     <ClCompile Include="TestAtomFeed.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="TestFeedData.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="TestWorker.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="TestFeedWorker.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
@@ -33,6 +42,9 @@
   <ItemGroup>
     <Filter Include="Source">
       <UniqueIdentifier>{a5ab2bf3-5f95-4536-a2a2-fc4eef0f98a0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header">
+      <UniqueIdentifier>{4d4eb8ba-86fe-4e19-8b4f-32aec6472e85}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
