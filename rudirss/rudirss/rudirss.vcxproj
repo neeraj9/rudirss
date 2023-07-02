@@ -77,7 +77,7 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\librssfetcher\include;$(SolutionDir)..\module\libWinHTTP\libWinHttp\include;$(SolutionDir)..\module\libmsxml\libmsxml\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)rudirss\include;$(SolutionDir)..\librssfetcher\include;$(SolutionDir)..\module\libWinHTTP\libWinHttp\include;$(SolutionDir)..\module\libmsxml\libmsxml\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -95,7 +95,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\librssfetcher\include;$(SolutionDir)..\module\libWinHTTP\libWinHttp\include;$(SolutionDir)..\module\libmsxml\libmsxml\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)rudirss\include;$(SolutionDir)..\librssfetcher\include;$(SolutionDir)..\module\libWinHTTP\libWinHttp\include;$(SolutionDir)..\module\libmsxml\libmsxml\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -113,12 +113,12 @@
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\librssfetcher\include;$(SolutionDir)..\module\libWinHTTP\libWinHttp\include;$(SolutionDir)..\module\libmsxml\libmsxml\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)rudirss\include;$(SolutionDir)..\librssfetcher\include;$(SolutionDir)..\module\libWinHTTP\libWinHttp\include;$(SolutionDir)..\module\libmsxml\libmsxml\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>librssfetcher.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>librssfetcher.lib;Comctl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
@@ -131,7 +131,7 @@
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\librssfetcher\include;$(SolutionDir)..\module\libWinHTTP\libWinHttp\include;$(SolutionDir)..\module\libmsxml\libmsxml\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)rudirss\include;$(SolutionDir)..\librssfetcher\include;$(SolutionDir)..\module\libWinHTTP\libWinHttp\include;$(SolutionDir)..\module\libmsxml\libmsxml\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -143,15 +143,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="framework.h" />
-    <ClInclude Include="Resource.h" />
-    <ClInclude Include="rudirss.h" />
-    <ClInclude Include="targetver.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="rudirss.cpp" />
-  </ItemGroup>
-  <ItemGroup>
     <ResourceCompile Include="rudirss.rc" />
   </ItemGroup>
   <ItemGroup>
@@ -162,6 +153,17 @@
     <ProjectReference Include="..\..\librssfetcher\librssfetcher.vcxproj">
       <Project>{049772eb-1ed1-4563-920c-41dd8887b26f}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="framework.h" />
+    <ClInclude Include="include\WindowHandle.h" />
+    <ClInclude Include="Resource.h" />
+    <ClInclude Include="rudirss.h" />
+    <ClInclude Include="targetver.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="rudirss.cpp" />
+    <ClCompile Include="source\WindowHandle.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
