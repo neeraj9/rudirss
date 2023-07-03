@@ -67,5 +67,5 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
             return 0;
         });
 
-    return mainWindow.MessageLoop();
+    return static_cast<int>(mainWindow.MessageLoop());
 }
