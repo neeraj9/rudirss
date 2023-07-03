@@ -4,21 +4,6 @@
 #include <format>
 #include <vector>
 
-#if 0
-#include <wrl.h>
-#include <wil/com.h>
-// <IncludeHeader>
-// include WebView2 header
-#include "WebView2.h"
-
-using namespace Microsoft::WRL;
-
-static wil::com_ptr<ICoreWebView2Controller> webviewController;
-
-// Pointer to WebView window
-static wil::com_ptr<ICoreWebView2> webview;
-#endif
-
 RudiRSSMainWindow::RudiRSSMainWindow() : m_initViewer{ FALSE }
 {
 
