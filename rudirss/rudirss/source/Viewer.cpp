@@ -9,7 +9,7 @@ Viewer::Viewer() : m_hWndParent{ nullptr }, m_rc{}
 
 Viewer::~Viewer()
 {
-
+    Destroy();
 }
 
 HRESULT Viewer::Initialize(HWND hWnd, const RECT &rc, FN_ON_WEBVIEW_READY fnOnWebViewReady)
@@ -83,4 +83,19 @@ HRESULT Viewer::MoveWindow(const RECT& rc)
         result = m_webviewController->put_Bounds(rc);
 
     return result;
+}
+
+void Viewer::Destroy()
+{
+    if (m_webview)
+    {
+        m_webview->Stop();
+        m_webview.reset();
+    }
+
+    if (m_webviewController)
+    {
+        m_webviewController->Close();
+        m_webviewController.reset();
+    }
 }

@@ -27,6 +27,8 @@ public:
     virtual ~Viewer();
 
     HRESULT Initialize(HWND hWnd, const RECT &rc, FN_ON_WEBVIEW_READY fnOnWebViewReady);
+    void Destroy();
+
     HRESULT Navigate(const std::wstring &uri);
     HRESULT MoveWindow(const RECT &rc);
 };
