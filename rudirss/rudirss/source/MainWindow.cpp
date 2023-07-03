@@ -1,6 +1,6 @@
 #include "MainWindow.h"
 
-MainWindow::MainWindow()
+MainWindow::MainWindow() : m_hInstance{ nullptr }
 {
 
 }
@@ -10,21 +10,16 @@ MainWindow::~MainWindow()
 
 }
 
-bool MainWindow::Initialize(FN_ON_REGISTER fnOnRegister, FN_CREATE_WINDOW fnCreateWindow, FN_ON_PROCESS_MESSAGE fnOnProcessMessage)
+bool MainWindow::Initialize(HINSTANCE hInstance)
 {
-    if (!fnOnRegister 
-        || !fnCreateWindow
-        || !fnOnProcessMessage)
-        return false;
+    m_hInstance = hInstance;
 
     WNDCLASSEXW wcex{};
-    fnOnRegister(wcex);
+    OnRegister(wcex);
     if (0 == RegisterClassExW(&wcex))
         return false;
 
-    m_fnOnProcessMessage = fnOnProcessMessage;
-
-    m_hWnd = fnCreateWindow();
+    m_hWnd = Create();
     if (!m_hWnd)
         return false;
 
@@ -52,7 +47,7 @@ LRESULT CALLBACK MainWindow::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPA
     if (param)
     {
         auto pThis = reinterpret_cast<MainWindow*>(param);
-        return pThis->m_fnOnProcessMessage(hWnd, message, wParam, lParam);
+        return pThis->OnProcessMessage(hWnd, message, wParam, lParam);
     }
 
     return DefWindowProc(hWnd, message, wParam, lParam);
