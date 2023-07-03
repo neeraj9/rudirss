@@ -156,6 +156,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h" />
+    <ClInclude Include="include\MainWindow.h" />
     <ClInclude Include="include\WindowHandle.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="rudirss.h" />
@@ -163,6 +164,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="rudirss.cpp" />
+    <ClCompile Include="source\MainWindow.cpp" />
     <ClCompile Include="source\WindowHandle.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

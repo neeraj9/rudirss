@@ -13,10 +13,10 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Header Files\Window">
+    <Filter Include="Header Files\include">
       <UniqueIdentifier>{44e46ea8-0360-4bd2-ab4c-e93c9aa39ea1}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Window">
+    <Filter Include="Source Files\source">
       <UniqueIdentifier>{933901c4-b50d-4984-88cd-816dbd39714f}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -47,7 +47,10 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\WindowHandle.h">
-      <Filter>Header Files\Window</Filter>
+      <Filter>Header Files\include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\MainWindow.h">
+      <Filter>Header Files\include</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -55,7 +58,10 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="source\WindowHandle.cpp">
-      <Filter>Source Files\Window</Filter>
+      <Filter>Source Files\source</Filter>
+    </ClCompile>
+    <ClCompile Include="source\MainWindow.cpp">
+      <Filter>Source Files\source</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
