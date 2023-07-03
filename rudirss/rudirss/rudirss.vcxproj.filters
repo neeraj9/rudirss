@@ -55,6 +55,9 @@
     <ClInclude Include="include\RudiRSSMainWindow.h">
       <Filter>Header Files\include</Filter>
     </ClInclude>
+    <ClInclude Include="include\Viewer.h">
+      <Filter>Header Files\include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="rudirss.cpp">
@@ -69,5 +72,11 @@
     <ClCompile Include="source\RudiRSSMainWindow.cpp">
       <Filter>Source Files\source</Filter>
     </ClCompile>
+    <ClCompile Include="source\Viewer.cpp">
+      <Filter>Source Files\source</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>

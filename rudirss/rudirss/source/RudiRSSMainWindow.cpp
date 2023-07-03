@@ -1,7 +1,25 @@
 #include "RudiRSSMainWindow.h"
 #include "Resource.h"
 
-RudiRSSMainWindow::RudiRSSMainWindow()
+#include <format>
+#include <vector>
+
+#if 0
+#include <wrl.h>
+#include <wil/com.h>
+// <IncludeHeader>
+// include WebView2 header
+#include "WebView2.h"
+
+using namespace Microsoft::WRL;
+
+static wil::com_ptr<ICoreWebView2Controller> webviewController;
+
+// Pointer to WebView window
+static wil::com_ptr<ICoreWebView2> webview;
+#endif
+
+RudiRSSMainWindow::RudiRSSMainWindow() : m_initViewer{ FALSE }
 {
 
 }
@@ -42,7 +60,20 @@ HWND RudiRSSMainWindow::Create()
 
     ShowWindow(hWnd, SW_SHOW);
     UpdateWindow(hWnd);
+
     return hWnd;
+}
+
+bool RudiRSSMainWindow::Initialize(HINSTANCE hInstance)
+{
+    bool result = false;
+    if (MainWindow::Initialize(hInstance))
+    {
+        InittializeControl();
+        result = true;
+    }
+
+    return result;
 }
 
 LRESULT RudiRSSMainWindow::OnProcessMessage(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
@@ -51,9 +82,8 @@ LRESULT RudiRSSMainWindow::OnProcessMessage(HWND hWnd, UINT message, WPARAM wPar
     {
     case WM_COMMAND:
     {
-        return DefWindowProc(hWnd, message, wParam, lParam);
+        return OnCommand(hWnd, message, wParam, lParam);
     }
-    break;
 
     case WM_PAINT:
     {
@@ -64,6 +94,10 @@ LRESULT RudiRSSMainWindow::OnProcessMessage(HWND hWnd, UINT message, WPARAM wPar
     }
     break;
 
+    case WM_SIZE:
+        UpdateControl();
+        break;
+
     case WM_DESTROY:
         PostQuitMessage(0);
         break;
@@ -73,4 +107,90 @@ LRESULT RudiRSSMainWindow::OnProcessMessage(HWND hWnd, UINT message, WPARAM wPar
     }
 
     return 0;
+}
+
+void RudiRSSMainWindow::InittializeControl()
+{
+    RECT rc{};
+    GetClientRect(m_hWnd, &rc);
+    LONG width = rc.right - rc.left;
+    LONG height = rc.bottom - rc.top;
+
+    m_feedListBox.Attach(CreateWindowExW(WS_EX_CLIENTEDGE,
+        L"LISTBOX", NULL, WS_CHILD | WS_VISIBLE | WS_VSCROLL | ES_AUTOVSCROLL | LBS_NOTIFY,
+        0, 0, 300, height, m_hWnd, (HMENU)IDC_FEED_LIST, m_hInstance, NULL));
+
+    RECT viewerRect{};
+    memcpy(&viewerRect, &rc, sizeof(rc));
+    viewerRect.left = 310;
+    HRESULT result = m_viewer.Initialize(m_hWnd, viewerRect, [&]() {
+        InterlockedExchange(reinterpret_cast<LONG*>(&m_initViewer), TRUE);
+        });
+
+    std::vector<std::wstring> text = { L"https://www.bing.com/", L"https://github.com/FarGroup/FarManager"};
+    for (const auto& item : text)
+    {
+        int pos = (int)SendMessage(m_feedListBox.m_hWnd, LB_ADDSTRING, 0,
+            (LPARAM)item.c_str());
+    }
+    SendMessage(m_feedListBox.m_hWnd, LB_SETCURSEL, 0, 0);
+}
+
+void RudiRSSMainWindow::UpdateControl()
+{
+    if (!m_hWnd)
+        return;
+
+    RECT rc{};
+    GetClientRect(m_hWnd, &rc);
+    LONG width = rc.right - rc.left;
+    LONG height = rc.bottom - rc.top;
+
+    if (m_feedListBox.m_hWnd)
+    {
+        MoveWindow(m_feedListBox.m_hWnd, 0, 0, 300, height, FALSE);
+    }
+
+    if (InterlockedOr(reinterpret_cast<LONG*>(&m_initViewer), 0))
+    {
+        rc.left = 310;
+        rc.top = 0;
+        m_viewer.MoveWindow(rc);
+    }
+}
+
+LRESULT RudiRSSMainWindow::OnCommand(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+    switch (LOWORD(wParam))
+    {
+    case IDC_FEED_LIST:
+    {
+        switch (HIWORD(wParam))
+        {
+        case LBN_SELCHANGE:
+        {
+            if (InterlockedOr(reinterpret_cast<LONG*>(&m_initViewer), 0))
+            {
+                int itemIdx = (int)SendMessage(m_feedListBox.m_hWnd, LB_GETCURSEL, 0, 0);
+
+                std::vector<WCHAR> sel(512, 0);
+                auto len = SendMessage(m_feedListBox.m_hWnd, LB_GETTEXT, itemIdx, (LPARAM)sel.data());
+                std::wstring selItem(sel.data(), len);
+                m_viewer.Navigate(selItem);
+            }
+        }
+        break;
+
+        default:
+            break;
+        }
+
+        break;
+    }
+
+    default:
+        break;
+    }
+
+    return DefWindowProc(hWnd, message, wParam, lParam);
 }

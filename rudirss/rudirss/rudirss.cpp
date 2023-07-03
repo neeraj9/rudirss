@@ -15,6 +15,5 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
     RudiRSSMainWindow mainWindow;
     mainWindow.Initialize(hInstance);
-
     return static_cast<int>(mainWindow.MessageLoop());
 }
