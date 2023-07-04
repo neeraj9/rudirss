@@ -4,6 +4,7 @@
 #include "AtomFeed.h"
 
 #include <stdexcept>
+#include <rpcdce.h>
 
 using namespace FeedCommon;
 
@@ -158,19 +159,23 @@ std::unique_ptr<Feed> FeedCommon::CreateFeed(const std::wstring& xmlString)
     return feed;
 }
 
-#if 0
-template<typename T>
-std::unique_ptr<T> FeedCommon::CreateFeedTask(const char *rawFeedData, size_t size)
+std::wstring FeedCommon::GetUUID()
 {
-    if (!rawFeedData || 0 == size)
-        return {};
+    std::wstring sUUID;
+    do
+    {
+        UUID uuid{};
+        if (RPC_S_OK != UuidCreate(&uuid))
+            break;
 
-    return std::make_unique<T>(rawFeedData, size);
+        RPC_WSTR uuidString{};
+        if (RPC_S_OK != UuidToString(&uuid, &uuidString))
+            break;
+
+        sUUID.assign((wchar_t*)uuidString, wcslen((wchar_t*)uuidString));
+        RpcStringFree(&uuidString);
+    } while (0);
+
+    return sUUID;
 }
 
-template<typename T>
-void FeedCommon::DestroyFeedTask(std::unique_ptr<T>& feedTask)
-{
-    feedTask.reset();
-}
-#endif

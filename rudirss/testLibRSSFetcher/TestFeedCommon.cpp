@@ -217,5 +217,10 @@ TEST(TestFeedCommon, TestCreateFeedTask)
         std::cout << e.what() << std::endl;
         ASSERT_FALSE(true);
     }
+}
 
+TEST(TestFeedCommon, TestGetUUID)
+{
+    std::wstring UUID = FeedCommon::GetUUID();
+    ASSERT_TRUE(!UUID.empty());
 }

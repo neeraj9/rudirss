@@ -46,4 +46,6 @@ namespace FeedCommon
     {
         feedTask.reset();
     }
+
+    std::wstring GetUUID();
 };
