@@ -98,27 +98,27 @@ void RudiRSSMainWindow::InittializeControl()
 {
     RECT rc{};
     GetClientRect(m_hWnd, &rc);
-    LONG width = rc.right - rc.left;
     LONG height = rc.bottom - rc.top;
+    LONG viewerX = 0;
 
-    m_feedListBox.Attach(CreateWindowExW(WS_EX_CLIENTEDGE,
+    m_feedListBox.Attach(CreateWindowExW(WS_EX_STATICEDGE,//WS_EX_CLIENTEDGE,
         L"LISTBOX", NULL, WS_CHILD | WS_VISIBLE | WS_VSCROLL | ES_AUTOVSCROLL | LBS_NOTIFY,
         0, 0, 300, height, m_hWnd, (HMENU)IDC_FEED_LIST, m_hInstance, NULL));
+    GetClientRect(m_feedListBox.m_hWnd, &rc);
+    viewerX += rc.right - rc.left;
+
+    m_feedTitleListBox.Attach(CreateWindowExW(WS_EX_STATICEDGE,//WS_EX_CLIENTEDGE,
+        L"LISTBOX", NULL, WS_CHILD | WS_VISIBLE | WS_VSCROLL | ES_AUTOVSCROLL | LBS_NOTIFY,
+        rc.right + 1, 0, 300, height, m_hWnd, (HMENU)IDC_FEED_TITLE_LIST, m_hInstance, NULL));
+    GetClientRect(m_feedTitleListBox.m_hWnd, &rc);
+    viewerX += rc.right - rc.left;
 
     RECT viewerRect{};
-    memcpy(&viewerRect, &rc, sizeof(rc));
-    viewerRect.left = 310;
+    GetClientRect(m_hWnd, &viewerRect);
+    viewerRect.left = viewerX + 1;
     HRESULT result = m_viewer.Initialize(m_hWnd, viewerRect, [&]() {
         InterlockedExchange(reinterpret_cast<LONG*>(&m_initViewer), TRUE);
         });
-
-    std::vector<std::wstring> text = { L"https://www.bing.com/", L"https://github.com/FarGroup/FarManager"};
-    for (const auto& item : text)
-    {
-        int pos = (int)SendMessage(m_feedListBox.m_hWnd, LB_ADDSTRING, 0,
-            (LPARAM)item.c_str());
-    }
-    SendMessage(m_feedListBox.m_hWnd, LB_SETCURSEL, 0, 0);
 }
 
 void RudiRSSMainWindow::UpdateControl()
@@ -126,22 +126,34 @@ void RudiRSSMainWindow::UpdateControl()
     if (!m_hWnd)
         return;
 
-    RECT rc{};
-    GetClientRect(m_hWnd, &rc);
-    LONG width = rc.right - rc.left;
-    LONG height = rc.bottom - rc.top;
-
-    if (m_feedListBox.m_hWnd)
+    do
     {
+        RECT rc{};
+        GetClientRect(m_hWnd, &rc);
+        LONG height = rc.bottom - rc.top;
+        LONG viewerX = 0;
+        if (!m_feedListBox.m_hWnd)
+            break;
+
         MoveWindow(m_feedListBox.m_hWnd, 0, 0, 300, height, FALSE);
-    }
+        GetClientRect(m_feedListBox.m_hWnd, &rc);
+        viewerX += rc.right - rc.left;
 
-    if (InterlockedOr(reinterpret_cast<LONG*>(&m_initViewer), 0))
-    {
-        rc.left = 310;
-        rc.top = 0;
-        m_viewer.MoveWindow(rc);
-    }
+        if (!m_feedTitleListBox.m_hWnd)
+            break;
+
+        MoveWindow(m_feedTitleListBox.m_hWnd, rc.right + 1, 0, 300, height, FALSE);
+        GetClientRect(m_feedTitleListBox.m_hWnd, &rc);
+        viewerX += rc.right - rc.left;
+
+        if (InterlockedOr(reinterpret_cast<LONG*>(&m_initViewer), 0))
+        {
+            RECT viewerRect{};
+            GetClientRect(m_hWnd, &viewerRect);
+            viewerRect.left = viewerX + 1;
+            m_viewer.MoveWindow(viewerRect);
+        }
+    } while (0);
 }
 
 LRESULT RudiRSSMainWindow::OnCommand(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)

@@ -11,6 +11,7 @@ protected:
     std::wstring m_title;
     std::wstring m_className;
     WindowHandle m_feedListBox;
+    WindowHandle m_feedTitleListBox;
     Viewer m_viewer;
     BOOL m_initViewer;
 
