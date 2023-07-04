@@ -1,12 +1,13 @@
 #include "RudiRSSMainWindow.h"
 #include "Resource.h"
+#include "FeedBase.h"
 
 #include <format>
 #include <vector>
 
 RudiRSSMainWindow::RudiRSSMainWindow() : m_initViewer{ FALSE }
 {
-
+    m_feedLock.Init();
 }
 
 RudiRSSMainWindow::~RudiRSSMainWindow()
@@ -55,6 +56,27 @@ bool RudiRSSMainWindow::Initialize(HINSTANCE hInstance)
     if (MainWindow::Initialize(hInstance))
     {
         InittializeControl();
+
+        m_rudiRSSClient.Initialize([&](const std::unique_ptr<Feed>& feed) {
+            if (!feed)
+                return;
+
+            FeedBase* feedBase = reinterpret_cast<FeedBase*>(feed.get());
+            SimpleFeed simpleFeed;
+            simpleFeed.feedInfo = feedBase->GetFeedInfo();
+            simpleFeed.feedData = feedBase->GetFeedData();
+            simpleFeed.spec = feedBase->GetSpec();
+            std::wstring title = feed->GetTitle();
+
+            {
+                ATL::CComCritSecLock lock(m_feedLock);
+                m_feeds.insert(std::pair<std::wstring, SimpleFeed>(title, std::move(simpleFeed)));
+            }
+
+            int pos = (int)SendMessage(m_feedListBox.m_hWnd, LB_ADDSTRING, 0,
+                (LPARAM)title.c_str());
+            });
+
         result = true;
     }
 
@@ -166,14 +188,68 @@ LRESULT RudiRSSMainWindow::OnCommand(HWND hWnd, UINT message, WPARAM wParam, LPA
         {
         case LBN_SELCHANGE:
         {
+            int itemIdx = (int)SendMessage(m_feedListBox.m_hWnd, LB_GETCURSEL, 0, 0);
+            std::vector<WCHAR> sel(512, 0);
+            auto len = SendMessage(m_feedListBox.m_hWnd, LB_GETTEXT, itemIdx, (LPARAM)sel.data());
+            std::wstring selItem(sel.data(), len);
+
+            {
+                ATL::CComCritSecLock lock(m_feedLock);
+                auto it = m_feeds.find(selItem);
+                if (it != m_feeds.end())
+                {
+                    SendMessage(m_feedTitleListBox.m_hWnd, LB_RESETCONTENT, 0, 0);
+                    for (const auto& feed : it->second.feedData)
+                    {
+                        int pos = (int)SendMessage(m_feedTitleListBox.m_hWnd, LB_ADDSTRING, 0,
+                            (LPARAM)feed.GetValue(L"title").c_str());
+                        SendMessage(m_feedTitleListBox.m_hWnd, LB_SETITEMDATA, pos, (LPARAM)(&feed));
+                    }
+                }
+            }
+        }
+        break;
+
+        default:
+            break;
+        }
+
+        break;
+    }
+
+    case IDC_FEED_TITLE_LIST:
+    {
+        switch (HIWORD(wParam))
+        {
+        case LBN_SELCHANGE:
+        {
             if (InterlockedOr(reinterpret_cast<LONG*>(&m_initViewer), 0))
             {
                 int itemIdx = (int)SendMessage(m_feedListBox.m_hWnd, LB_GETCURSEL, 0, 0);
-
                 std::vector<WCHAR> sel(512, 0);
                 auto len = SendMessage(m_feedListBox.m_hWnd, LB_GETTEXT, itemIdx, (LPARAM)sel.data());
                 std::wstring selItem(sel.data(), len);
-                m_viewer.Navigate(selItem);
+                FeedCommon::FeedSpecification spec = FeedCommon::FeedSpecification::None;
+                {
+                    ATL::CComCritSecLock lock(m_feedLock);
+                    auto it = m_feeds.find(selItem);
+                    if (it != m_feeds.end())
+                    {
+                        spec = it->second.spec;
+                    }
+                }
+
+                if (FeedCommon::FeedSpecification::None != spec)
+                {
+                    itemIdx = (int)SendMessage(m_feedTitleListBox.m_hWnd, LB_GETCURSEL, 0, 0);
+                    std::wstring link;
+                    {
+                        ATL::CComCritSecLock lock(m_feedLock);
+                        FeedData* feedData = (FeedData*)SendMessage(m_feedTitleListBox.m_hWnd, LB_GETITEMDATA, itemIdx, 0);
+                        link = feedData->GetValue(FeedCommon::FeedSpecification::RSS == spec? L"link": L"id");
+                    }
+                    m_viewer.Navigate(link);
+                }
             }
         }
         break;

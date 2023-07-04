@@ -157,6 +157,7 @@
   <ItemGroup>
     <ClInclude Include="framework.h" />
     <ClInclude Include="include\MainWindow.h" />
+    <ClInclude Include="include\RudiRSSClient.h" />
     <ClInclude Include="include\RudiRSSMainWindow.h" />
     <ClInclude Include="include\Viewer.h" />
     <ClInclude Include="include\WindowHandle.h" />
@@ -167,6 +168,7 @@
   <ItemGroup>
     <ClCompile Include="rudirss.cpp" />
     <ClCompile Include="source\MainWindow.cpp" />
+    <ClCompile Include="source\RudiRSSClient.cpp" />
     <ClCompile Include="source\RudiRSSMainWindow.cpp" />
     <ClCompile Include="source\Viewer.cpp" />
     <ClCompile Include="source\WindowHandle.cpp" />

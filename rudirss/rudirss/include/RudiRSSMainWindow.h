@@ -2,8 +2,12 @@
 
 #include "MainWindow.h"
 #include "Viewer.h"
+#include "RudiRSSClient.h"
+#include "FeedCommon.h"
 
 #include <string>
+#include <map>
+#include <atlcore.h>
 
 class RudiRSSMainWindow : public MainWindow
 {
@@ -14,6 +18,20 @@ protected:
     WindowHandle m_feedTitleListBox;
     Viewer m_viewer;
     BOOL m_initViewer;
+    RudiRSSClient m_rudiRSSClient;
+
+    struct SimpleFeed
+    {
+        FeedData feedInfo;
+        std::vector<FeedData> feedData;
+        FeedCommon::FeedSpecification spec;
+        SimpleFeed() : spec{FeedCommon::FeedSpecification::None} {}
+        SimpleFeed(const SimpleFeed& rhs) : feedInfo(rhs.feedInfo), feedData(rhs.feedData), spec{FeedCommon::FeedSpecification::None} {}
+        SimpleFeed(const SimpleFeed&& rhs) noexcept: feedInfo(std::move(rhs.feedInfo)), feedData(std::move(rhs.feedData)),
+            spec{ rhs.spec } {}
+    };
+    std::map<std::wstring, SimpleFeed> m_feeds;
+    ATL::CComCriticalSection m_feedLock;
 
     virtual void OnRegister(WNDCLASSEXW& wcex);
     virtual HWND Create();

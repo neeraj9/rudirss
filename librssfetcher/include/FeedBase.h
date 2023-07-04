@@ -39,5 +39,8 @@ public:
 
     void SetSpec(FeedSpecification spec) { m_spec = spec; }
     FeedSpecification GetSpec() const { return m_spec; }
+
+    const std::vector<FeedData>& GetFeedData() const { return m_feeds; }
+    const FeedData& GetFeedInfo() const { return m_feedInfo; }
 };
 

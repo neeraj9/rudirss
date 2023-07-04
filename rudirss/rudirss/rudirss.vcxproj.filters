@@ -58,6 +58,9 @@
     <ClInclude Include="include\Viewer.h">
       <Filter>Header Files\include</Filter>
     </ClInclude>
+    <ClInclude Include="include\RudiRSSClient.h">
+      <Filter>Header Files\include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="rudirss.cpp">
@@ -75,8 +78,14 @@
     <ClCompile Include="source\Viewer.cpp">
       <Filter>Source Files\source</Filter>
     </ClCompile>
+    <ClCompile Include="source\RudiRSSClient.cpp">
+      <Filter>Source Files\source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="$(MSBuildThisFileDirectory)..\..\natvis\wil.natvis" />
   </ItemGroup>
 </Project>
