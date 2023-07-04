@@ -141,6 +141,14 @@ void RudiRSSMainWindow::InittializeControl()
     HRESULT result = m_viewer.Initialize(m_hWnd, viewerRect, [&]() {
         InterlockedExchange(reinterpret_cast<LONG*>(&m_initViewer), TRUE);
         });
+
+    LOGFONT font{};
+    SystemParametersInfo(SPI_GETICONTITLELOGFONT, sizeof(font), &font, 0);
+    HFONT newFont = CreateFont(font.lfHeight, font.lfWidth, font.lfEscapement, font.lfOrientation, font.lfWeight, font.lfItalic, font.lfUnderline, font.lfStrikeOut,
+        font.lfCharSet, font.lfOutPrecision, font.lfClipPrecision, font.lfQuality, font.lfPitchAndFamily, font.lfFaceName);
+
+    SendMessage(m_feedListBox.m_hWnd, WM_SETFONT, WPARAM(newFont), TRUE);
+    SendMessage(m_feedTitleListBox.m_hWnd, WM_SETFONT, WPARAM(newFont), TRUE);
 }
 
 void RudiRSSMainWindow::UpdateControl()
@@ -189,9 +197,9 @@ LRESULT RudiRSSMainWindow::OnCommand(HWND hWnd, UINT message, WPARAM wParam, LPA
         case LBN_SELCHANGE:
         {
             int itemIdx = (int)SendMessage(m_feedListBox.m_hWnd, LB_GETCURSEL, 0, 0);
-            std::vector<WCHAR> sel(512, 0);
-            auto len = SendMessage(m_feedListBox.m_hWnd, LB_GETTEXT, itemIdx, (LPARAM)sel.data());
-            std::wstring selItem(sel.data(), len);
+            auto len = (int)SendMessage(m_feedListBox.m_hWnd, LB_GETTEXTLEN, itemIdx, 0);
+            std::wstring selItem(len, 0);
+            SendMessage(m_feedListBox.m_hWnd, LB_GETTEXT, itemIdx, (LPARAM)selItem.data());
 
             {
                 ATL::CComCritSecLock lock(m_feedLock);
@@ -226,29 +234,21 @@ LRESULT RudiRSSMainWindow::OnCommand(HWND hWnd, UINT message, WPARAM wParam, LPA
             if (InterlockedOr(reinterpret_cast<LONG*>(&m_initViewer), 0))
             {
                 int itemIdx = (int)SendMessage(m_feedListBox.m_hWnd, LB_GETCURSEL, 0, 0);
-                std::vector<WCHAR> sel(512, 0);
-                auto len = SendMessage(m_feedListBox.m_hWnd, LB_GETTEXT, itemIdx, (LPARAM)sel.data());
-                std::wstring selItem(sel.data(), len);
-                FeedCommon::FeedSpecification spec = FeedCommon::FeedSpecification::None;
+                auto len = (int)SendMessage(m_feedListBox.m_hWnd, LB_GETTEXTLEN, itemIdx, 0);
+                std::wstring selItem(len, 0);
+                SendMessage(m_feedListBox.m_hWnd, LB_GETTEXT, itemIdx, (LPARAM)selItem.data());
+
                 {
                     ATL::CComCritSecLock lock(m_feedLock);
                     auto it = m_feeds.find(selItem);
                     if (it != m_feeds.end())
                     {
-                        spec = it->second.spec;
-                    }
-                }
-
-                if (FeedCommon::FeedSpecification::None != spec)
-                {
-                    itemIdx = (int)SendMessage(m_feedTitleListBox.m_hWnd, LB_GETCURSEL, 0, 0);
-                    std::wstring link;
-                    {
-                        ATL::CComCritSecLock lock(m_feedLock);
+                        FeedCommon::FeedSpecification spec = it->second.spec;
+                        itemIdx = (int)SendMessage(m_feedTitleListBox.m_hWnd, LB_GETCURSEL, 0, 0);
                         FeedData* feedData = (FeedData*)SendMessage(m_feedTitleListBox.m_hWnd, LB_GETITEMDATA, itemIdx, 0);
-                        link = feedData->GetValue(FeedCommon::FeedSpecification::RSS == spec? L"link": L"id");
+                        std::wstring link = feedData->GetValue(FeedCommon::FeedSpecification::RSS == spec ? L"link" : L"id");
+                        m_viewer.Navigate(link);
                     }
-                    m_viewer.Navigate(link);
                 }
             }
         }

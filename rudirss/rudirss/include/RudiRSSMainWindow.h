@@ -26,8 +26,7 @@ protected:
         std::vector<FeedData> feedData;
         FeedCommon::FeedSpecification spec;
         SimpleFeed() : spec{FeedCommon::FeedSpecification::None} {}
-        SimpleFeed(const SimpleFeed& rhs) : feedInfo(rhs.feedInfo), feedData(rhs.feedData), spec{FeedCommon::FeedSpecification::None} {}
-        SimpleFeed(const SimpleFeed&& rhs) noexcept: feedInfo(std::move(rhs.feedInfo)), feedData(std::move(rhs.feedData)),
+        SimpleFeed(SimpleFeed&& rhs) noexcept: feedInfo(std::move(rhs.feedInfo)), feedData(std::move(rhs.feedData)),
             spec{ rhs.spec } {}
     };
     std::map<std::wstring, SimpleFeed> m_feeds;
