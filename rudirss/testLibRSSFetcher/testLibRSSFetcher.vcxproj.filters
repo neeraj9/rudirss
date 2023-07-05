@@ -32,6 +32,9 @@
     <ClCompile Include="TestFeedWorker.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="TestFeedDatabase.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />

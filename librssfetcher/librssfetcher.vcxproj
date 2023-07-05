@@ -24,6 +24,7 @@
     <ClInclude Include="include\FeedBase.h" />
     <ClInclude Include="include\FeedClient.h" />
     <ClInclude Include="include\FeedData.h" />
+    <ClInclude Include="include\FeedDatabase.h" />
     <ClInclude Include="include\FeedElement.h" />
     <ClInclude Include="include\FeedCommon.h" />
     <ClInclude Include="include\FeedFetcher.h" />
@@ -33,6 +34,8 @@
     <ClInclude Include="include\FetchUnit.h" />
     <ClInclude Include="include\HttpGetRequest.h" />
     <ClInclude Include="include\RSSFeed.h" />
+    <ClInclude Include="include\SQLite3Handle.h" />
+    <ClInclude Include="include\SQLite3StmtHandle.h" />
     <ClInclude Include="include\Task.h" />
     <ClInclude Include="include\Worker.h" />
   </ItemGroup>
@@ -41,6 +44,7 @@
     <ClCompile Include="source\FeedBase.cpp" />
     <ClCompile Include="source\FeedClient.cpp" />
     <ClCompile Include="source\FeedCommon.cpp" />
+    <ClCompile Include="source\FeedDatabase.cpp" />
     <ClCompile Include="source\FeedFetcher.cpp" />
     <ClCompile Include="source\FeedTask.cpp" />
     <ClCompile Include="source\FeedWorker.cpp" />
@@ -172,7 +176,7 @@
     </PreBuildEvent>
     <Lib>
       <AdditionalLibraryDirectories>$(SolutionDir)..\module\libWinHTTP\libWinHTTP\$(Platform)\$(Configuration);$(SolutionDir)..\module\libmsxml\libmsxml\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>libWinHTTP.lib;libmsxml.lib;Rpcrt4.lib</AdditionalDependencies>
+      <AdditionalDependencies>libWinHTTP.lib;libmsxml.lib;Rpcrt4.lib;winsqlite3.lib</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
