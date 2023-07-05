@@ -7,7 +7,6 @@
 
 RudiRSSMainWindow::RudiRSSMainWindow() : m_initViewer{ FALSE }
 {
-    m_feedLock.Init();
 }
 
 RudiRSSMainWindow::~RudiRSSMainWindow()
@@ -57,24 +56,10 @@ bool RudiRSSMainWindow::Initialize(HINSTANCE hInstance)
     {
         InittializeControl();
 
-        m_rudiRSSClient.Initialize([&](const std::unique_ptr<Feed>& feed) {
-            if (!feed)
-                return;
-
-            FeedBase* feedBase = reinterpret_cast<FeedBase*>(feed.get());
-            SimpleFeed simpleFeed;
-            simpleFeed.feedInfo = feedBase->GetFeedInfo();
-            simpleFeed.feedData = feedBase->GetFeedData();
-            simpleFeed.spec = feedBase->GetSpec();
-            std::wstring title = feed->GetTitle();
-
-            {
-                ATL::CComCritSecLock lock(m_feedLock);
-                m_feeds.insert(std::pair<std::wstring, SimpleFeed>(title, std::move(simpleFeed)));
-            }
-
+        m_rudiRSSClient.Initialize([&](const LONG_PTR feedId, const std::unique_ptr<Feed>& feed) {
             int pos = (int)SendMessage(m_feedListBox.m_hWnd, LB_ADDSTRING, 0,
-                (LPARAM)title.c_str());
+                (LPARAM)feed->GetTitle().c_str());
+            SendMessage(m_feedListBox.m_hWnd, LB_SETITEMDATA, pos, (LPARAM)feedId);
             });
 
         result = true;
@@ -192,72 +177,13 @@ LRESULT RudiRSSMainWindow::OnCommand(HWND hWnd, UINT message, WPARAM wParam, LPA
     {
     case IDC_FEED_LIST:
     {
-        switch (HIWORD(wParam))
-        {
-        case LBN_SELCHANGE:
-        {
-            int itemIdx = (int)SendMessage(m_feedListBox.m_hWnd, LB_GETCURSEL, 0, 0);
-            auto len = (int)SendMessage(m_feedListBox.m_hWnd, LB_GETTEXTLEN, itemIdx, 0);
-            std::wstring selItem(len, 0);
-            SendMessage(m_feedListBox.m_hWnd, LB_GETTEXT, itemIdx, (LPARAM)selItem.data());
-
-            {
-                ATL::CComCritSecLock lock(m_feedLock);
-                auto it = m_feeds.find(selItem);
-                if (it != m_feeds.end())
-                {
-                    SendMessage(m_feedTitleListBox.m_hWnd, LB_RESETCONTENT, 0, 0);
-                    for (const auto& feed : it->second.feedData)
-                    {
-                        int pos = (int)SendMessage(m_feedTitleListBox.m_hWnd, LB_ADDSTRING, 0,
-                            (LPARAM)feed.GetValue(L"title").c_str());
-                        SendMessage(m_feedTitleListBox.m_hWnd, LB_SETITEMDATA, pos, (LPARAM)(&feed));
-                    }
-                }
-            }
-        }
-        break;
-
-        default:
-            break;
-        }
-
+        OnProcessFeedList(hWnd, message, wParam, lParam);
         break;
     }
 
     case IDC_FEED_TITLE_LIST:
     {
-        switch (HIWORD(wParam))
-        {
-        case LBN_SELCHANGE:
-        {
-            if (InterlockedOr(reinterpret_cast<LONG*>(&m_initViewer), 0))
-            {
-                int itemIdx = (int)SendMessage(m_feedListBox.m_hWnd, LB_GETCURSEL, 0, 0);
-                auto len = (int)SendMessage(m_feedListBox.m_hWnd, LB_GETTEXTLEN, itemIdx, 0);
-                std::wstring selItem(len, 0);
-                SendMessage(m_feedListBox.m_hWnd, LB_GETTEXT, itemIdx, (LPARAM)selItem.data());
-
-                {
-                    ATL::CComCritSecLock lock(m_feedLock);
-                    auto it = m_feeds.find(selItem);
-                    if (it != m_feeds.end())
-                    {
-                        FeedCommon::FeedSpecification spec = it->second.spec;
-                        itemIdx = (int)SendMessage(m_feedTitleListBox.m_hWnd, LB_GETCURSEL, 0, 0);
-                        FeedData* feedData = (FeedData*)SendMessage(m_feedTitleListBox.m_hWnd, LB_GETITEMDATA, itemIdx, 0);
-                        std::wstring link = feedData->GetValue(FeedCommon::FeedSpecification::RSS == spec ? L"link" : L"id");
-                        m_viewer.Navigate(link);
-                    }
-                }
-            }
-        }
-        break;
-
-        default:
-            break;
-        }
-
+        OnProcessFeedTitleList(hWnd, message, wParam, lParam);
         break;
     }
 
@@ -266,4 +192,63 @@ LRESULT RudiRSSMainWindow::OnCommand(HWND hWnd, UINT message, WPARAM wParam, LPA
     }
 
     return DefWindowProc(hWnd, message, wParam, lParam);
+}
+
+void RudiRSSMainWindow::OnProcessFeedList(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+    switch (HIWORD(wParam))
+    {
+    case LBN_SELCHANGE:
+    {
+        int itemIdx = (int)SendMessage(m_feedListBox.m_hWnd, LB_GETCURSEL, 0, 0);
+        LONG_PTR feedId = (LONG_PTR)SendMessage(m_feedListBox.m_hWnd, LB_GETITEMDATA, itemIdx, 0);
+
+        m_rudiRSSClient.QueryFeedContainer(feedId, [&](const RudiRSSClient::FeedContainer* feedContainer) {
+            if (feedContainer)
+            {
+                SendMessage(m_feedTitleListBox.m_hWnd, LB_RESETCONTENT, 0, 0);
+                for (size_t feedDataId = 0; feedDataId < feedContainer->feedData.size(); feedDataId++)
+                {
+                    const auto& feed = feedContainer->feedData[feedDataId];
+                    int pos = (int)SendMessage(m_feedTitleListBox.m_hWnd, LB_ADDSTRING, 0,
+                        (LPARAM)feed.GetValue(L"title").c_str());
+                    SendMessage(m_feedTitleListBox.m_hWnd, LB_SETITEMDATA, pos, (LPARAM)feedDataId);
+                }
+            }
+            });
+    }
+    break;
+
+    default:
+        break;
+    }
+}
+void RudiRSSMainWindow::OnProcessFeedTitleList(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+    switch (HIWORD(wParam))
+    {
+    case LBN_SELCHANGE:
+    {
+        if (InterlockedOr(reinterpret_cast<LONG*>(&m_initViewer), 0))
+        {
+            int itemIdx = (int)SendMessage(m_feedListBox.m_hWnd, LB_GETCURSEL, 0, 0);
+            LONG_PTR feedId = (LONG_PTR)SendMessage(m_feedListBox.m_hWnd, LB_GETITEMDATA, itemIdx, 0);
+            itemIdx = (int)SendMessage(m_feedTitleListBox.m_hWnd, LB_GETCURSEL, 0, 0);
+            LONG_PTR feedDataId = (LONG_PTR)SendMessage(m_feedTitleListBox.m_hWnd, LB_GETITEMDATA, itemIdx, 0);
+
+            m_rudiRSSClient.QueryFeedData(feedId, feedDataId, [&](const RudiRSSClient::FeedContainer* feedContainer, const FeedData* feedData) {
+                if (feedData)
+                {
+                    auto spec = feedContainer->spec;
+                    std::wstring link = feedData->GetValue(FeedCommon::FeedSpecification::RSS == spec ? L"link" : L"id");
+                    m_viewer.Navigate(link);
+                }
+                });
+        }
+    }
+    break;
+
+    default:
+        break;
+    }
 }

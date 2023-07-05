@@ -6,7 +6,7 @@
 #include "FeedCommon.h"
 
 #include <string>
-#include <map>
+#include <list>
 #include <atlcore.h>
 
 class RudiRSSMainWindow : public MainWindow
@@ -20,18 +20,6 @@ protected:
     BOOL m_initViewer;
     RudiRSSClient m_rudiRSSClient;
 
-    struct SimpleFeed
-    {
-        FeedData feedInfo;
-        std::vector<FeedData> feedData;
-        FeedCommon::FeedSpecification spec;
-        SimpleFeed() : spec{FeedCommon::FeedSpecification::None} {}
-        SimpleFeed(SimpleFeed&& rhs) noexcept: feedInfo(std::move(rhs.feedInfo)), feedData(std::move(rhs.feedData)),
-            spec{ rhs.spec } {}
-    };
-    std::map<std::wstring, SimpleFeed> m_feeds;
-    ATL::CComCriticalSection m_feedLock;
-
     virtual void OnRegister(WNDCLASSEXW& wcex);
     virtual HWND Create();
     virtual LRESULT OnProcessMessage(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
@@ -40,6 +28,8 @@ protected:
     void UpdateControl();
 
     virtual LRESULT OnCommand(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
+    void OnProcessFeedList(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
+    void OnProcessFeedTitleList(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
 public:
     RudiRSSMainWindow();
