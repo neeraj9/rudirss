@@ -3,15 +3,15 @@
 
 TEST(TestTimerCase, TestPeriodTimer)
 {
-    Timer timerPrint;
+    Timer timer;
 
     int cnt = 0;
-    timerPrint.Create([](PVOID param, BOOLEAN timerOrWaitFired) {
+    timer.Create([](PVOID param, BOOLEAN timerOrWaitFired) {
         int *pCnt = reinterpret_cast<int*>(param);
         (*pCnt)++;
         }, &cnt, 0, 1000, WT_EXECUTEDEFAULT);
 
     Sleep(6000);
-    timerPrint.Delete();
+    timer.Delete();
     ASSERT_TRUE(cnt >= 5);
 }
