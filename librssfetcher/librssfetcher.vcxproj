@@ -37,6 +37,7 @@
     <ClInclude Include="include\SQLite3Handle.h" />
     <ClInclude Include="include\SQLite3StmtHandle.h" />
     <ClInclude Include="include\Task.h" />
+    <ClInclude Include="include\Timer.h" />
     <ClInclude Include="include\Worker.h" />
   </ItemGroup>
   <ItemGroup>
@@ -50,6 +51,7 @@
     <ClCompile Include="source\FeedWorker.cpp" />
     <ClCompile Include="source\FetchUnit.cpp" />
     <ClCompile Include="source\RSSFeed.cpp" />
+    <ClCompile Include="source\Timer.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
