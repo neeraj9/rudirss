@@ -6,6 +6,7 @@
 #include <string>
 #include <time.h>
 #include <functional>
+#include <atlcore.h>
 
 class FeedDatabase
 {
@@ -14,9 +15,12 @@ protected:
     SQLite3StmtHandle m_insertFeedStmt;
     SQLite3StmtHandle m_insertFeedDataStmt;
     SQLite3StmtHandle m_queryFeedStmt;
-    SQLite3StmtHandle m_queryFeedDataStmt;
+    SQLite3StmtHandle m_queryAllFeedsStmt;
+    SQLite3StmtHandle m_queryFeedDataByGuidStmt;
+    SQLite3StmtHandle m_queryFeedDataByFeedDataIdStmt;
     SQLite3StmtHandle m_deleteAllFeedStmt;
     SQLite3StmtHandle m_deleteAllFeedDataStmt;
+    ATL::CComCriticalSection m_dbLock;
 
 public:
     FeedDatabase();
@@ -28,15 +32,30 @@ public:
 
     struct Feed
     {
+        long long feedid;
         std::string guid;
         std::string url;
-        Feed() {}
-        Feed(const Feed& rhs) : guid{ rhs.guid }, url{ rhs.url } {}
-        Feed(Feed&& rhs) noexcept: guid{ std::move(rhs.guid) }, url{ std::move(rhs.url) } {}
+        std::string title;
+        Feed() : feedid{ 0 } {}
+        Feed(const Feed& rhs) : feedid{ rhs.feedid }, guid{ rhs.guid }, url{ rhs.url }, title{ rhs.title } {}
+        Feed(Feed&& rhs) noexcept : feedid{ rhs.feedid }, guid{ std::move(rhs.guid) }, url{ std::move(rhs.url) }, title{ rhs.title } {}
+        Feed& operator=(Feed&& rhs) noexcept
+        {
+            if (this != &rhs)
+            {
+                feedid = rhs.feedid;
+                guid = std::move(rhs.guid);
+                url = std::move(rhs.url);
+                title = std::move(rhs.title);
+            }
+
+            return *this;
+        }
     };
 
     struct FeedData
     {
+        long long feeddataid;
         std::string guid;
         std::string feedguid;
         std::string link;
@@ -46,22 +65,61 @@ public:
         time_t createdtime;
         std::string tag;
         std::string misc;
-        FeedData() : timestamp{ 0 }, createdtime{ 0 } {}
-        FeedData(const FeedData& rhs) : guid{ rhs.guid }, feedguid{ rhs.feedguid }, link{ rhs.link }, title{ rhs.title },
+        FeedData() : feeddataid{ 0 }, timestamp{ 0 }, createdtime{ 0 } {}
+        FeedData(const FeedData& rhs) : feeddataid{ rhs.feeddataid }, guid{ rhs.guid }, feedguid{ rhs.feedguid }, link{ rhs.link }, title{ rhs.title },
             datetime{ rhs.datetime }, timestamp{ rhs.timestamp }, createdtime{ rhs.createdtime }, tag{ rhs.tag },
             misc{ rhs.misc } {}
-        FeedData(FeedData&& rhs) noexcept: guid{ std::move(rhs.guid) }, feedguid{ std::move(rhs.feedguid) }, link{ std::move(rhs.link) },
-            title{ std::move(rhs.title) }, datetime{ std::move(rhs.datetime) }, timestamp{ rhs.timestamp }, createdtime{ rhs.createdtime },
-            tag{ std::move(rhs.tag) }, misc{ std::move(rhs.misc) } {}
+        FeedData(FeedData&& rhs) noexcept : feeddataid{ rhs.feeddataid }, guid{ std::move(rhs.guid) }, feedguid{ std::move(rhs.feedguid) },
+            link{ std::move(rhs.link) }, title{ std::move(rhs.title) }, datetime{ std::move(rhs.datetime) }, timestamp{ rhs.timestamp },
+            createdtime{ rhs.createdtime }, tag{ std::move(rhs.tag) }, misc{ std::move(rhs.misc) } {}
+        FeedData& operator=(FeedData&& rhs) noexcept
+        {
+            if (this != &rhs)
+            {
+                feeddataid = rhs.feeddataid;
+                guid = std::move(rhs.guid);
+                feedguid = std::move(rhs.feedguid);
+                link = std::move(rhs.link);
+                title = std::move(rhs.title);
+                datetime = std::move(rhs.datetime);
+                timestamp = rhs.timestamp;
+                createdtime = rhs.createdtime;
+                tag = std::move(rhs.tag);
+                misc = std::move(rhs.misc);
+            }
+
+            return *this;
+        }
     };
 
-    bool InsertFeed(const Feed &feed);
-    bool InsertFeedData(const FeedData &feedData);
+    struct FeedConsumptionUnit
+    {
+        Feed feed;
+        std::vector<FeedData> feedDataContainer;
+        FeedConsumptionUnit() {}
+        FeedConsumptionUnit(const FeedConsumptionUnit& rhs) :feed{ rhs.feed }, feedDataContainer{ rhs.feedDataContainer } {}
+        FeedConsumptionUnit(FeedConsumptionUnit&& rhs) noexcept :feed{ std::move(rhs.feed) }, feedDataContainer{ std::move(rhs.feedDataContainer) } {}
+        FeedConsumptionUnit& operator=(FeedConsumptionUnit&& rhs) noexcept
+        {
+            if (this != &rhs)
+            {
+                feed = std::move(rhs.feed);
+                feedDataContainer = std::move(rhs.feedDataContainer);
+            }
+
+            return *this;
+        }
+    };
+
+    bool InsertFeed(const Feed& feed);
+    bool InsertFeedData(const FeedData& feedData);
 
     using FN_QUERY_FEED = std::function<void(const Feed&)>;
     using FN_QUERY_FEED_DATA = std::function<void(const FeedData&)>;
+    bool QueryFeed(long long feedId, FN_QUERY_FEED fnQueryFeed);
     bool QueryAllFeeds(FN_QUERY_FEED fnQueryFeed);
-    bool QueryFeedData(const std::string &guid, FN_QUERY_FEED_DATA fnQueryFeedData);
+    bool QueryFeedData(const std::string& guid, FN_QUERY_FEED_DATA fnQueryFeedData);
+    bool QueryFeedData(long long feeddataid, FN_QUERY_FEED_DATA fnQueryFeedData);
     bool DeleteAllFeeds();
     bool DeleteAllFeedData();
 };

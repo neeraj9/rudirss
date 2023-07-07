@@ -29,6 +29,7 @@ TEST(TestFeedDatabaseCase, TestDBOperations)
         FeedDatabase::Feed feed;
         feed.guid = sGUID;
         feed.url = url;
+        feed.title = "test title";
         auto result = feedDatabase.InsertFeed(feed);
         ASSERT_TRUE(result);
 
@@ -39,7 +40,7 @@ TEST(TestFeedDatabaseCase, TestDBOperations)
         for (const auto& link : links)
         {
             FeedDatabase::FeedData feedData;
-            feedData.guid = link;;
+            feedData.guid = link;
             feedData.feedguid = sGUID;
             feedData.link = link;
             feedData.title = title;

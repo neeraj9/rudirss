@@ -2,9 +2,11 @@
 
 #include "FeedClient.h"
 #include "FeedCommon.h"
+#include "FeedDatabase.h"
 
 #include <functional>
 #include <vector>
+#include <queue>
 
 class RudiRSSClient : public FeedClient
 {
@@ -12,28 +14,27 @@ public:
     RudiRSSClient();
     virtual ~RudiRSSClient();
 
-    struct FeedContainer
-    {
-        FeedData feedInfo;
-        std::vector<FeedData> feedData;
-        FeedCommon::FeedSpecification spec;
-        FeedContainer() : spec{FeedCommon::FeedSpecification::None} {}
-        FeedContainer(const FeedContainer& rhs) = delete;
-        FeedContainer(FeedContainer&& rhs) noexcept: feedInfo(std::move(rhs.feedInfo)), feedData(std::move(rhs.feedData)),
-            spec{ rhs.spec } {}
-    };
-
-    using FN_ON_FEED_READY = std::function<void(const LONG_PTR, const std::unique_ptr<Feed>&)>;
-    bool Initialize(FN_ON_FEED_READY fnOnFeedReady);
-    void QueryFeedContainer(const LONG_PTR feedId, std::function<void(const FeedContainer*)> fnQuery);
-    void QueryFeedData(const LONG_PTR feedId, const LONG_PTR feedDataId, std::function<void(const FeedContainer*, const FeedData*)> fnQuery);
+    virtual bool Initialize();
+    bool QueryFeed(long long feedId, FeedDatabase::FN_QUERY_FEED fnQueryFeed);
+    bool QueryAllFeeds(FeedDatabase::FN_QUERY_FEED fnQueryFeed);
+    bool QueryFeedData(const std::string& guid, FeedDatabase::FN_QUERY_FEED_DATA fnQueryFeedData);
+    bool QueryFeedData(long long feeddataid, FeedDatabase::FN_QUERY_FEED_DATA fnQueryFeedData);
 
 protected:
-    FN_ON_FEED_READY m_fnOnFeedReady;
-
-    std::vector<FeedContainer> m_feedCollection;
-    ATL::CComCriticalSection m_feedLock;
+    static const size_t DEFAULT_MAX_CONSUMPTION_COUNT = 32768;
+    FeedDatabase m_db;
+    ATL::CComCriticalSection m_dbLock;
+    HANDLE m_dbSemaphore;
+    HANDLE m_dbStopEvent;
+    HANDLE m_dbConsumptionThread;
+    std::queue<FeedDatabase::FeedConsumptionUnit> m_dbQueue;
 
     virtual void OnFeedReady(const std::unique_ptr<Feed>& feed);
 
+    static unsigned __stdcall ThreadDBConsumption(void* param);
+    void StartDBConsumption();
+    void StopDBConsumption();
+    void PushDBConsumptionUnit(const std::unique_ptr<Feed>& feed);
+    bool PopDBConsumptionUnit(FeedDatabase::FeedConsumptionUnit &consumptionUnit);
+    void DBConsumption();
 };

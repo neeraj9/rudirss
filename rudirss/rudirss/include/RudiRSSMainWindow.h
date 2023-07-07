@@ -31,6 +31,8 @@ protected:
     void OnProcessFeedList(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
     void OnProcessFeedTitleList(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
+    void EnableWindow(BOOL enable);
+
 public:
     RudiRSSMainWindow();
     virtual ~RudiRSSMainWindow();
