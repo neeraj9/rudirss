@@ -20,14 +20,17 @@ bool FeedClient::Initialize()
         {
             m_feedFetcher.Initialize([&](const FetchUnit* fetchUnit, bool result, DWORD statusCode, const char* data, size_t size,
                 const WINHTTP_ASYNC_RESULT* asyncResult) {
-                    auto feedTask = FeedCommon::CreateFeedTask<FeedTask>(data, size);
-                    feedTask->SetFeedUrl(fetchUnit->FeedUrl());
-                    PushTask(std::move(feedTask));
+                    if (result)
+                    {
+                        auto feedTask = FeedCommon::CreateFeedTask<FeedTask>(data, size);
+                        feedTask->SetFeedUrl(fetchUnit->FeedUrl());
+                        PushTask(std::move(feedTask));
 
-                    // Pass worker type instead of passing task pointer here, and maintain task queue ourselves because IOCP's internal queue
-                    // can't be controlled outside. The main goal of task queue is to easily know whether queue is empty and to prevent the operation from
-                    // memory leak in IOCP queue when the thread pool is shutdown and some tasks still remain in IOCP queue.
-                    m_threardPool.QueueRequest(static_cast<Worker::RequestType>(FeedWorker::Type::Feed));
+                        // Pass worker type instead of passing task pointer here, and maintain task queue ourselves because IOCP's internal queue
+                        // can't be controlled outside. The main goal of task queue is to easily know whether queue is empty and to prevent the operation from
+                        // memory leak in IOCP queue when the thread pool is shutdown and some tasks still remain in IOCP queue.
+                        m_threardPool.QueueRequest(static_cast<Worker::RequestType>(FeedWorker::Type::Feed));
+                    }
                 });
 
             m_feedFetcher.StartFetchRoutine();

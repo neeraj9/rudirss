@@ -36,7 +36,6 @@ void FetchUnit::Fetch(const void *userParam, const WinHttpSession &session, cons
         }, [&](const void* userParam, bool result, DWORD statusCode) {
             m_onFetchComplete(userParam, result, statusCode, m_data.data(), m_data.size(), nullptr);
         }, [&](const void* userParam, const WINHTTP_ASYNC_RESULT* asyncResult) {
-            m_onFetchComplete(userParam, false, 0, nullptr, 0, asyncResult);
         });
     if (!result)
         throw std::runtime_error("Error: SendRequest failed.");
