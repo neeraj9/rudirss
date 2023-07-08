@@ -39,6 +39,9 @@ protected:
     std::queue<FeedDatabase::FeedConsumptionUnit> m_dbQueue;
     Timer m_refreshFeedTimer;
     TimerParameter m_timerParam;
+    std::wstring m_rudirssDirectory;
+    std::wstring m_rudirssIni;
+    std::wstring m_rudirssDbPath;
 
     virtual void OnFeedReady(const std::unique_ptr<Feed>& feed);
 

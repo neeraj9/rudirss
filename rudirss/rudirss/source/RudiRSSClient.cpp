@@ -10,6 +10,13 @@ RudiRSSClient::RudiRSSClient() : m_dbSemaphore{ nullptr }, m_dbStopEvent{ nullpt
     m_dbLock.Init();
     m_dbSemaphore = CreateSemaphore(nullptr, 0, DEFAULT_MAX_CONSUMPTION_COUNT, nullptr);
     m_dbStopEvent = CreateEvent(nullptr, TRUE, FALSE, nullptr);
+
+    WCHAR appDataDir[MAX_PATH]{};
+    SHGetSpecialFolderPath(NULL, appDataDir, CSIDL_APPDATA, FALSE);
+    m_rudirssDirectory = std::wstring(appDataDir) + L"\\rudirss";
+    CreateDirectory(m_rudirssDirectory.c_str(), nullptr);
+    m_rudirssIni = m_rudirssDirectory + L"\\rudirss.ini";
+    m_rudirssDbPath = m_rudirssDirectory + L"\\rudirss.db";
 }
 
 RudiRSSClient::~RudiRSSClient()
@@ -25,13 +32,10 @@ bool RudiRSSClient::Initialize()
 {
     try
     {
-        WCHAR appDataDir[MAX_PATH]{};
-        SHGetSpecialFolderPath(NULL, appDataDir, CSIDL_APPDATA, FALSE);
-        std::wstring dbPath = std::wstring(appDataDir) + L"\\rudirss.db";
-        m_db.Open(dbPath);
+        m_db.Open(m_rudirssDbPath);
         m_db.Initialize();
     }
-    catch (const std::exception &e)
+    catch (const std::exception& e)
     {
         return false;
     }
@@ -167,7 +171,7 @@ bool RudiRSSClient::InitializeRefreshFeedTimer(FN_ON_REFRESH_FEEDS_COMPLETE fnOn
     m_timerParam.fnOnRefreshFeedsComplete = fnOnRefreshFeedsComplete;
     m_timerParam.rudiRSSClient = this;
     m_refreshFeedTimer.Create([](PVOID param, BOOLEAN timerOrWaitFired) {
-        TimerParameter *timerParam = reinterpret_cast<TimerParameter*>(param);
+        TimerParameter* timerParam = reinterpret_cast<TimerParameter*>(param);
         RudiRSSClient* rudiRSSClient = timerParam->rudiRSSClient;
 
 #if 0
@@ -178,7 +182,7 @@ bool RudiRSSClient::InitializeRefreshFeedTimer(FN_ON_REFRESH_FEEDS_COMPLETE fnOn
             });
 #endif
 
-        }, & m_timerParam, dueTime, period, WT_EXECUTEDEFAULT);
+}, &m_timerParam, dueTime, period, WT_EXECUTEDEFAULT);
 
     return false;
 }
