@@ -21,6 +21,7 @@ bool FeedClient::Initialize()
             m_feedFetcher.Initialize([&](const FetchUnit* fetchUnit, bool result, DWORD statusCode, const char* data, size_t size,
                 const WINHTTP_ASYNC_RESULT* asyncResult) {
                     auto feedTask = FeedCommon::CreateFeedTask<FeedTask>(data, size);
+                    feedTask->SetFeedUrl(fetchUnit->FeedUrl());
                     PushTask(std::move(feedTask));
 
                     // Pass worker type instead of passing task pointer here, and maintain task queue ourselves because IOCP's internal queue

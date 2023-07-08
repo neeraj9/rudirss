@@ -16,6 +16,7 @@ protected:
     FeedData m_feedInfo;
     std::vector<FeedData> m_feeds;
     FeedSpecification m_spec;
+    std::wstring m_feedUrl;
 
 public:
     FeedBase();
@@ -42,5 +43,8 @@ public:
 
     const std::vector<FeedData>& GetFeedData() const { return m_feeds; }
     const FeedData& GetFeedInfo() const { return m_feedInfo; }
+
+    void SetFeedUrl(const std::wstring& feedUrl) { m_feedUrl = feedUrl; }
+    const std::wstring GetFeedUrl() const { return m_feedUrl; }
 };
 

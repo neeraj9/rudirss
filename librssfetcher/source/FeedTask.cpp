@@ -1,6 +1,7 @@
 #include "FeedTask.h"
 #include "FeedCommon.h"
 #include "FeedClient.h"
+#include "FeedBase.h"
 
 FeedTask::FeedTask(const char *rawFeedData, size_t size): m_rawFeedData(rawFeedData, size)
 {
@@ -19,6 +20,8 @@ void FeedTask::DoTask(void* param, OVERLAPPED* overlapped)
         try
         {
             auto feed = FeedCommon::CreateFeed(wsRawFeedData);
+            auto feedBase = reinterpret_cast<FeedBase*>(feed.get());
+            feedBase->SetFeedUrl(m_feedUrl);
             auto feedClient = reinterpret_cast<FeedClient*>(param);
             feedClient->OnFeedReady(feed);
         }

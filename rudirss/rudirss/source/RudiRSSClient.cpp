@@ -14,6 +14,7 @@ RudiRSSClient::RudiRSSClient() : m_dbSemaphore{ nullptr }, m_dbStopEvent{ nullpt
 
 RudiRSSClient::~RudiRSSClient()
 {
+    m_refreshFeedTimer.Delete();
     StopDBConsumption();
 
     CloseHandle(m_dbSemaphore);
@@ -103,7 +104,7 @@ void RudiRSSClient::PushDBConsumptionUnit(const std::unique_ptr<Feed>& feed)
     FeedBase* feedBase = reinterpret_cast<FeedBase*>(feed.get());
     auto spec = feedBase->GetSpec();
     FeedDatabase::FeedConsumptionUnit consumptionUnit;
-    FeedCommon::ConvertWideStringToString(feed->GetValue(FeedCommon::FeedSpecification::RSS == spec ? L"link" : L"id"), consumptionUnit.feed.guid);
+    FeedCommon::ConvertWideStringToString(feedBase->GetFeedUrl(), consumptionUnit.feed.guid);
     consumptionUnit.feed.url = consumptionUnit.feed.guid;
     FeedCommon::ConvertWideStringToString(feed->GetValue(L"title"), consumptionUnit.feed.title);
 
@@ -161,3 +162,23 @@ bool RudiRSSClient::QueryFeedData(long long feeddataid, FeedDatabase::FN_QUERY_F
     return m_db.QueryFeedData(feeddataid, fnQueryFeedData);
 }
 
+bool RudiRSSClient::InitializeRefreshFeedTimer(FN_ON_REFRESH_FEEDS_COMPLETE fnOnRefreshFeedsComplete, DWORD dueTime, DWORD period)
+{
+    m_timerParam.fnOnRefreshFeedsComplete = fnOnRefreshFeedsComplete;
+    m_timerParam.rudiRSSClient = this;
+    m_refreshFeedTimer.Create([](PVOID param, BOOLEAN timerOrWaitFired) {
+        TimerParameter *timerParam = reinterpret_cast<TimerParameter*>(param);
+        RudiRSSClient* rudiRSSClient = timerParam->rudiRSSClient;
+
+#if 0
+        rudiRSSClient->QueryAllFeeds([&](const FeedDatabase::Feed& feed) {
+            std::wstring url;
+            FeedCommon::ConvertStringToWideString(feed.url, url);
+            rudiRSSClient->ConsumeFeed(url);
+            });
+#endif
+
+        }, & m_timerParam, dueTime, period, WT_EXECUTEDEFAULT);
+
+    return false;
+}
