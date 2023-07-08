@@ -27,7 +27,25 @@ public:
         FN_ON_REFRESH_FEEDS_COMPLETE fnOnRefreshFeedsComplete;
         RudiRSSClient* rudiRSSClient;
     };
-    bool InitializeRefreshFeedTimer(FN_ON_REFRESH_FEEDS_COMPLETE fnOnRefreshFeedsComplete, DWORD dueTime, DWORD period);
+    void InitializeRefreshFeedTimer(FN_ON_REFRESH_FEEDS_COMPLETE fnOnRefreshFeedsComplete, DWORD dueTime, DWORD period);
+
+    struct Configuration
+    {
+        std::vector<std::wstring> feedUrls;
+        Configuration() {}
+        Configuration(const Configuration& rhs) : feedUrls{ rhs.feedUrls } {}
+        Configuration(Configuration&& rhs) noexcept: feedUrls{ std::move(rhs.feedUrls) } {}
+        Configuration& operator=(Configuration&& rhs) noexcept
+        {
+            if (this != &rhs)
+            {
+                feedUrls = std::move(rhs.feedUrls);
+            }
+
+            return *this;
+        }
+    };
+    bool LoadConfig(Configuration &config);
 
 protected:
     static const size_t DEFAULT_MAX_CONSUMPTION_COUNT = 32768;

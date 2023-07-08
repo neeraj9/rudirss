@@ -4,6 +4,7 @@
 
 #include <userenv.h>
 #include <shlobj_core.h>
+#include <format>
 
 RudiRSSClient::RudiRSSClient() : m_dbSemaphore{ nullptr }, m_dbStopEvent{ nullptr }, m_dbConsumptionThread{ nullptr }
 {
@@ -34,6 +35,9 @@ bool RudiRSSClient::Initialize()
     {
         m_db.Open(m_rudirssDbPath);
         m_db.Initialize();
+
+        InitializeRefreshFeedTimer([&]() {
+            }, 0, 1800 * 1000);
     }
     catch (const std::exception& e)
     {
@@ -166,7 +170,7 @@ bool RudiRSSClient::QueryFeedData(long long feeddataid, FeedDatabase::FN_QUERY_F
     return m_db.QueryFeedData(feeddataid, fnQueryFeedData);
 }
 
-bool RudiRSSClient::InitializeRefreshFeedTimer(FN_ON_REFRESH_FEEDS_COMPLETE fnOnRefreshFeedsComplete, DWORD dueTime, DWORD period)
+void RudiRSSClient::InitializeRefreshFeedTimer(FN_ON_REFRESH_FEEDS_COMPLETE fnOnRefreshFeedsComplete, DWORD dueTime, DWORD period)
 {
     m_timerParam.fnOnRefreshFeedsComplete = fnOnRefreshFeedsComplete;
     m_timerParam.rudiRSSClient = this;
@@ -174,15 +178,28 @@ bool RudiRSSClient::InitializeRefreshFeedTimer(FN_ON_REFRESH_FEEDS_COMPLETE fnOn
         TimerParameter* timerParam = reinterpret_cast<TimerParameter*>(param);
         RudiRSSClient* rudiRSSClient = timerParam->rudiRSSClient;
 
-#if 0
-        rudiRSSClient->QueryAllFeeds([&](const FeedDatabase::Feed& feed) {
-            std::wstring url;
-            FeedCommon::ConvertStringToWideString(feed.url, url);
-            rudiRSSClient->ConsumeFeed(url);
-            });
-#endif
+        RudiRSSClient::Configuration config;
+        if (rudiRSSClient->LoadConfig(config))
+        {
+            for (const auto& feedUrl : config.feedUrls)
+            {
+                rudiRSSClient->ConsumeFeed(feedUrl);
+            }
+        }
 
-}, &m_timerParam, dueTime, period, WT_EXECUTEDEFAULT);
+        }, & m_timerParam, dueTime, period, WT_EXECUTEDEFAULT);
+}
 
-    return false;
+bool RudiRSSClient::LoadConfig(Configuration& config)
+{
+    config.feedUrls.clear();
+    std::vector<WCHAR> data(2048, 0);
+    int feedCount = GetPrivateProfileInt(L"Feed", L"Count", 0, m_rudirssIni.c_str());
+    for (int c = 0; c < feedCount; c++)
+    {
+        DWORD size = GetPrivateProfileString(L"Feed", std::format(L"Feed_{}", c).c_str(), L"", data.data(), data.size(), m_rudirssIni.c_str());
+        config.feedUrls.push_back(std::wstring(data.data(), size));
+    }
+
+    return !config.feedUrls.empty();
 }
