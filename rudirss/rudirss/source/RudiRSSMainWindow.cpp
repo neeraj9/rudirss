@@ -56,8 +56,10 @@ bool RudiRSSMainWindow::Initialize(HINSTANCE hInstance)
     {
         InittializeControl();
 
-        EnableWindow(FALSE);
         m_rudiRSSClient.Initialize();
+
+#if 1
+        EnableWindow(FALSE);
         result = m_rudiRSSClient.QueryAllFeeds([&](const FeedDatabase::Feed& feed) {
             std::wstring title;
             FeedCommon::ConvertStringToWideString(feed.title, title);
@@ -66,6 +68,9 @@ bool RudiRSSMainWindow::Initialize(HINSTANCE hInstance)
             SendMessage(m_feedListBox.m_hWnd, LB_SETITEMDATA, pos, (LPARAM)feed.feedid);
             });
         EnableWindow(TRUE);
+#endif
+
+        m_rudiRSSClient.StartRefreshFeedTimer(0, 1800 * 1000);
     }
 
     return result;

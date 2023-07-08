@@ -94,15 +94,25 @@ public:
 
     struct FeedConsumptionUnit
     {
+        enum class OperationType
+        {
+            INSERT_DATA,
+            NOTIFY_INSERTION_COMPLETE,
+        };
+
+        OperationType opType;
         Feed feed;
         std::vector<FeedData> feedDataContainer;
-        FeedConsumptionUnit() {}
-        FeedConsumptionUnit(const FeedConsumptionUnit& rhs) :feed{ rhs.feed }, feedDataContainer{ rhs.feedDataContainer } {}
-        FeedConsumptionUnit(FeedConsumptionUnit&& rhs) noexcept :feed{ std::move(rhs.feed) }, feedDataContainer{ std::move(rhs.feedDataContainer) } {}
+        FeedConsumptionUnit() : opType{ OperationType::INSERT_DATA } {}
+        FeedConsumptionUnit(const FeedConsumptionUnit& rhs) :opType{ rhs.opType }, feed{ rhs.feed },
+            feedDataContainer{ rhs.feedDataContainer } {}
+        FeedConsumptionUnit(FeedConsumptionUnit&& rhs) noexcept :opType{ rhs.opType }, feed{ std::move(rhs.feed) },
+            feedDataContainer{ std::move(rhs.feedDataContainer) } {}
         FeedConsumptionUnit& operator=(FeedConsumptionUnit&& rhs) noexcept
         {
             if (this != &rhs)
             {
+                opType = rhs.opType;
                 feed = std::move(rhs.feed);
                 feedDataContainer = std::move(rhs.feedDataContainer);
             }

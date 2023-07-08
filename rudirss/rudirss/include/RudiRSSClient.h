@@ -15,19 +15,15 @@ public:
     RudiRSSClient();
     virtual ~RudiRSSClient();
 
+    using FN_ON_REFRESH_FEED_COMPLETE = std::function<void(const FeedDatabase::Feed& feed)>;
     virtual bool Initialize();
     bool QueryFeed(long long feedId, FeedDatabase::FN_QUERY_FEED fnQueryFeed);
     bool QueryAllFeeds(FeedDatabase::FN_QUERY_FEED fnQueryFeed);
     bool QueryFeedData(const std::string& guid, FeedDatabase::FN_QUERY_FEED_DATA fnQueryFeedData);
     bool QueryFeedData(long long feeddataid, FeedDatabase::FN_QUERY_FEED_DATA fnQueryFeedData);
 
-    using FN_ON_REFRESH_FEEDS_COMPLETE = std::function<void()>;
-    struct TimerParameter
-    {
-        FN_ON_REFRESH_FEEDS_COMPLETE fnOnRefreshFeedsComplete;
-        RudiRSSClient* rudiRSSClient;
-    };
-    void InitializeRefreshFeedTimer(FN_ON_REFRESH_FEEDS_COMPLETE fnOnRefreshFeedsComplete, DWORD dueTime, DWORD period);
+    using FN_ON_FEES_REFRESH_COMPLETE = std::function<void()>;
+    void StartRefreshFeedTimer(DWORD dueTime, DWORD period);
 
     struct Configuration
     {
@@ -56,7 +52,6 @@ protected:
     HANDLE m_dbConsumptionThread;
     std::queue<FeedDatabase::FeedConsumptionUnit> m_dbQueue;
     Timer m_refreshFeedTimer;
-    TimerParameter m_timerParam;
     std::wstring m_rudirssDirectory;
     std::wstring m_rudirssIni;
     std::wstring m_rudirssDbPath;
@@ -67,6 +62,7 @@ protected:
     void StartDBConsumption();
     void StopDBConsumption();
     void PushDBConsumptionUnit(const std::unique_ptr<Feed>& feed);
+    void PushDBNotifyInsertionCompleteEvent();
     bool PopDBConsumptionUnit(FeedDatabase::FeedConsumptionUnit &consumptionUnit);
     void DBConsumption();
 };
