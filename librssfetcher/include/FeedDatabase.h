@@ -15,6 +15,7 @@ protected:
     SQLite3StmtHandle m_insertFeedStmt;
     SQLite3StmtHandle m_insertFeedDataStmt;
     SQLite3StmtHandle m_queryFeedStmt;
+    SQLite3StmtHandle m_queryFeedByGuidStmt;
     SQLite3StmtHandle m_queryAllFeedsStmt;
     SQLite3StmtHandle m_queryFeedDataByGuidStmt;
     SQLite3StmtHandle m_queryFeedDataByFeedDataIdStmt;
@@ -127,6 +128,7 @@ public:
     using FN_QUERY_FEED = std::function<void(const Feed&)>;
     using FN_QUERY_FEED_DATA = std::function<void(const FeedData&)>;
     bool QueryFeed(long long feedId, FN_QUERY_FEED fnQueryFeed);
+    bool QueryFeed(const std::string &guid, FN_QUERY_FEED fnQueryFeed);
     bool QueryAllFeeds(FN_QUERY_FEED fnQueryFeed);
     bool QueryFeedData(const std::string& guid, FN_QUERY_FEED_DATA fnQueryFeedData);
     bool QueryFeedData(long long feeddataid, FN_QUERY_FEED_DATA fnQueryFeedData);

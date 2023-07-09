@@ -46,6 +46,11 @@ void FeedDatabase::Initialize()
     if (0 != ret)
         throw std::runtime_error("Error: cannot prepare query statement for feed.");
 
+    stmt = "SELECT * FROM Feed WHERE guid = ?";
+    ret = sqlite3_prepare_v2(m_sql.m_handle, stmt.c_str(), stmt.length(), &m_queryFeedByGuidStmt.m_handle, nullptr);
+    if (0 != ret)
+        throw std::runtime_error("Error: cannot prepare query statement for feed by guid.");
+
     stmt = "SELECT * FROM Feed";
     ret = sqlite3_prepare_v2(m_sql.m_handle, stmt.c_str(), stmt.length(), &m_queryAllFeedsStmt.m_handle, nullptr);
     if (0 != ret)
@@ -54,12 +59,12 @@ void FeedDatabase::Initialize()
     stmt = "SELECT * FROM FeedData WHERE feedguid = ?";
     ret = sqlite3_prepare_v2(m_sql.m_handle, stmt.c_str(), stmt.length(), &m_queryFeedDataByGuidStmt.m_handle, nullptr);
     if (0 != ret)
-        throw std::runtime_error("Error: cannot prepare query statement for feed data.");
+        throw std::runtime_error("Error: cannot prepare query statement for feed data by guid.");
 
     stmt = "SELECT * FROM FeedData WHERE feeddataid = ?";
     ret = sqlite3_prepare_v2(m_sql.m_handle, stmt.c_str(), stmt.length(), &m_queryFeedDataByFeedDataIdStmt.m_handle, nullptr);
     if (0 != ret)
-        throw std::runtime_error("Error: cannot prepare query statement for feed data.");
+        throw std::runtime_error("Error: cannot prepare query statement for feed data by feeddataid.");
 
     stmt = "DELETE FROM Feed";
     ret = sqlite3_prepare_v2(m_sql.m_handle, stmt.c_str(), stmt.length(), &m_deleteAllFeedStmt.m_handle, nullptr);
@@ -77,6 +82,7 @@ void FeedDatabase::Close()
     m_insertFeedStmt.Close();
     m_insertFeedDataStmt.Close();
     m_queryFeedStmt.Close();
+    m_queryFeedByGuidStmt.Close();
     m_queryAllFeedsStmt.Close();
     m_queryFeedDataByGuidStmt.Close();
     m_queryFeedDataByFeedDataIdStmt.Close();
@@ -146,6 +152,32 @@ bool FeedDatabase::QueryFeed(long long feedId, FN_QUERY_FEED fnQueryFeed)
             fnQueryFeed(feed);
         }
         sqlite3_reset(m_queryFeedStmt.m_handle);
+    }
+
+    return SQLITE_DONE == ret;
+}
+
+bool FeedDatabase::QueryFeed(const std::string& guid, FN_QUERY_FEED fnQueryFeed)
+{
+    ATL::CComCritSecLock lock(m_dbLock);
+    if (!m_queryFeedByGuidStmt.m_handle
+        || !fnQueryFeed)
+        return false;
+
+    int ret = SQLITE_OK;
+    if (SQLITE_OK == (ret = sqlite3_bind_text(m_queryFeedByGuidStmt.m_handle, 1, guid.c_str(), guid.length(), nullptr)))
+    {
+        Feed feed;
+        while (SQLITE_ROW == (ret = sqlite3_step(m_queryFeedByGuidStmt.m_handle)))
+        {
+            int col = 0;
+            feed.feedid = sqlite3_column_int64(m_queryFeedByGuidStmt.m_handle, col++);
+            feed.guid = (const char*)sqlite3_column_text(m_queryFeedByGuidStmt.m_handle, col++);
+            feed.url = (const char*)sqlite3_column_text(m_queryFeedByGuidStmt.m_handle, col++);
+            feed.title = (const char*)sqlite3_column_text(m_queryFeedByGuidStmt.m_handle, col++);
+            fnQueryFeed(feed);
+        }
+        sqlite3_reset(m_queryFeedByGuidStmt.m_handle);
     }
 
     return SQLITE_DONE == ret;

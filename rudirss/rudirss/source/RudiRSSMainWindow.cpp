@@ -56,9 +56,9 @@ bool RudiRSSMainWindow::Initialize(HINSTANCE hInstance)
     {
         InittializeControl();
 
-        m_rudiRSSClient.Initialize();
+        result = m_rudiRSSClient.Initialize();
 
-#if 1
+#if 0
         EnableWindow(FALSE);
         result = m_rudiRSSClient.QueryAllFeeds([&](const FeedDatabase::Feed& feed) {
             std::wstring title;
@@ -69,8 +69,23 @@ bool RudiRSSMainWindow::Initialize(HINSTANCE hInstance)
             });
         EnableWindow(TRUE);
 #endif
-
-        m_rudiRSSClient.StartRefreshFeedTimer(0, 1800 * 1000);
+        if (result)
+        {
+            m_rudiRSSClient.StartRefreshFeedTimer(0, 1800 * 1000, [&](const FeedDatabase::FeedConsumptionUnit& consumptionUnit) {
+                if (FeedDatabase::FeedConsumptionUnit::OperationType::NOTIFY_INSERTION_COMPLETE == consumptionUnit.opType)
+                {
+                    EnableWindow(FALSE);
+                    m_rudiRSSClient.QueryFeed(consumptionUnit.feed.guid, [&](const FeedDatabase::Feed& feed) {
+                        std::wstring title;
+                        FeedCommon::ConvertStringToWideString(feed.title, title);
+                        int pos = (int)SendMessage(m_feedListBox.m_hWnd, LB_ADDSTRING, 0,
+                            (LPARAM)title.c_str());
+                        SendMessage(m_feedListBox.m_hWnd, LB_SETITEMDATA, pos, (LPARAM)feed.feedid);
+                        });
+                    EnableWindow(TRUE);
+                }
+                });
+        }
     }
 
     return result;

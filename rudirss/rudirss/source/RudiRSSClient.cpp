@@ -6,10 +6,14 @@
 #include <shlobj_core.h>
 #include <format>
 
-RudiRSSClient::RudiRSSClient() : m_dbSemaphore{ nullptr }, m_dbConsumptionThread{ nullptr }, m_runDbConsumption{ FALSE }
+RudiRSSClient::RudiRSSClient() : m_dbSemaphore{ nullptr }, m_dbConsumptionThread{ nullptr },
+m_runDbConsumption{ FALSE }, m_keepNotification{ FALSE }, m_dbNotificationThread{ nullptr }
 {
     m_dbLock.Init();
     m_dbSemaphore = CreateSemaphore(nullptr, 0, DEFAULT_MAX_CONSUMPTION_COUNT, nullptr);
+
+    m_notificationLock.Init();
+    m_notificationSemaphore = CreateSemaphore(nullptr, 0, DEFAULT_MAX_CONSUMPTION_COUNT, nullptr);
 
     WCHAR appDataDir[MAX_PATH]{};
     SHGetSpecialFolderPath(NULL, appDataDir, CSIDL_APPDATA, FALSE);
@@ -25,6 +29,7 @@ RudiRSSClient::~RudiRSSClient()
     StopDBConsumption();
 
     CloseHandle(m_dbSemaphore);
+    CloseHandle(m_notificationSemaphore);
 }
 
 bool RudiRSSClient::Initialize()
@@ -48,16 +53,25 @@ void RudiRSSClient::OnFeedReady(const std::unique_ptr<Feed>& feed)
 {
     if (feed)
         PushDBConsumptionUnit(feed);
+
+    NotifyDbInsertionComplete(feed);
 }
 
 unsigned __stdcall RudiRSSClient::ThreadDBConsumption(void* param)
 {
     auto pThis = reinterpret_cast<RudiRSSClient*>(param);
-    pThis->DBConsumption();
+    pThis->OnDBConsumption();
     return 0;
 }
 
-void RudiRSSClient::DBConsumption()
+unsigned __stdcall RudiRSSClient::ThreadDBNotification(void* param)
+{
+    auto pThis = reinterpret_cast<RudiRSSClient*>(param);
+    pThis->OnDBNotification();
+    return 0;
+}
+
+void RudiRSSClient::OnDBConsumption()
 {
     while (WAIT_OBJECT_0 == WaitForSingleObject(m_dbSemaphore, INFINITE))
     {
@@ -76,12 +90,42 @@ void RudiRSSClient::DBConsumption()
                 m_db.InsertFeedData(feedData);
             }
         }
+        else
+        {
+            ATL::CComCritSecLock lock(m_notificationLock);
+            m_notificationQueue.push(consumptionUnit);
+            ::ReleaseSemaphore(m_notificationSemaphore, 1, nullptr);
+        }
+    }
+}
+
+void RudiRSSClient::OnDBNotification()
+{
+    while (WAIT_OBJECT_0 == WaitForSingleObject(m_notificationSemaphore, INFINITE))
+    {
+        if (!InterlockedOr(reinterpret_cast<LONG*>(&m_keepNotification), 0))
+            break;
+        
+        ATL::CComCritSecLock lock(m_notificationLock);
+        if (!m_notificationQueue.empty())
+        {
+            auto consumptionUnit = m_notificationQueue.front();
+            m_notificationQueue.pop();
+            if (m_fnOnDbNotification)
+                m_fnOnDbNotification(consumptionUnit);
+        }
     }
 }
 
 void RudiRSSClient::StartDBConsumption()
 {
     StopDBConsumption();
+
+    if (!m_dbNotificationThread)
+    {
+        m_keepNotification = TRUE;
+        m_dbNotificationThread = (HANDLE)_beginthreadex(nullptr, 0, ThreadDBNotification, this, 0, nullptr);
+    }
 
     if (!m_dbConsumptionThread)
     {
@@ -92,6 +136,15 @@ void RudiRSSClient::StartDBConsumption()
 
 void RudiRSSClient::StopDBConsumption()
 {
+    if (m_dbNotificationThread)
+    {
+        InterlockedExchange(reinterpret_cast<unsigned long*>(&m_keepNotification), FALSE);
+        ::ReleaseSemaphore(m_notificationSemaphore, 1, nullptr);
+        WaitForSingleObject(m_dbNotificationThread, INFINITE);
+        CloseHandle(m_dbNotificationThread);
+        m_dbNotificationThread = nullptr;
+    }
+
     if (m_dbConsumptionThread)
     {
         InterlockedExchange(reinterpret_cast<unsigned long*>(&m_runDbConsumption), FALSE);
@@ -134,10 +187,12 @@ void RudiRSSClient::PushDBConsumptionUnit(const std::unique_ptr<Feed>& feed)
     ::ReleaseSemaphore(m_dbSemaphore, 1, nullptr);
 }
 
-void RudiRSSClient::PushDBNotifyInsertionCompleteEvent()
+void RudiRSSClient::NotifyDbInsertionComplete(const std::unique_ptr<Feed>& feed)
 {
     FeedDatabase::FeedConsumptionUnit consumptionUnit;
     consumptionUnit.opType = FeedDatabase::FeedConsumptionUnit::OperationType::NOTIFY_INSERTION_COMPLETE;
+    FeedBase* feedBase = reinterpret_cast<FeedBase*>(feed.get());
+    FeedCommon::ConvertWideStringToString(feedBase->GetFeedUrl(), consumptionUnit.feed.guid);
 
     {
         ATL::CComCritSecLock lock(m_dbLock);
@@ -163,6 +218,11 @@ bool RudiRSSClient::QueryFeed(long long feedId, FeedDatabase::FN_QUERY_FEED fnQu
     return m_db.QueryFeed(feedId, fnQueryFeed);
 }
 
+bool RudiRSSClient::QueryFeed(const std::string& guid, FeedDatabase::FN_QUERY_FEED fnQueryFeed)
+{
+    return m_db.QueryFeed(guid, fnQueryFeed);
+}
+
 bool RudiRSSClient::QueryAllFeeds(FeedDatabase::FN_QUERY_FEED fnQueryFeed)
 {
     return m_db.QueryAllFeeds(fnQueryFeed);
@@ -178,8 +238,9 @@ bool RudiRSSClient::QueryFeedData(long long feeddataid, FeedDatabase::FN_QUERY_F
     return m_db.QueryFeedData(feeddataid, fnQueryFeedData);
 }
 
-void RudiRSSClient::StartRefreshFeedTimer(DWORD dueTime, DWORD period)
+void RudiRSSClient::StartRefreshFeedTimer(DWORD dueTime, DWORD period, FN_ON_DB_NOTIFICATION fnOnDbNotification)
 {
+    m_fnOnDbNotification = fnOnDbNotification;
     m_refreshFeedTimer.Create([](PVOID param, BOOLEAN timerOrWaitFired) {
         RudiRSSClient* rudiRSSClient = reinterpret_cast<RudiRSSClient*>(param);
         RudiRSSClient::Configuration config;
@@ -207,3 +268,4 @@ bool RudiRSSClient::LoadConfig(Configuration& config)
 
     return !config.feedUrls.empty();
 }
+
