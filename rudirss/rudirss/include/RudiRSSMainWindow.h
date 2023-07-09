@@ -7,6 +7,7 @@
 
 #include <string>
 #include <list>
+#include <set>
 #include <atlcore.h>
 
 class RudiRSSMainWindow : public MainWindow
@@ -19,6 +20,8 @@ protected:
     Viewer m_viewer;
     BOOL m_initViewer;
     RudiRSSClient m_rudiRSSClient;
+    std::set<long long> m_feedIdSet;
+    ATL::CComCriticalSection m_feedListLock;
 
     virtual void OnRegister(WNDCLASSEXW& wcex);
     virtual HWND Create();
@@ -32,6 +35,10 @@ protected:
     void OnProcessFeedTitleList(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
     void EnableWindow(BOOL enable);
+
+    bool FeedIdExistInSet(long long feedid);
+    void InsertFeedIdIntoSet(long long feedid);
+    void ClearFeedIdSet();
 
 public:
     RudiRSSMainWindow();

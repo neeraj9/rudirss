@@ -7,6 +7,7 @@
 
 RudiRSSMainWindow::RudiRSSMainWindow() : m_initViewer{ FALSE }
 {
+    m_feedListLock.Init();
 }
 
 RudiRSSMainWindow::~RudiRSSMainWindow()
@@ -58,29 +59,34 @@ bool RudiRSSMainWindow::Initialize(HINSTANCE hInstance)
 
         result = m_rudiRSSClient.Initialize();
 
-#if 0
-        EnableWindow(FALSE);
-        result = m_rudiRSSClient.QueryAllFeeds([&](const FeedDatabase::Feed& feed) {
-            std::wstring title;
-            FeedCommon::ConvertStringToWideString(feed.title, title);
-            int pos = (int)SendMessage(m_feedListBox.m_hWnd, LB_ADDSTRING, 0,
-                (LPARAM)title.c_str());
-            SendMessage(m_feedListBox.m_hWnd, LB_SETITEMDATA, pos, (LPARAM)feed.feedid);
-            });
-        EnableWindow(TRUE);
-#endif
         if (result)
         {
+            ClearFeedIdSet();
+            EnableWindow(FALSE);
+            m_rudiRSSClient.QueryAllFeeds([&](const FeedDatabase::Feed& feed) {
+                InsertFeedIdIntoSet(feed.feedid);
+
+                std::wstring title;
+                FeedCommon::ConvertStringToWideString(feed.title, title);
+                int pos = (int)SendMessage(m_feedListBox.m_hWnd, LB_ADDSTRING, 0,
+                    (LPARAM)title.c_str());
+                SendMessage(m_feedListBox.m_hWnd, LB_SETITEMDATA, pos, (LPARAM)feed.feedid);
+                });
+            EnableWindow(TRUE);
+
             m_rudiRSSClient.StartRefreshFeedTimer(0, 1800 * 1000, [&](const FeedDatabase::FeedConsumptionUnit& consumptionUnit) {
                 if (FeedDatabase::FeedConsumptionUnit::OperationType::NOTIFY_INSERTION_COMPLETE == consumptionUnit.opType)
                 {
                     EnableWindow(FALSE);
                     m_rudiRSSClient.QueryFeed(consumptionUnit.feed.guid, [&](const FeedDatabase::Feed& feed) {
-                        std::wstring title;
-                        FeedCommon::ConvertStringToWideString(feed.title, title);
-                        int pos = (int)SendMessage(m_feedListBox.m_hWnd, LB_ADDSTRING, 0,
-                            (LPARAM)title.c_str());
-                        SendMessage(m_feedListBox.m_hWnd, LB_SETITEMDATA, pos, (LPARAM)feed.feedid);
+                        if (!FeedIdExistInSet(feed.feedid))
+                        {
+                            std::wstring title;
+                            FeedCommon::ConvertStringToWideString(feed.title, title);
+                            int pos = (int)SendMessage(m_feedListBox.m_hWnd, LB_ADDSTRING, 0,
+                                (LPARAM)title.c_str());
+                            SendMessage(m_feedListBox.m_hWnd, LB_SETITEMDATA, pos, (LPARAM)feed.feedid);
+                        }
                         });
                     EnableWindow(TRUE);
                 }
@@ -282,4 +288,23 @@ void RudiRSSMainWindow::EnableWindow(BOOL enable)
 {
     ::EnableWindow(m_feedListBox.m_hWnd, enable);
     ::EnableWindow(m_feedTitleListBox.m_hWnd, enable);
+}
+
+bool RudiRSSMainWindow::FeedIdExistInSet(long long feedid)
+{
+    ATL::CComCritSecLock lock(m_feedListLock);
+    return m_feedIdSet.end() != m_feedIdSet.find(feedid);
+}
+
+void RudiRSSMainWindow::InsertFeedIdIntoSet(long long feedid)
+{
+    ATL::CComCritSecLock lock(m_feedListLock);
+    m_feedIdSet.insert(feedid);
+}
+
+void RudiRSSMainWindow::ClearFeedIdSet()
+{
+    ATL::CComCritSecLock lock(m_feedListLock);
+    m_feedIdSet.clear();
+
 }

@@ -92,8 +92,10 @@ void RudiRSSClient::OnDBConsumption()
         }
         else
         {
-            ATL::CComCritSecLock lock(m_notificationLock);
-            m_notificationQueue.push(consumptionUnit);
+            {
+                ATL::CComCritSecLock lock(m_notificationLock);
+                m_notificationQueue.push(std::move(consumptionUnit));
+            }
             ::ReleaseSemaphore(m_notificationSemaphore, 1, nullptr);
         }
     }
