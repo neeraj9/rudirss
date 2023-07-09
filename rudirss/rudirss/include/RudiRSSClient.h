@@ -48,8 +48,8 @@ protected:
     FeedDatabase m_db;
     ATL::CComCriticalSection m_dbLock;
     HANDLE m_dbSemaphore;
-    HANDLE m_dbStopEvent;
     HANDLE m_dbConsumptionThread;
+    BOOL m_runDbConsumption;
     std::queue<FeedDatabase::FeedConsumptionUnit> m_dbQueue;
     Timer m_refreshFeedTimer;
     std::wstring m_rudirssDirectory;

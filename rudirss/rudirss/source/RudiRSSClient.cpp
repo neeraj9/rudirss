@@ -6,11 +6,10 @@
 #include <shlobj_core.h>
 #include <format>
 
-RudiRSSClient::RudiRSSClient() : m_dbSemaphore{ nullptr }, m_dbStopEvent{ nullptr }, m_dbConsumptionThread{ nullptr }
+RudiRSSClient::RudiRSSClient() : m_dbSemaphore{ nullptr }, m_dbConsumptionThread{ nullptr }, m_runDbConsumption{ FALSE }
 {
     m_dbLock.Init();
     m_dbSemaphore = CreateSemaphore(nullptr, 0, DEFAULT_MAX_CONSUMPTION_COUNT, nullptr);
-    m_dbStopEvent = CreateEvent(nullptr, TRUE, FALSE, nullptr);
 
     WCHAR appDataDir[MAX_PATH]{};
     SHGetSpecialFolderPath(NULL, appDataDir, CSIDL_APPDATA, FALSE);
@@ -26,7 +25,6 @@ RudiRSSClient::~RudiRSSClient()
     StopDBConsumption();
 
     CloseHandle(m_dbSemaphore);
-    CloseHandle(m_dbStopEvent);
 }
 
 bool RudiRSSClient::Initialize()
@@ -61,12 +59,11 @@ unsigned __stdcall RudiRSSClient::ThreadDBConsumption(void* param)
 
 void RudiRSSClient::DBConsumption()
 {
-    while (WAIT_OBJECT_0 != WaitForSingleObject(m_dbStopEvent, 0))
+    while (WAIT_OBJECT_0 == WaitForSingleObject(m_dbSemaphore, INFINITE))
     {
-        WaitForSingleObject(m_dbSemaphore, INFINITE);
-        if (WAIT_OBJECT_0 == WaitForSingleObject(m_dbStopEvent, 0))
+        if (!InterlockedOr(reinterpret_cast<LONG*>(&m_runDbConsumption), 0))
             break;
-
+        
         FeedDatabase::FeedConsumptionUnit consumptionUnit;
         if (!PopDBConsumptionUnit(consumptionUnit))
             continue;
@@ -86,9 +83,9 @@ void RudiRSSClient::StartDBConsumption()
 {
     StopDBConsumption();
 
-    ResetEvent(m_dbStopEvent);
     if (!m_dbConsumptionThread)
     {
+        m_runDbConsumption = TRUE;
         m_dbConsumptionThread = (HANDLE)_beginthreadex(nullptr, 0, ThreadDBConsumption, this, 0, nullptr);
     }
 }
@@ -97,7 +94,7 @@ void RudiRSSClient::StopDBConsumption()
 {
     if (m_dbConsumptionThread)
     {
-        SetEvent(m_dbStopEvent);
+        InterlockedExchange(reinterpret_cast<unsigned long*>(&m_runDbConsumption), FALSE);
         ::ReleaseSemaphore(m_dbSemaphore, 1, nullptr);
         WaitForSingleObject(m_dbConsumptionThread, INFINITE);
         CloseHandle(m_dbConsumptionThread);
