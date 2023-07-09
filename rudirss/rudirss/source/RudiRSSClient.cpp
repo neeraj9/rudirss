@@ -111,7 +111,7 @@ void RudiRSSClient::OnDBNotification()
         ATL::CComCritSecLock lock(m_notificationLock);
         if (!m_notificationQueue.empty())
         {
-            auto consumptionUnit = m_notificationQueue.front();
+            auto consumptionUnit = std::move(m_notificationQueue.front());
             m_notificationQueue.pop();
             if (m_fnOnDbNotification)
                 m_fnOnDbNotification(consumptionUnit);
