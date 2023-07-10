@@ -67,15 +67,16 @@ public:
         std::string datetime;
         time_t timestamp;
         time_t createdtime;
+        long long read;
         std::string tag;
         std::string misc;
-        FeedData() : feeddataid{ INVALID_FEEDDATA_ID }, timestamp{ 0 }, createdtime{ 0 } {}
-        FeedData(const FeedData& rhs) : feeddataid{ rhs.feeddataid }, guid{ rhs.guid }, feedguid{ rhs.feedguid }, link{ rhs.link }, title{ rhs.title },
-            datetime{ rhs.datetime }, timestamp{ rhs.timestamp }, createdtime{ rhs.createdtime }, tag{ rhs.tag },
-            misc{ rhs.misc } {}
+        FeedData() : feeddataid{ INVALID_FEEDDATA_ID }, timestamp{ 0 }, createdtime{ 0 }, read{ 0 } {}
+        FeedData(const FeedData& rhs) : feeddataid{ rhs.feeddataid }, guid{ rhs.guid }, feedguid{ rhs.feedguid }, link{ rhs.link },
+            title{ rhs.title }, datetime{ rhs.datetime }, timestamp{ rhs.timestamp }, createdtime{ rhs.createdtime }, read{ rhs.read },
+            tag{ rhs.tag }, misc{ rhs.misc } {}
         FeedData(FeedData&& rhs) noexcept : feeddataid{ rhs.feeddataid }, guid{ std::move(rhs.guid) }, feedguid{ std::move(rhs.feedguid) },
             link{ std::move(rhs.link) }, title{ std::move(rhs.title) }, datetime{ std::move(rhs.datetime) }, timestamp{ rhs.timestamp },
-            createdtime{ rhs.createdtime }, tag{ std::move(rhs.tag) }, misc{ std::move(rhs.misc) } {}
+            createdtime{ rhs.createdtime }, read{ rhs.read }, tag{ std::move(rhs.tag) }, misc{ std::move(rhs.misc) } {}
         FeedData& operator=(FeedData&& rhs) noexcept
         {
             if (this != &rhs)
@@ -88,6 +89,7 @@ public:
                 datetime = std::move(rhs.datetime);
                 timestamp = rhs.timestamp;
                 createdtime = rhs.createdtime;
+                read = rhs.read;
                 tag = std::move(rhs.tag);
                 misc = std::move(rhs.misc);
             }

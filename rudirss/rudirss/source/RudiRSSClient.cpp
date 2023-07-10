@@ -176,8 +176,6 @@ void RudiRSSClient::PushDBConsumptionUnit(const std::unique_ptr<Feed>& feed)
         FeedCommon::ConvertWideStringToString(feedData.GetValue(FeedCommon::FeedSpecification::RSS == spec ? L"pubDate" : L"updated"), dbFeedData.datetime);
         dbFeedData.timestamp = FeedCommon::ConvertDatetimeToTimestamp(spec, dbFeedData.datetime);
         dbFeedData.createdtime = time(nullptr);
-        dbFeedData.tag = "";
-        dbFeedData.misc = "";
         consumptionUnit.feedDataContainer.push_back(std::move(dbFeedData));
         return true;
         });

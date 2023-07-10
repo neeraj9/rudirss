@@ -25,7 +25,7 @@ void FeedDatabase::Initialize()
         throw std::runtime_error("Error: cannot create Feed table.");
 
     ret = sqlite3_exec(m_sql.m_handle, "CREATE TABLE IF NOT EXISTS FeedData(feeddataid INTEGER PRIMARY KEY AUTOINCREMENT, guid TEXT NOT NULL, feedguid TEXT NOT NULL,"\
-        "link TEXT NOT NULL, title TEXT NOT NULL, datetime TEXT NOT NULL, timestamp INTEGER, createdtime INTEGER, tag TEXT, misc TEXT)",
+        "link TEXT NOT NULL, title TEXT NOT NULL, datetime TEXT NOT NULL, timestamp INTEGER, createdtime INTEGER, read INTEGER, tag TEXT, misc TEXT)",
         nullptr, nullptr, nullptr);
     if (0 != ret)
         throw std::runtime_error("Error: cannot create FeedData table.");
@@ -35,7 +35,7 @@ void FeedDatabase::Initialize()
     if (0 != ret)
         throw std::runtime_error("Error: cannot prepare insertion statement for feed.");
 
-    stmt = "INSERT INTO FeedData(guid, feedguid, link, title, datetime, timestamp, createdtime, tag, misc) SELECT ?, ?, ?, ?, ?, ?, ?, ?, ?"\
+    stmt = "INSERT INTO FeedData(guid, feedguid, link, title, datetime, timestamp, createdtime, read, tag, misc) SELECT ?, ?, ?, ?, ?, ?, ?, ?, ?, ?"\
         "WHERE NOT EXISTS(SELECT * FROM FeedData WHERE guid = ?)";
     ret = sqlite3_prepare_v2(m_sql.m_handle, stmt.c_str(), stmt.length(), &m_insertFeedDataStmt.m_handle, nullptr);
     if (0 != ret)
@@ -134,6 +134,7 @@ bool FeedDatabase::InsertFeedData(const FeedData& feedData)
     sqlite3_bind_text(m_insertFeedDataStmt.m_handle, col++, feedData.datetime.c_str(), feedData.datetime.length(), nullptr);
     sqlite3_bind_int64(m_insertFeedDataStmt.m_handle, col++, feedData.timestamp);
     sqlite3_bind_int64(m_insertFeedDataStmt.m_handle, col++, feedData.createdtime);
+    sqlite3_bind_int64(m_insertFeedDataStmt.m_handle, col++, feedData.read);
     sqlite3_bind_text(m_insertFeedDataStmt.m_handle, col++, feedData.tag.c_str(), feedData.tag.length(), nullptr);
     sqlite3_bind_text(m_insertFeedDataStmt.m_handle, col++, feedData.misc.c_str(), feedData.misc.length(), nullptr);
     sqlite3_bind_text(m_insertFeedDataStmt.m_handle, col++, feedData.guid.c_str(), feedData.guid.length(), nullptr);
@@ -240,6 +241,7 @@ bool FeedDatabase::QueryFeedData(const std::string& guid, FN_QUERY_FEED_DATA fnQ
             feedData.datetime = (const char*)sqlite3_column_text(m_queryFeedDataByGuidStmt.m_handle, col++);
             feedData.timestamp = sqlite3_column_int64(m_queryFeedDataByGuidStmt.m_handle, col++);
             feedData.createdtime = sqlite3_column_int64(m_queryFeedDataByGuidStmt.m_handle, col++);
+            feedData.read = sqlite3_column_int64(m_queryFeedDataByGuidStmt.m_handle, col++);
             feedData.tag = (const char*)sqlite3_column_text(m_queryFeedDataByGuidStmt.m_handle, col++);
             feedData.misc = (const char*)sqlite3_column_text(m_queryFeedDataByGuidStmt.m_handle, col++);
             fnQueryFeedData(feedData);
@@ -272,6 +274,7 @@ bool FeedDatabase::QueryFeedDataOrderByTimestamp(const std::string& guid, FN_QUE
             feedData.datetime = (const char*)sqlite3_column_text(m_queryFeedDataByGuidOrderByTimestampStmt.m_handle, col++);
             feedData.timestamp = sqlite3_column_int64(m_queryFeedDataByGuidOrderByTimestampStmt.m_handle, col++);
             feedData.createdtime = sqlite3_column_int64(m_queryFeedDataByGuidOrderByTimestampStmt.m_handle, col++);
+            feedData.read = sqlite3_column_int64(m_queryFeedDataByGuidOrderByTimestampStmt.m_handle, col++);
             feedData.tag = (const char*)sqlite3_column_text(m_queryFeedDataByGuidOrderByTimestampStmt.m_handle, col++);
             feedData.misc = (const char*)sqlite3_column_text(m_queryFeedDataByGuidOrderByTimestampStmt.m_handle, col++);
             fnQueryFeedData(feedData);
@@ -302,6 +305,7 @@ bool FeedDatabase::QueryAllFeedDataOrderByTimestamp(FN_QUERY_FEED_DATA fnQueryFe
         feedData.datetime = (const char*)sqlite3_column_text(m_queryAllFeedDataOrderByTimestampStmt.m_handle, col++);
         feedData.timestamp = sqlite3_column_int64(m_queryAllFeedDataOrderByTimestampStmt.m_handle, col++);
         feedData.createdtime = sqlite3_column_int64(m_queryAllFeedDataOrderByTimestampStmt.m_handle, col++);
+        feedData.read = sqlite3_column_int64(m_queryAllFeedDataOrderByTimestampStmt.m_handle, col++);
         feedData.tag = (const char*)sqlite3_column_text(m_queryAllFeedDataOrderByTimestampStmt.m_handle, col++);
         feedData.misc = (const char*)sqlite3_column_text(m_queryAllFeedDataOrderByTimestampStmt.m_handle, col++);
         fnQueryFeedData(feedData);
@@ -333,6 +337,7 @@ bool FeedDatabase::QueryFeedData(long long feeddataid, FN_QUERY_FEED_DATA fnQuer
             feedData.datetime = (const char*)sqlite3_column_text(m_queryFeedDataByFeedDataIdStmt.m_handle, col++);
             feedData.timestamp = sqlite3_column_int64(m_queryFeedDataByFeedDataIdStmt.m_handle, col++);
             feedData.createdtime = sqlite3_column_int64(m_queryFeedDataByFeedDataIdStmt.m_handle, col++);
+            feedData.read = sqlite3_column_int64(m_queryFeedDataByFeedDataIdStmt.m_handle, col++);
             feedData.tag = (const char*)sqlite3_column_text(m_queryFeedDataByFeedDataIdStmt.m_handle, col++);
             feedData.misc = (const char*)sqlite3_column_text(m_queryFeedDataByFeedDataIdStmt.m_handle, col++);
             fnQueryFeedData(feedData);
