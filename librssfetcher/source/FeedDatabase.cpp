@@ -395,6 +395,7 @@ bool FeedDatabase::UpdateFeedDataReadColumn(long long feeddataid, long long read
 
         ret = sqlite3_step(m_updateFeedDataReadStmt.m_handle);
     } while (0);
+    sqlite3_reset(m_updateFeedDataReadStmt.m_handle);
 
     return SQLITE_DONE == ret;
 }
