@@ -5,6 +5,7 @@
 
 #include <stdexcept>
 #include <rpcdce.h>
+#include <atltime.h>
 
 using namespace FeedCommon;
 
@@ -179,3 +180,44 @@ std::wstring FeedCommon::GetUUID()
     return sUUID;
 }
 
+long long FeedCommon::ConvertDatetimeToTimestamp(FeedSpecification spec, const std::string& datetime)
+{
+    long long timestamp = 0;
+    if (spec == FeedSpecification::RSS)
+    {
+        const std::map<std::string, int> months{ {"Jan", 1}, { "Feb", 2 }, { "Mar", 3 }, { "Apr", 4 }, { "May", 5 }, { "Jun", 6 },
+            { "Jul", 7 }, { "Aug", 8 }, { "Sep", 9 }, { "Oct", 10 }, { "Nov", 11 }, { "Dec", 12 } };
+        int year;
+        char month[4]{};
+        int day;
+        int hour;
+        int minute;
+        int second;
+        if (6 == sscanf_s(datetime.c_str(), "%*[^,], %d %s %d %d:%d:%d", &day, month, static_cast<unsigned int>(sizeof(month)),
+            &year, &hour, &minute, &second))
+        {
+            auto it = months.find(month);
+            if (it != months.end())
+            {
+                CTime tmpTimestamp(year, it->second, day, hour, minute, second);
+                timestamp = tmpTimestamp.GetTime();
+            }
+        }
+    }
+    else if (spec == FeedSpecification::Atom)
+    {
+        int year;
+        int month;
+        int day;
+        int hour;
+        int minute;
+        int second;
+        if (6 == sscanf_s(datetime.c_str(), "%d-%d-%dT%d:%d:%d", &year, &month, &day, &hour, &minute, &second))
+        {
+            CTime tmpTimestamp(year, month, day, hour, minute, second);
+            timestamp = tmpTimestamp.GetTime();
+        }
+    }
+
+    return timestamp;
+}

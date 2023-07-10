@@ -48,4 +48,6 @@ namespace FeedCommon
     }
 
     std::wstring GetUUID();
+
+    long long ConvertDatetimeToTimestamp(FeedSpecification spec, const std::string& datetime);
 };

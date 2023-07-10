@@ -5,6 +5,7 @@
 
 #include <format>
 #include <fstream>
+#include <atltime.h>
 
 using namespace FeedCommon;
 
@@ -223,4 +224,19 @@ TEST(TestFeedCommon, TestGetUUID)
 {
     std::wstring UUID = FeedCommon::GetUUID();
     ASSERT_TRUE(!UUID.empty());
+}
+
+TEST(TestFeedCommon, TestParseDatetime)
+{
+    std::string datetime = "2023-07-06T12:05:57+08:00";
+    auto timestamp = FeedCommon::ConvertDatetimeToTimestamp(FeedCommon::FeedSpecification::Atom, datetime);
+    CTime t = timestamp;
+    ASSERT_TRUE(2023 == t.GetYear() && 7 == t.GetMonth() && 6 == t.GetDay()
+        && 12 == t.GetHour() && 5 == t.GetMinute() && 57 == t.GetSecond());
+
+    datetime = "Sun, 9 Jul 2023 07:57:07 +0000";
+    timestamp = FeedCommon::ConvertDatetimeToTimestamp(FeedCommon::FeedSpecification::RSS, datetime);
+    t = timestamp;
+    ASSERT_TRUE(2023 == t.GetYear() && 7 == t.GetMonth() && 9 == t.GetDay()
+        && 7 == t.GetHour() && 57 == t.GetMinute() && 7 == t.GetSecond());
 }
