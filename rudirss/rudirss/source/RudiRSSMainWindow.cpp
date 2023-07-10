@@ -172,20 +172,26 @@ void RudiRSSMainWindow::InitFeedListView(int x, int y, int width, int height)
     lvColumn.cx = width;
     lvColumn.pszText = const_cast<wchar_t*>(L"Subscribed");
     SendMessage(m_feedListView.m_hWnd, LVM_INSERTCOLUMN, 0, (LPARAM)&lvColumn);
+
+    // Initialize a 'All' item so that it can display all feeds from database
+    LVITEM lvItem{};
+    std::wstring text;
+    lvItem.pszText = const_cast<wchar_t*>(L"All feeds");
+    lvItem.iItem = 0;
+    lvItem.iSubItem = 0;
+    lvItem.mask = LVIF_TEXT | LVIF_PARAM;
+    lvItem.lParam = (LPARAM)FeedDatabase::INVALID_FEEDDATA_ID;
+    SendMessage(m_feedListView.m_hWnd, LVM_INSERTITEM, 0, (LPARAM)&lvItem);
 }
 
 void RudiRSSMainWindow::InsertIntoFeedListView(const FeedDatabase::Feed& feed)
 {
-    unsigned int listCnt = (unsigned int)SendMessage(m_feedListView.m_hWnd, LVM_GETITEMCOUNT, 0, 0);
-    if (listCnt > 0)
-        listCnt--;
-
     LVITEM lvItem{};
     int col = 0;
     std::wstring text;
     FeedCommon::ConvertStringToWideString(feed.title, text);
     lvItem.pszText = text.data();
-    lvItem.iItem = listCnt;
+    lvItem.iItem = static_cast<int>(SendMessage(m_feedListView.m_hWnd, LVM_GETITEMCOUNT, 0, 0));
     lvItem.iSubItem = col++;
     lvItem.mask = LVIF_TEXT | LVIF_PARAM;
     lvItem.lParam = (LPARAM)feed.feedid;
@@ -325,16 +331,25 @@ void RudiRSSMainWindow::OnProcessFeedListView(HWND hWnd, UINT message, WPARAM wP
     case NM_CLICK:
     {
         long long feedId = static_cast<long long>(GetLParamFromListView(itemActivate));
-        std::string guid;
-        m_rudiRSSClient.QueryFeed(feedId, [&](const FeedDatabase::Feed& feed) {
-            guid = feed.guid;
-            });
+        if (FeedDatabase::INVALID_FEEDDATA_ID != feedId)
+        {
+            std::string guid;
+            m_rudiRSSClient.QueryFeed(feedId, [&](const FeedDatabase::Feed& feed) {
+                guid = feed.guid;
+                });
 
-        SendMessage(m_feedTitleListView.m_hWnd, LVM_DELETEALLITEMS, 0, 0);
+            SendMessage(m_feedTitleListView.m_hWnd, LVM_DELETEALLITEMS, 0, 0);
 
-        m_rudiRSSClient.QueryFeedDataOrderByTimestamp(guid, [&](const FeedDatabase::FeedData& feedData) {
-            InsertIntoFeedTitleListView(feedData);
-            });
+            m_rudiRSSClient.QueryFeedDataOrderByTimestamp(guid, [&](const FeedDatabase::FeedData& feedData) {
+                InsertIntoFeedTitleListView(feedData);
+                });
+        }
+        else
+        {
+            m_rudiRSSClient.QueryAllFeedDataOrderByTimestamp([&](const FeedDatabase::FeedData& feedData) {
+                InsertIntoFeedTitleListView(feedData);
+                });
+        }
     }
     break;
 

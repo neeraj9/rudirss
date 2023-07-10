@@ -20,6 +20,7 @@ protected:
     SQLite3StmtHandle m_queryFeedDataByGuidStmt;
     SQLite3StmtHandle m_queryFeedDataByFeedDataIdStmt;
     SQLite3StmtHandle m_queryFeedDataByGuidOrderByTimestampStmt;
+    SQLite3StmtHandle m_queryAllFeedDataOrderByTimestampStmt;
     SQLite3StmtHandle m_deleteAllFeedStmt;
     SQLite3StmtHandle m_deleteAllFeedDataStmt;
     ATL::CComCriticalSection m_dbLock;
@@ -55,6 +56,7 @@ public:
         }
     };
 
+    static const long long INVALID_FEEDDATA_ID = -1;
     struct FeedData
     {
         long long feeddataid;
@@ -67,7 +69,7 @@ public:
         time_t createdtime;
         std::string tag;
         std::string misc;
-        FeedData() : feeddataid{ 0 }, timestamp{ 0 }, createdtime{ 0 } {}
+        FeedData() : feeddataid{ INVALID_FEEDDATA_ID }, timestamp{ 0 }, createdtime{ 0 } {}
         FeedData(const FeedData& rhs) : feeddataid{ rhs.feeddataid }, guid{ rhs.guid }, feedguid{ rhs.feedguid }, link{ rhs.link }, title{ rhs.title },
             datetime{ rhs.datetime }, timestamp{ rhs.timestamp }, createdtime{ rhs.createdtime }, tag{ rhs.tag },
             misc{ rhs.misc } {}
@@ -133,6 +135,7 @@ public:
     bool QueryAllFeeds(FN_QUERY_FEED fnQueryFeed);
     bool QueryFeedData(const std::string& guid, FN_QUERY_FEED_DATA fnQueryFeedData);
     bool QueryFeedDataOrderByTimestamp(const std::string& guid, FN_QUERY_FEED_DATA fnQueryFeedData);
+    bool QueryAllFeedDataOrderByTimestamp(FN_QUERY_FEED_DATA fnQueryFeedData);
     bool QueryFeedData(long long feeddataid, FN_QUERY_FEED_DATA fnQueryFeedData);
     bool DeleteAllFeeds();
     bool DeleteAllFeedData();
