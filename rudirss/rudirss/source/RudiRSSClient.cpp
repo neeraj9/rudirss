@@ -248,6 +248,11 @@ bool RudiRSSClient::QueryFeedData(long long feeddataid, FeedDatabase::FN_QUERY_F
     return m_db.QueryFeedData(feeddataid, fnQueryFeedData);
 }
 
+bool RudiRSSClient::UpdateFeedDataReadColumn(long long feeddataid, long long read)
+{
+    return m_db.UpdateFeedDataReadColumn(feeddataid, read);
+}
+
 void RudiRSSClient::StartRefreshFeedTimer(DWORD dueTime, DWORD period, FN_ON_DB_NOTIFICATION fnOnDbNotification)
 {
     m_fnOnDbNotification = fnOnDbNotification;

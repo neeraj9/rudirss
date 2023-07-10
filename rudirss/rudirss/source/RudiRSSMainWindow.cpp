@@ -375,6 +375,7 @@ LRESULT RudiRSSMainWindow::OnProcessFeedTitleListView(HWND hWnd, UINT message, W
                 FeedCommon::ConvertStringToWideString(feedData.link, link);
                 m_viewer.Navigate(link);
                 });
+            m_rudiRSSClient.UpdateFeedDataReadColumn(feedDataId, static_cast<long long>(true));
         }
     }
     break;

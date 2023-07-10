@@ -23,6 +23,7 @@ protected:
     SQLite3StmtHandle m_queryAllFeedDataOrderByTimestampStmt;
     SQLite3StmtHandle m_deleteAllFeedStmt;
     SQLite3StmtHandle m_deleteAllFeedDataStmt;
+    SQLite3StmtHandle m_updateFeedDataReadStmt;
     ATL::CComCriticalSection m_dbLock;
 
 public:
@@ -70,7 +71,7 @@ public:
         long long read;
         std::string tag;
         std::string misc;
-        FeedData() : feeddataid{ INVALID_FEEDDATA_ID }, timestamp{ 0 }, createdtime{ 0 }, read{ 0 } {}
+        FeedData() : feeddataid{ INVALID_FEEDDATA_ID }, timestamp{ 0 }, createdtime{ 0 }, read{ static_cast<long long>(false) } {}
         FeedData(const FeedData& rhs) : feeddataid{ rhs.feeddataid }, guid{ rhs.guid }, feedguid{ rhs.feedguid }, link{ rhs.link },
             title{ rhs.title }, datetime{ rhs.datetime }, timestamp{ rhs.timestamp }, createdtime{ rhs.createdtime }, read{ rhs.read },
             tag{ rhs.tag }, misc{ rhs.misc } {}
@@ -141,4 +142,5 @@ public:
     bool QueryFeedData(long long feeddataid, FN_QUERY_FEED_DATA fnQueryFeedData);
     bool DeleteAllFeeds();
     bool DeleteAllFeedData();
+    bool UpdateFeedDataReadColumn(long long feeddataid, long long read);
 };

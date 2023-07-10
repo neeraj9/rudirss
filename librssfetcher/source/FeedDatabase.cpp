@@ -85,6 +85,11 @@ void FeedDatabase::Initialize()
     ret = sqlite3_prepare_v2(m_sql.m_handle, stmt.c_str(), stmt.length(), &m_deleteAllFeedDataStmt.m_handle, nullptr);
     if (0 != ret)
         throw std::runtime_error("Error: cannot prepare deletion statement for feed data.");
+
+    stmt = "UPDATE FeedData SET read = ? WHERE feeddataid = ?";
+    ret = sqlite3_prepare_v2(m_sql.m_handle, stmt.c_str(), stmt.length(), &m_updateFeedDataReadStmt.m_handle, nullptr);
+    if (0 != ret)
+        throw std::runtime_error("Error: cannot prepare update statement for read column of feed data.");
 }
 
 void FeedDatabase::Close()
@@ -100,6 +105,7 @@ void FeedDatabase::Close()
     m_queryAllFeedDataOrderByTimestampStmt.Close();
     m_deleteAllFeedStmt.Close();
     m_deleteAllFeedDataStmt.Close();
+    m_updateFeedDataReadStmt.Close();
     m_sql.Close();
 }
 
@@ -368,6 +374,27 @@ bool FeedDatabase::DeleteAllFeedData()
 
     int ret = sqlite3_step(m_deleteAllFeedDataStmt.m_handle);
     sqlite3_reset(m_deleteAllFeedDataStmt.m_handle);
+
+    return SQLITE_DONE == ret;
+}
+
+bool FeedDatabase::UpdateFeedDataReadColumn(long long feeddataid, long long read)
+{
+    ATL::CComCritSecLock lock(m_dbLock);
+    if (!m_updateFeedDataReadStmt.m_handle)
+        return false;
+
+    int ret = SQLITE_OK;;
+    do
+    {
+        if (SQLITE_OK != (ret = sqlite3_bind_int64(m_updateFeedDataReadStmt.m_handle, 1, read)))
+            break;
+        
+        if (SQLITE_OK != (ret = sqlite3_bind_int64(m_updateFeedDataReadStmt.m_handle, 2, feeddataid)))
+            break;
+
+        ret = sqlite3_step(m_updateFeedDataReadStmt.m_handle);
+    } while (0);
 
     return SQLITE_DONE == ret;
 }
