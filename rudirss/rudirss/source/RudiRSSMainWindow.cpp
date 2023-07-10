@@ -213,16 +213,12 @@ void RudiRSSMainWindow::InitFeedTitleListView(int x, int y, int width, int heigh
 
 void RudiRSSMainWindow::InsertIntoFeedTitleListView(const FeedDatabase::FeedData& feedData)
 {
-    unsigned int listCnt = (unsigned int)SendMessage(m_feedTitleListView.m_hWnd, LVM_GETITEMCOUNT, 0, 0);
-    if (listCnt > 0)
-        listCnt--;
-
     LVITEM lvItem{};
     int col = 0;
     std::wstring text;
     FeedCommon::ConvertStringToWideString(feedData.title, text);
     lvItem.pszText = text.data();
-    lvItem.iItem = listCnt;
+    lvItem.iItem = static_cast<int>(SendMessage(m_feedTitleListView.m_hWnd, LVM_GETITEMCOUNT, 0, 0));
     lvItem.iSubItem = col++;
     lvItem.mask = LVIF_TEXT | LVIF_PARAM;
     lvItem.lParam = (LPARAM)feedData.feeddataid;
@@ -238,7 +234,7 @@ void RudiRSSMainWindow::InsertIntoFeedTitleListView(const FeedDatabase::FeedData
 long long RudiRSSMainWindow::GetFeedIdFromFeedTitleListView()
 {
     long long feeddataid = 0;
-    int selItem = (int)SendMessage(m_feedTitleListView.m_hWnd, LVM_GETNEXTITEM, -1, LVNI_SELECTED);
+    int selItem = static_cast<int>(SendMessage(m_feedTitleListView.m_hWnd, LVM_GETNEXTITEM, -1, LVNI_SELECTED));
     if (-1 != selItem)
     {
         LVITEM lvItem{};
@@ -336,7 +332,7 @@ void RudiRSSMainWindow::OnProcessFeedListView(HWND hWnd, UINT message, WPARAM wP
 
         SendMessage(m_feedTitleListView.m_hWnd, LVM_DELETEALLITEMS, 0, 0);
 
-        m_rudiRSSClient.QueryFeedData(guid, [&](const FeedDatabase::FeedData& feedData) {
+        m_rudiRSSClient.QueryFeedDataOrderByTimestamp(guid, [&](const FeedDatabase::FeedData& feedData) {
             InsertIntoFeedTitleListView(feedData);
             });
     }

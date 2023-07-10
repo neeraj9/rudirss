@@ -19,6 +19,7 @@ protected:
     SQLite3StmtHandle m_queryAllFeedsStmt;
     SQLite3StmtHandle m_queryFeedDataByGuidStmt;
     SQLite3StmtHandle m_queryFeedDataByFeedDataIdStmt;
+    SQLite3StmtHandle m_queryFeedDataByGuidOrderByTimestampStmt;
     SQLite3StmtHandle m_deleteAllFeedStmt;
     SQLite3StmtHandle m_deleteAllFeedDataStmt;
     ATL::CComCriticalSection m_dbLock;
@@ -131,6 +132,7 @@ public:
     bool QueryFeed(const std::string &guid, FN_QUERY_FEED fnQueryFeed);
     bool QueryAllFeeds(FN_QUERY_FEED fnQueryFeed);
     bool QueryFeedData(const std::string& guid, FN_QUERY_FEED_DATA fnQueryFeedData);
+    bool QueryFeedDataOrderByTimestamp(const std::string& guid, FN_QUERY_FEED_DATA fnQueryFeedData);
     bool QueryFeedData(long long feeddataid, FN_QUERY_FEED_DATA fnQueryFeedData);
     bool DeleteAllFeeds();
     bool DeleteAllFeedData();

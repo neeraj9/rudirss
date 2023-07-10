@@ -20,6 +20,7 @@ public:
     bool QueryFeed(const std::string &guid, FeedDatabase::FN_QUERY_FEED fnQueryFeed);
     bool QueryAllFeeds(FeedDatabase::FN_QUERY_FEED fnQueryFeed);
     bool QueryFeedData(const std::string& guid, FeedDatabase::FN_QUERY_FEED_DATA fnQueryFeedData);
+    bool QueryFeedDataOrderByTimestamp(const std::string& guid, FeedDatabase::FN_QUERY_FEED_DATA fnQueryFeedData);
     bool QueryFeedData(long long feeddataid, FeedDatabase::FN_QUERY_FEED_DATA fnQueryFeedData);
 
     using FN_ON_DB_NOTIFICATION = std::function<void(const FeedDatabase::FeedConsumptionUnit &)>;

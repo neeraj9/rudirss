@@ -235,6 +235,11 @@ bool RudiRSSClient::QueryFeedData(const std::string& guid, FeedDatabase::FN_QUER
     return m_db.QueryFeedData(guid, fnQueryFeedData);
 }
 
+bool RudiRSSClient::QueryFeedDataOrderByTimestamp(const std::string& guid, FeedDatabase::FN_QUERY_FEED_DATA fnQueryFeedData)
+{
+    return m_db.QueryFeedDataOrderByTimestamp(guid, fnQueryFeedData);
+}
+
 bool RudiRSSClient::QueryFeedData(long long feeddataid, FeedDatabase::FN_QUERY_FEED_DATA fnQueryFeedData)
 {
     return m_db.QueryFeedData(feeddataid, fnQueryFeedData);
