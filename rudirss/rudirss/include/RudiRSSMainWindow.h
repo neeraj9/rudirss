@@ -8,6 +8,7 @@
 #include <string>
 #include <list>
 #include <set>
+#include <map>
 #include <atlcore.h>
 #include <CommCtrl.h>
 
@@ -27,13 +28,16 @@ protected:
     BOOL m_initViewer;
     RudiRSSClient m_rudiRSSClient;
     std::set<long long> m_feedIdSet;
+    std::map<long long, long long> m_feedReadStateSet;
     ATL::CComCriticalSection m_feedListLock;
 
     HFONT m_font;
+    HFONT m_boldFont;
 
     virtual void OnRegister(WNDCLASSEXW& wcex);
     virtual HWND Create();
-    virtual LRESULT OnProcessMessage(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
+    LRESULT OnProcessMessage(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
+    void OnDestroy();
 
     void InittializeControl();
     void UpdateControl();
@@ -52,6 +56,10 @@ protected:
     bool FeedIdExistInSet(long long feedid);
     void InsertFeedIdIntoSet(long long feedid);
     void ClearFeedIdSet();
+
+    bool FeedDataIsRead(long long feeddataid);
+    void InsertFeedDataReadStateIntoSet(long long feeddataid, long long read);
+    void ClearFeedDataReadStateSet();
 
 public:
     RudiRSSMainWindow();

@@ -5,7 +5,7 @@
 #include <format>
 #include <vector>
 
-RudiRSSMainWindow::RudiRSSMainWindow() : m_initViewer{ FALSE }, m_font{ nullptr }
+RudiRSSMainWindow::RudiRSSMainWindow() : m_initViewer{ FALSE }, m_font{ nullptr }, m_boldFont{ nullptr }
 {
     m_feedListViewWidth = 250;
     m_feedTitleListTitleColumnWidth = 250;
@@ -17,7 +17,8 @@ RudiRSSMainWindow::RudiRSSMainWindow() : m_initViewer{ FALSE }, m_font{ nullptr 
 
 RudiRSSMainWindow::~RudiRSSMainWindow()
 {
-
+    DeleteObject(m_font);
+    DeleteObject(m_boldFont);
 }
 
 void RudiRSSMainWindow::OnRegister(WNDCLASSEXW& wcex)
@@ -110,6 +111,7 @@ LRESULT RudiRSSMainWindow::OnProcessMessage(HWND hWnd, UINT message, WPARAM wPar
         break;
 
     case WM_DESTROY:
+        OnDestroy();
         PostQuitMessage(0);
         break;
 
@@ -118,6 +120,12 @@ LRESULT RudiRSSMainWindow::OnProcessMessage(HWND hWnd, UINT message, WPARAM wPar
     }
 
     return 0;
+}
+
+void RudiRSSMainWindow::OnDestroy()
+{
+    DeleteObject(m_font);
+    DeleteObject(m_boldFont);
 }
 
 void RudiRSSMainWindow::InittializeControl()
@@ -157,6 +165,10 @@ void RudiRSSMainWindow::InitFont()
     SystemParametersInfo(SPI_GETICONTITLELOGFONT, sizeof(font), &font, 0);
     m_font = CreateFont(font.lfHeight, font.lfWidth, font.lfEscapement, font.lfOrientation, font.lfWeight, font.lfItalic, font.lfUnderline, font.lfStrikeOut,
         font.lfCharSet, font.lfOutPrecision, font.lfClipPrecision, font.lfQuality, font.lfPitchAndFamily, font.lfFaceName);
+
+    font.lfWeight = FW_BOLD;
+    m_boldFont = CreateFont(font.lfHeight, font.lfWidth, font.lfEscapement, font.lfOrientation, font.lfWeight, font.lfItalic, font.lfUnderline, font.lfStrikeOut,
+        font.lfCharSet, font.lfOutPrecision, font.lfClipPrecision, font.lfQuality, font.lfPitchAndFamily, font.lfFaceName);
 }
 
 void RudiRSSMainWindow::InitFeedListView(int x, int y, int width, int height)
@@ -174,7 +186,7 @@ void RudiRSSMainWindow::InitFeedListView(int x, int y, int width, int height)
     lvColumn.pszText = const_cast<wchar_t*>(L"Subscribed");
     SendMessage(m_feedListView.m_hWnd, LVM_INSERTCOLUMN, 0, (LPARAM)&lvColumn);
 
-    // Initialize a 'All' item so that it can display all feeds from database
+    // Initialize a 'All feeds' item so that it can display all feeds from database
     LVITEM lvItem{};
     std::wstring text;
     lvItem.pszText = const_cast<wchar_t*>(L"All feeds");
@@ -331,6 +343,8 @@ LRESULT RudiRSSMainWindow::OnProcessFeedListView(HWND hWnd, UINT message, WPARAM
     case NM_CLICK:
     {
         long long feedId = static_cast<long long>(GetLParamFromListView(itemActivate));
+        SendMessage(m_feedTitleListView.m_hWnd, LVM_DELETEALLITEMS, 0, 0);
+        ClearFeedDataReadStateSet();
         if (FeedDatabase::INVALID_FEEDDATA_ID != feedId)
         {
             std::string guid;
@@ -338,16 +352,16 @@ LRESULT RudiRSSMainWindow::OnProcessFeedListView(HWND hWnd, UINT message, WPARAM
                 guid = feed.guid;
                 });
 
-            SendMessage(m_feedTitleListView.m_hWnd, LVM_DELETEALLITEMS, 0, 0);
-
             m_rudiRSSClient.QueryFeedDataOrderByTimestamp(guid, [&](const FeedDatabase::FeedData& feedData) {
                 InsertIntoFeedTitleListView(feedData);
+                InsertFeedDataReadStateIntoSet(feedData.feeddataid, feedData.read);
                 });
         }
         else
         {
             m_rudiRSSClient.QueryAllFeedDataOrderByTimestamp([&](const FeedDatabase::FeedData& feedData) {
                 InsertIntoFeedTitleListView(feedData);
+                InsertFeedDataReadStateIntoSet(feedData.feeddataid, feedData.read);
                 });
         }
     }
@@ -376,6 +390,39 @@ LRESULT RudiRSSMainWindow::OnProcessFeedTitleListView(HWND hWnd, UINT message, W
                 m_viewer.Navigate(link);
                 });
             m_rudiRSSClient.UpdateFeedDataReadColumn(feedDataId, static_cast<long long>(true));
+            InsertFeedDataReadStateIntoSet(feedDataId, static_cast<long long>(true));
+        }
+    }
+    break;
+
+    case NM_CUSTOMDRAW:
+    {
+        LPNMLVCUSTOMDRAW lpNMCustomDraw = (LPNMLVCUSTOMDRAW)lParam;
+        if (CDDS_PREPAINT == lpNMCustomDraw->nmcd.dwDrawStage)
+        {
+            return CDRF_NOTIFYITEMDRAW;
+        }
+        else if (CDDS_ITEMPREPAINT == lpNMCustomDraw->nmcd.dwDrawStage)
+        {
+            return CDRF_NOTIFYSUBITEMDRAW;
+        }
+        // Flag combined with CDDS_ITEMPREPAINT or CDDS_ITEMPOSTPAINT if a subitem is being drawn.
+        else if ((CDDS_ITEMPREPAINT | CDDS_SUBITEM) == lpNMCustomDraw->nmcd.dwDrawStage)
+        {
+            if (lpNMCustomDraw->iSubItem == 0)
+            {
+                auto feedDataId = static_cast<long long>(lpNMCustomDraw->nmcd.lItemlParam);
+                if (FeedDataIsRead(feedDataId))
+                {
+                    SelectObject(lpNMCustomDraw->nmcd.hdc, m_font);
+                }
+                else
+                {
+                    SelectObject(lpNMCustomDraw->nmcd.hdc, m_boldFont);
+                }
+
+                return CDRF_NEWFONT;
+            }
         }
     }
     break;
@@ -385,7 +432,7 @@ LRESULT RudiRSSMainWindow::OnProcessFeedTitleListView(HWND hWnd, UINT message, W
     }
 
     return DefWindowProc(hWnd, message, wParam, lParam);
-}
+    }
 
 bool RudiRSSMainWindow::FeedIdExistInSet(long long feedid)
 {
@@ -403,4 +450,29 @@ void RudiRSSMainWindow::ClearFeedIdSet()
 {
     ATL::CComCritSecLock lock(m_feedListLock);
     m_feedIdSet.clear();
+}
+
+bool RudiRSSMainWindow::FeedDataIsRead(long long feeddataid)
+{
+    ATL::CComCritSecLock lock(m_feedListLock);
+    bool read = false;
+    auto it = m_feedReadStateSet.find(feeddataid);
+    if (it != m_feedReadStateSet.end())
+    {
+        read = 0 != it->second;
+    }
+
+    return read;
+}
+
+void RudiRSSMainWindow::InsertFeedDataReadStateIntoSet(long long feeddataid, long long read)
+{
+    ATL::CComCritSecLock lock(m_feedListLock);
+    m_feedReadStateSet[feeddataid] = read;
+}
+
+void RudiRSSMainWindow::ClearFeedDataReadStateSet()
+{
+    ATL::CComCritSecLock lock(m_feedListLock);
+    m_feedReadStateSet.clear();
 }
