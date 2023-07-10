@@ -7,6 +7,11 @@
 
 RudiRSSMainWindow::RudiRSSMainWindow() : m_initViewer{ FALSE }, m_font{ nullptr }
 {
+    m_feedListViewWidth = 250;
+    m_feedTitleListTitleColumnWidth = 250;
+    m_feedTitleListUpdatedWidth = 150;
+    m_feedTitleListWidth = m_feedTitleListTitleColumnWidth + m_feedTitleListUpdatedWidth;
+
     m_feedListLock.Init();
 }
 
@@ -128,12 +133,12 @@ void RudiRSSMainWindow::InittializeControl()
     LONG height = rc.bottom - rc.top;
     LONG viewerX = 0;
 
-    InitFeedListView(0, 0, 300, height);
+    InitFeedListView(0, 0, m_feedListViewWidth, height);
     GetClientRect(m_feedListView.m_hWnd, &rc);
     viewerX += rc.right - rc.left;
 
-    int titleColWidth = 200;
-    int updatedColWidth = 100;
+    int titleColWidth = m_feedTitleListTitleColumnWidth;
+    int updatedColWidth = m_feedTitleListUpdatedWidth;
     InitFeedTitleListView(rc.right + 1, 0, titleColWidth + updatedColWidth, height, titleColWidth, updatedColWidth);
     GetClientRect(m_feedTitleListView.m_hWnd, &rc);
 
@@ -272,14 +277,14 @@ void RudiRSSMainWindow::UpdateControl()
         if (!m_feedListView.m_hWnd)
             break;
 
-        MoveWindow(m_feedListView.m_hWnd, 0, 0, 300, height, FALSE);
+        MoveWindow(m_feedListView.m_hWnd, 0, 0, m_feedListViewWidth, height, FALSE);
         GetClientRect(m_feedListView.m_hWnd, &rc);
         viewerX += rc.right - rc.left;
 
         if (!m_feedTitleListView.m_hWnd)
             break;
 
-        MoveWindow(m_feedTitleListView.m_hWnd, rc.right + 1, 0, 300, height, FALSE);
+        MoveWindow(m_feedTitleListView.m_hWnd, rc.right + 1, 0, m_feedTitleListWidth, height, FALSE);
         GetClientRect(m_feedTitleListView.m_hWnd, &rc);
         viewerX += rc.right - rc.left;
 

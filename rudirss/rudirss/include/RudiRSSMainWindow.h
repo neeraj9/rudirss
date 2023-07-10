@@ -19,6 +19,10 @@ protected:
     WindowHandle m_feedListBox;
     WindowHandle m_feedListView;
     WindowHandle m_feedTitleListView;
+    int m_feedListViewWidth;
+    int m_feedTitleListWidth;
+    int m_feedTitleListTitleColumnWidth;
+    int m_feedTitleListUpdatedWidth;
     Viewer m_viewer;
     BOOL m_initViewer;
     RudiRSSClient m_rudiRSSClient;
