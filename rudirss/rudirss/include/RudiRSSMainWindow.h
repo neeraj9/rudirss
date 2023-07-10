@@ -45,9 +45,9 @@ protected:
     long long GetFeedIdFromFeedTitleListView();
     LPARAM GetLParamFromListView(LPNMITEMACTIVATE activateItem);
 
-    virtual LRESULT OnProcessListViewCommand(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
-    void OnProcessFeedListView(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
-    void OnProcessFeedTitleListView(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
+    LRESULT OnProcessListViewCommand(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
+    LRESULT OnProcessFeedListView(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
+    LRESULT OnProcessFeedTitleListView(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
     bool FeedIdExistInSet(long long feedid);
     void InsertFeedIdIntoSet(long long feedid);

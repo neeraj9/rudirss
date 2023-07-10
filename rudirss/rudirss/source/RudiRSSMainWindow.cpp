@@ -308,14 +308,12 @@ LRESULT RudiRSSMainWindow::OnProcessListViewCommand(HWND hWnd, UINT message, WPA
     {
     case IDC_FEED_LIST_VIEW:
     {
-        OnProcessFeedListView(hWnd, message, wParam, lParam);
-        break;
+        return OnProcessFeedListView(hWnd, message, wParam, lParam);
     }
 
     case IDC_FEED_TITLE_LIST_VIEW:
     {
-        OnProcessFeedTitleListView(hWnd, message, wParam, lParam);
-        break;
+        return OnProcessFeedTitleListView(hWnd, message, wParam, lParam);
     }
 
     default:
@@ -325,7 +323,7 @@ LRESULT RudiRSSMainWindow::OnProcessListViewCommand(HWND hWnd, UINT message, WPA
     return DefWindowProc(hWnd, message, wParam, lParam);
 }
 
-void RudiRSSMainWindow::OnProcessFeedListView(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+LRESULT RudiRSSMainWindow::OnProcessFeedListView(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     LPNMITEMACTIVATE itemActivate = (LPNMITEMACTIVATE)lParam;
     switch (itemActivate->hdr.code)
@@ -358,9 +356,11 @@ void RudiRSSMainWindow::OnProcessFeedListView(HWND hWnd, UINT message, WPARAM wP
     default:
         break;
     }
+
+    return DefWindowProc(hWnd, message, wParam, lParam);
 }
 
-void RudiRSSMainWindow::OnProcessFeedTitleListView(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+LRESULT RudiRSSMainWindow::OnProcessFeedTitleListView(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     LPNMITEMACTIVATE itemActivate = (LPNMITEMACTIVATE)lParam;
     switch (itemActivate->hdr.code)
@@ -382,6 +382,8 @@ void RudiRSSMainWindow::OnProcessFeedTitleListView(HWND hWnd, UINT message, WPAR
     default:
         break;
     }
+
+    return DefWindowProc(hWnd, message, wParam, lParam);
 }
 
 bool RudiRSSMainWindow::FeedIdExistInSet(long long feedid)
