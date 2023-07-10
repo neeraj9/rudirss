@@ -17,7 +17,6 @@ protected:
     std::wstring m_title;
     std::wstring m_className;
     WindowHandle m_feedListBox;
-    WindowHandle m_feedTitleListBox;
     WindowHandle m_feedTitleListView;
     Viewer m_viewer;
     BOOL m_initViewer;
@@ -41,7 +40,7 @@ protected:
     LPARAM GetLParamFromListView(LPNMITEMACTIVATE activateItem);
 
     virtual LRESULT OnListBoxCommand(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
-    void OnProcessFeedList(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
+    void OnProcessFeedListBox(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
     virtual LRESULT OnProcessListViewCommand(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
     void OnProcessFeedTitleListView(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 

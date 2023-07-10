@@ -290,7 +290,7 @@ LRESULT RudiRSSMainWindow::OnListBoxCommand(HWND hWnd, UINT message, WPARAM wPar
     {
     case IDC_FEED_LIST:
     {
-        OnProcessFeedList(hWnd, message, wParam, lParam);
+        OnProcessFeedListBox(hWnd, message, wParam, lParam);
         break;
     }
 
@@ -301,7 +301,7 @@ LRESULT RudiRSSMainWindow::OnListBoxCommand(HWND hWnd, UINT message, WPARAM wPar
     return DefWindowProc(hWnd, message, wParam, lParam);
 }
 
-void RudiRSSMainWindow::OnProcessFeedList(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+void RudiRSSMainWindow::OnProcessFeedListBox(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     switch (HIWORD(wParam))
     {
