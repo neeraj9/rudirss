@@ -165,6 +165,7 @@ void RudiRSSMainWindow::InitFeedListView(int x, int y, int width, int height)
     m_feedListView.Attach(CreateWindowEx(WS_EX_STATICEDGE, WC_LISTVIEW, nullptr, dwStyle, x, y,
         width, height, m_hWnd, (HMENU)IDC_FEED_LIST_VIEW, m_hInstance, nullptr));
     SendMessage(m_feedListView.m_hWnd, LVM_SETEXTENDEDLISTVIEWSTYLE, 0, LVS_EX_FULLROWSELECT); // Set extended style
+    SendMessage(m_feedListView.m_hWnd, WM_SETFONT, (WPARAM)m_font, TRUE);
 
     LV_COLUMN   lvColumn{};
     lvColumn.mask = LVCF_WIDTH | LVCF_TEXT;
@@ -204,6 +205,7 @@ void RudiRSSMainWindow::InitFeedTitleListView(int x, int y, int width, int heigh
     m_feedTitleListView.Attach(CreateWindowEx(WS_EX_STATICEDGE, WC_LISTVIEW, nullptr, dwStyle, x, y,
         titleColWidth + updatedColWidth, height, m_hWnd, (HMENU)IDC_FEED_TITLE_LIST_VIEW, m_hInstance, nullptr));
     SendMessage(m_feedTitleListView.m_hWnd, LVM_SETEXTENDEDLISTVIEWSTYLE, 0, LVS_EX_FULLROWSELECT); // Set extended style
+    SendMessage(m_feedTitleListView.m_hWnd, WM_SETFONT, (WPARAM)m_font, TRUE);
 
     LV_COLUMN   lvColumn{};
     lvColumn.mask = LVCF_WIDTH | LVCF_TEXT;
