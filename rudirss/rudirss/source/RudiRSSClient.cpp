@@ -85,8 +85,13 @@ void RudiRSSClient::OnDBConsumption()
         if (FeedDatabase::FeedConsumptionUnit::OperationType::INSERT_DATA == consumptionUnit.opType)
         {
             m_db.InsertFeed(consumptionUnit.feed);
-            for (const auto& feedData : consumptionUnit.feedDataContainer)
+            long long feedid = 0;
+            m_db.QueryFeedByGuid(consumptionUnit.feed.guid, [&](const FeedDatabase::Feed& feed) {
+                feedid = feed.feedid;
+                });
+            for (auto& feedData : consumptionUnit.feedDataContainer)
             {
+                feedData.feedid = feedid;
                 m_db.InsertFeedData(feedData);
             }
         }
@@ -170,7 +175,7 @@ void RudiRSSClient::PushDBConsumptionUnit(const std::unique_ptr<Feed>& feed)
     feed->IterateFeeds([&](const FeedData& feedData) -> bool {
         FeedDatabase::FeedData dbFeedData;
         FeedCommon::ConvertWideStringToString(feedData.GetValue(FeedCommon::FeedSpecification::RSS == spec ? L"link" : L"id"), dbFeedData.guid);
-        dbFeedData.feedguid = consumptionUnit.feed.guid;
+        dbFeedData.feedid = consumptionUnit.feed.feedid;
         dbFeedData.link = dbFeedData.guid;
         FeedCommon::ConvertWideStringToString(feedData.GetValue(L"title"), dbFeedData.title);
         FeedCommon::ConvertWideStringToString(feedData.GetValue(FeedCommon::FeedSpecification::RSS == spec ? L"pubDate" : L"updated"), dbFeedData.datetime);
@@ -218,9 +223,9 @@ bool RudiRSSClient::QueryFeed(long long feedId, FeedDatabase::FN_QUERY_FEED fnQu
     return m_db.QueryFeed(feedId, fnQueryFeed);
 }
 
-bool RudiRSSClient::QueryFeed(const std::string& guid, FeedDatabase::FN_QUERY_FEED fnQueryFeed)
+bool RudiRSSClient::QueryFeedByGuid(const std::string& guid, FeedDatabase::FN_QUERY_FEED fnQueryFeed)
 {
-    return m_db.QueryFeed(guid, fnQueryFeed);
+    return m_db.QueryFeedByGuid(guid, fnQueryFeed);
 }
 
 bool RudiRSSClient::QueryAllFeeds(FeedDatabase::FN_QUERY_FEED fnQueryFeed)
@@ -228,14 +233,14 @@ bool RudiRSSClient::QueryAllFeeds(FeedDatabase::FN_QUERY_FEED fnQueryFeed)
     return m_db.QueryAllFeeds(fnQueryFeed);
 }
 
-bool RudiRSSClient::QueryFeedData(const std::string& guid, FeedDatabase::FN_QUERY_FEED_DATA fnQueryFeedData)
+bool RudiRSSClient::QueryFeedDataByFeedId(long long feedid, FeedDatabase::FN_QUERY_FEED_DATA fnQueryFeedData)
 {
-    return m_db.QueryFeedData(guid, fnQueryFeedData);
+    return m_db.QueryFeedDataByFeedId(feedid, fnQueryFeedData);
 }
 
-bool RudiRSSClient::QueryFeedDataOrderByTimestamp(const std::string& guid, FeedDatabase::FN_QUERY_FEED_DATA fnQueryFeedData)
+bool RudiRSSClient::QueryFeedDataOrderByTimestamp(long long feedid, FeedDatabase::FN_QUERY_FEED_DATA fnQueryFeedData)
 {
-    return m_db.QueryFeedDataOrderByTimestamp(guid, fnQueryFeedData);
+    return m_db.QueryFeedDataOrderByTimestamp(feedid, fnQueryFeedData);
 }
 
 bool RudiRSSClient::QueryAllFeedDataOrderByTimestamp(FeedDatabase::FN_QUERY_FEED_DATA fnQueryFeedData)
@@ -243,9 +248,9 @@ bool RudiRSSClient::QueryAllFeedDataOrderByTimestamp(FeedDatabase::FN_QUERY_FEED
     return m_db.QueryAllFeedDataOrderByTimestamp(fnQueryFeedData);
 }
 
-bool RudiRSSClient::QueryFeedData(long long feeddataid, FeedDatabase::FN_QUERY_FEED_DATA fnQueryFeedData)
+bool RudiRSSClient::QueryFeedDataByFeedDataId(long long feeddataid, FeedDatabase::FN_QUERY_FEED_DATA fnQueryFeedData)
 {
-    return m_db.QueryFeedData(feeddataid, fnQueryFeedData);
+    return m_db.QueryFeedDataByFeedDataId(feeddataid, fnQueryFeedData);
 }
 
 bool RudiRSSClient::UpdateFeedDataReadColumn(long long feeddataid, long long read)

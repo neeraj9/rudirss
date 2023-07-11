@@ -17,12 +17,12 @@ public:
 
     virtual bool Initialize();
     bool QueryFeed(long long feedId, FeedDatabase::FN_QUERY_FEED fnQueryFeed);
-    bool QueryFeed(const std::string &guid, FeedDatabase::FN_QUERY_FEED fnQueryFeed);
+    bool QueryFeedByGuid(const std::string &guid, FeedDatabase::FN_QUERY_FEED fnQueryFeed);
     bool QueryAllFeeds(FeedDatabase::FN_QUERY_FEED fnQueryFeed);
-    bool QueryFeedData(const std::string& guid, FeedDatabase::FN_QUERY_FEED_DATA fnQueryFeedData);
-    bool QueryFeedDataOrderByTimestamp(const std::string& guid, FeedDatabase::FN_QUERY_FEED_DATA fnQueryFeedData);
+    bool QueryFeedDataByFeedId(long long feedid, FeedDatabase::FN_QUERY_FEED_DATA fnQueryFeedData);
+    bool QueryFeedDataOrderByTimestamp(long long feedid, FeedDatabase::FN_QUERY_FEED_DATA fnQueryFeedData);
     bool QueryAllFeedDataOrderByTimestamp(FeedDatabase::FN_QUERY_FEED_DATA fnQueryFeedData);
-    bool QueryFeedData(long long feeddataid, FeedDatabase::FN_QUERY_FEED_DATA fnQueryFeedData);
+    bool QueryFeedDataByFeedDataId(long long feeddataid, FeedDatabase::FN_QUERY_FEED_DATA fnQueryFeedData);
     bool UpdateFeedDataReadColumn(long long feeddataid, long long read);
 
     using FN_ON_DB_NOTIFICATION = std::function<void(const FeedDatabase::FeedConsumptionUnit &)>;

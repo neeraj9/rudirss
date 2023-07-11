@@ -74,7 +74,7 @@ bool RudiRSSMainWindow::Initialize(HINSTANCE hInstance)
             m_rudiRSSClient.StartRefreshFeedTimer(0, 1800 * 1000, [&](const FeedDatabase::FeedConsumptionUnit& consumptionUnit) {
                 if (FeedDatabase::FeedConsumptionUnit::OperationType::NOTIFY_INSERTION_COMPLETE == consumptionUnit.opType)
                 {
-                    m_rudiRSSClient.QueryFeed(consumptionUnit.feed.guid, [&](const FeedDatabase::Feed& feed) {
+                    m_rudiRSSClient.QueryFeedByGuid(consumptionUnit.feed.guid, [&](const FeedDatabase::Feed& feed) {
                         if (!FeedIdExistInSet(feed.feedid))
                             InsertIntoFeedListView(feed);
                         });
@@ -277,7 +277,7 @@ std::wstring RudiRSSMainWindow::GetReadStateSymbol(long long read)
     return 0 != read ? L"[X] " : L"[ ] ";
 }
 
-void RudiRSSMainWindow::MarkFeedDataAsReadOrUnRead(LPNMITEMACTIVATE activateItem, const std::wstring &title, long long read)
+void RudiRSSMainWindow::MarkFeedDataAsReadOrUnRead(LPNMITEMACTIVATE activateItem, const std::wstring& title, long long read)
 {
     std::wstring text = GetReadStateSymbol(read) + title;;
     LVITEM lvItem{};
@@ -356,12 +356,7 @@ LRESULT RudiRSSMainWindow::OnProcessFeedListView(HWND hWnd, UINT message, WPARAM
         SendMessage(m_feedTitleListView.m_hWnd, LVM_DELETEALLITEMS, 0, 0);
         if (FeedDatabase::INVALID_FEEDDATA_ID != feedId)
         {
-            std::string guid;
-            m_rudiRSSClient.QueryFeed(feedId, [&](const FeedDatabase::Feed& feed) {
-                guid = feed.guid;
-                });
-
-            m_rudiRSSClient.QueryFeedDataOrderByTimestamp(guid, [&](const FeedDatabase::FeedData& feedData) {
+            m_rudiRSSClient.QueryFeedDataOrderByTimestamp(feedId, [&](const FeedDatabase::FeedData& feedData) {
                 InsertIntoFeedTitleListView(feedData);
                 });
         }
@@ -392,7 +387,7 @@ LRESULT RudiRSSMainWindow::OnProcessFeedTitleListView(HWND hWnd, UINT message, W
         {
             long long feedDataId = static_cast<long long>(GetLParamFromListView(itemActivate));
             std::wstring title;
-            m_rudiRSSClient.QueryFeedData(feedDataId, [&](const FeedDatabase::FeedData& feedData) {
+            m_rudiRSSClient.QueryFeedDataByFeedDataId(feedDataId, [&](const FeedDatabase::FeedData& feedData) {
                 FeedCommon::ConvertStringToWideString(feedData.title, title);
                 std::wstring link;
                 FeedCommon::ConvertStringToWideString(feedData.link, link);

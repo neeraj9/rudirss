@@ -17,6 +17,7 @@ TEST(TestFeedDatabaseCase, TestDBOperations)
         ASSERT_TRUE(true);
 
         std::string sGUID = "d8c26708-ee30-44a0-8fd8-8b8fc20f4ae2";
+        long long feedid = 1;
         std::string url = "https://news.ycombinator.com/rss";
         std::vector<std::string> links = { "https://www.nytimes.com/2023/06/16/us/daniel-ellsberg-dead.html", "https://propbox.co" };
         std::string datetime = "2023-06-12T13:33:08+08:00";
@@ -41,7 +42,7 @@ TEST(TestFeedDatabaseCase, TestDBOperations)
         {
             FeedDatabase::FeedData feedData;
             feedData.guid = link;
-            feedData.feedguid = sGUID;
+            feedData.feedid = feedid;
             feedData.link = link;
             feedData.title = title;
             feedData.datetime = datetime;
@@ -52,7 +53,7 @@ TEST(TestFeedDatabaseCase, TestDBOperations)
             feedDatabase.InsertFeedData(feedData);
         }
 
-        result = feedDatabase.QueryFeedData(sGUID, [](const FeedDatabase::FeedData& feedData) {
+        result = feedDatabase.QueryFeedDataByFeedId(feedid, [](const FeedDatabase::FeedData& feedData) {
             });
         ASSERT_TRUE(result);
 

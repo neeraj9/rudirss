@@ -17,9 +17,9 @@ protected:
     SQLite3StmtHandle m_queryFeedStmt;
     SQLite3StmtHandle m_queryFeedByGuidStmt;
     SQLite3StmtHandle m_queryAllFeedsStmt;
-    SQLite3StmtHandle m_queryFeedDataByGuidStmt;
+    SQLite3StmtHandle m_queryFeedDataByFeedIdStmt;
     SQLite3StmtHandle m_queryFeedDataByFeedDataIdStmt;
-    SQLite3StmtHandle m_queryFeedDataByGuidOrderByTimestampStmt;
+    SQLite3StmtHandle m_queryFeedDataByFeedIdOrderByTimestampStmt;
     SQLite3StmtHandle m_queryAllFeedDataOrderByTimestampStmt;
     SQLite3StmtHandle m_deleteAllFeedStmt;
     SQLite3StmtHandle m_deleteAllFeedDataStmt;
@@ -62,7 +62,7 @@ public:
     {
         long long feeddataid;
         std::string guid;
-        std::string feedguid;
+        long long feedid;
         std::string link;
         std::string title;
         std::string datetime;
@@ -71,11 +71,11 @@ public:
         long long read;
         std::string tag;
         std::string misc;
-        FeedData() : feeddataid{ INVALID_FEEDDATA_ID }, timestamp{ 0 }, createdtime{ 0 }, read{ static_cast<long long>(false) } {}
-        FeedData(const FeedData& rhs) : feeddataid{ rhs.feeddataid }, guid{ rhs.guid }, feedguid{ rhs.feedguid }, link{ rhs.link },
+        FeedData() : feeddataid{ INVALID_FEEDDATA_ID }, feedid{ 0 }, timestamp{ 0 }, createdtime{ 0 }, read{ static_cast<long long>(false) } {}
+        FeedData(const FeedData& rhs) : feeddataid{ rhs.feeddataid }, guid{ rhs.guid }, feedid{ rhs.feedid }, link{ rhs.link },
             title{ rhs.title }, datetime{ rhs.datetime }, timestamp{ rhs.timestamp }, createdtime{ rhs.createdtime }, read{ rhs.read },
             tag{ rhs.tag }, misc{ rhs.misc } {}
-        FeedData(FeedData&& rhs) noexcept : feeddataid{ rhs.feeddataid }, guid{ std::move(rhs.guid) }, feedguid{ std::move(rhs.feedguid) },
+        FeedData(FeedData&& rhs) noexcept : feeddataid{ rhs.feeddataid }, guid{ std::move(rhs.guid) }, feedid{ std::move(rhs.feedid) },
             link{ std::move(rhs.link) }, title{ std::move(rhs.title) }, datetime{ std::move(rhs.datetime) }, timestamp{ rhs.timestamp },
             createdtime{ rhs.createdtime }, read{ rhs.read }, tag{ std::move(rhs.tag) }, misc{ std::move(rhs.misc) } {}
         FeedData& operator=(FeedData&& rhs) noexcept
@@ -84,7 +84,7 @@ public:
             {
                 feeddataid = rhs.feeddataid;
                 guid = std::move(rhs.guid);
-                feedguid = std::move(rhs.feedguid);
+                feedid = rhs.feedid;
                 link = std::move(rhs.link);
                 title = std::move(rhs.title);
                 datetime = std::move(rhs.datetime);
@@ -130,16 +130,17 @@ public:
 
     bool InsertFeed(const Feed& feed);
     bool InsertFeedData(const FeedData& feedData);
+    sqlite3_int64 GetLastInsertRowid();
 
     using FN_QUERY_FEED = std::function<void(const Feed&)>;
     using FN_QUERY_FEED_DATA = std::function<void(const FeedData&)>;
     bool QueryFeed(long long feedId, FN_QUERY_FEED fnQueryFeed);
-    bool QueryFeed(const std::string &guid, FN_QUERY_FEED fnQueryFeed);
+    bool QueryFeedByGuid(const std::string &guid, FN_QUERY_FEED fnQueryFeed);
     bool QueryAllFeeds(FN_QUERY_FEED fnQueryFeed);
-    bool QueryFeedData(const std::string& guid, FN_QUERY_FEED_DATA fnQueryFeedData);
-    bool QueryFeedDataOrderByTimestamp(const std::string& guid, FN_QUERY_FEED_DATA fnQueryFeedData);
+    bool QueryFeedDataByFeedId(long long feedid, FN_QUERY_FEED_DATA fnQueryFeedData);
+    bool QueryFeedDataOrderByTimestamp(long long feedid, FN_QUERY_FEED_DATA fnQueryFeedData);
     bool QueryAllFeedDataOrderByTimestamp(FN_QUERY_FEED_DATA fnQueryFeedData);
-    bool QueryFeedData(long long feeddataid, FN_QUERY_FEED_DATA fnQueryFeedData);
+    bool QueryFeedDataByFeedDataId(long long feeddataid, FN_QUERY_FEED_DATA fnQueryFeedData);
     bool DeleteAllFeeds();
     bool DeleteAllFeedData();
     bool UpdateFeedDataReadColumn(long long feeddataid, long long read);
