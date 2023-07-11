@@ -17,7 +17,6 @@ class RudiRSSMainWindow : public MainWindow
 protected:
     std::wstring m_title;
     std::wstring m_className;
-    WindowHandle m_feedListBox;
     WindowHandle m_feedListView;
     WindowHandle m_feedTitleListView;
     int m_feedListViewWidth;
@@ -31,7 +30,6 @@ protected:
     ATL::CComCriticalSection m_feedListLock;
 
     HFONT m_font;
-    HFONT m_boldFont;
 
     virtual void OnRegister(WNDCLASSEXW& wcex);
     virtual HWND Create();
