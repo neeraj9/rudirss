@@ -229,15 +229,6 @@ void RudiRSSMainWindow::InitFeedTitleListView(int x, int y, int width, int heigh
     lvColumn.cx = updatedColWidth;
     lvColumn.pszText = const_cast<wchar_t*>(L"Updated");
     SendMessage(m_feedTitleListView.m_hWnd, LVM_INSERTCOLUMN, 1, (LPARAM)&lvColumn);
-
-    HIMAGELIST imageList = ImageList_Create(16, 16, ILC_COLORDDB | ILC_MASK, 1, 0);
-    HICON hIcon = (HICON)LoadImage(m_hInstance, MAKEINTRESOURCE(IDI_ICON_NEW_FEED_ITEM), IMAGE_ICON, 0, 0, LR_DEFAULTCOLOR);
-    ImageList_AddIcon(imageList, hIcon);
-    DestroyIcon(hIcon);
-    hIcon = (HICON)LoadImage(m_hInstance, MAKEINTRESOURCE(IDI_ICON_CHECKED_FEED_ITEM), IMAGE_ICON, 0, 0, LR_DEFAULTCOLOR);
-    ImageList_AddIcon(imageList, hIcon);
-    DestroyIcon(hIcon);
-    ListView_SetImageList(m_feedTitleListView.m_hWnd, imageList, LVSIL_SMALL);
 }
 
 void RudiRSSMainWindow::InsertIntoFeedTitleListView(const FeedDatabase::FeedData& feedData)
@@ -246,11 +237,11 @@ void RudiRSSMainWindow::InsertIntoFeedTitleListView(const FeedDatabase::FeedData
     int col = 0;
     std::wstring text;
     FeedCommon::ConvertStringToWideString(feedData.title, text);
+    text = GetReadStateSymbol(feedData.read) + text;
     lvItem.pszText = text.data();
     lvItem.iItem = static_cast<int>(SendMessage(m_feedTitleListView.m_hWnd, LVM_GETITEMCOUNT, 0, 0));
     lvItem.iSubItem = col++;
-    lvItem.mask = LVIF_TEXT | LVIF_PARAM | LVIF_IMAGE;
-    lvItem.iImage = 0 == feedData.read ? 0: 1;
+    lvItem.mask = LVIF_TEXT | LVIF_PARAM;
     lvItem.lParam = (LPARAM)feedData.feeddataid;
     SendMessage(m_feedTitleListView.m_hWnd, LVM_INSERTITEM, 0, (LPARAM)&lvItem);
 
@@ -288,13 +279,19 @@ LPARAM RudiRSSMainWindow::GetLParamFromListView(LPNMITEMACTIVATE activateItem)
     return lvItem.lParam;
 }
 
-void RudiRSSMainWindow::MarkFeedDataAsReadOrUnRead(LPNMITEMACTIVATE activateItem, long long read)
+std::wstring RudiRSSMainWindow::GetReadStateSymbol(long long read)
 {
+    return 0 != read ? L"[X] " : L"[ ] ";
+}
+
+void RudiRSSMainWindow::MarkFeedDataAsReadOrUnRead(LPNMITEMACTIVATE activateItem, const std::wstring &title, long long read)
+{
+    std::wstring text = GetReadStateSymbol(read) + title;;
     LVITEM lvItem{};
     lvItem.iItem = activateItem->iItem;
     lvItem.iSubItem = activateItem->iSubItem;
-    lvItem.mask = LVIF_IMAGE;
-    lvItem.iImage = 0 == read ? 0: 1;
+    lvItem.mask = LVIF_TEXT;
+    lvItem.pszText = text.data();
     SendMessage(activateItem->hdr.hwndFrom, LVM_SETITEM, 0, (LPARAM)&lvItem);
 }
 
@@ -401,13 +398,15 @@ LRESULT RudiRSSMainWindow::OnProcessFeedTitleListView(HWND hWnd, UINT message, W
         if (InterlockedOr(reinterpret_cast<LONG*>(&m_initViewer), 0))
         {
             long long feedDataId = static_cast<long long>(GetLParamFromListView(itemActivate));
+            std::wstring title;
             m_rudiRSSClient.QueryFeedData(feedDataId, [&](const FeedDatabase::FeedData& feedData) {
+                FeedCommon::ConvertStringToWideString(feedData.title, title);
                 std::wstring link;
                 FeedCommon::ConvertStringToWideString(feedData.link, link);
                 m_viewer.Navigate(link);
                 });
             m_rudiRSSClient.UpdateFeedDataReadColumn(feedDataId, static_cast<long long>(true));
-            MarkFeedDataAsReadOrUnRead(itemActivate, static_cast<long long>(true));
+            MarkFeedDataAsReadOrUnRead(itemActivate, title, static_cast<long long>(true));
         }
     }
     break;

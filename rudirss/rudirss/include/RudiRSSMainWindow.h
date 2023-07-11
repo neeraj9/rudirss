@@ -47,7 +47,9 @@ protected:
     void InsertIntoFeedTitleListView(const FeedDatabase::FeedData& feedData);
     long long GetFeedIdFromFeedTitleListView();
     LPARAM GetLParamFromListView(LPNMITEMACTIVATE activateItem);
-    void MarkFeedDataAsReadOrUnRead(LPNMITEMACTIVATE activateItem, long long read);
+
+    std::wstring GetReadStateSymbol(long long read);
+    void MarkFeedDataAsReadOrUnRead(LPNMITEMACTIVATE activateItem, const std::wstring &title, long long read);
 
     LRESULT OnProcessListViewCommand(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
     LRESULT OnProcessFeedListView(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);

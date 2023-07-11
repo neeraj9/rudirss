@@ -14,9 +14,6 @@
 #define IDI_SMALL                       108
 #define IDC_RUDIRSS                     109
 #define IDR_MAINFRAME                   128
-#define IDI_ICON_NEW_FEED_ITEM          130
-#define IDI_ICON2                       131
-#define IDI_ICON_CHECKED_FEED_ITEM      131
 #define IDC_STATIC                      -1
 
 // Next default values for new objects
