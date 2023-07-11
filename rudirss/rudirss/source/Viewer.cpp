@@ -49,9 +49,6 @@ HRESULT Viewer::Initialize(HWND hWnd, const RECT &rc, FN_ON_WEBVIEW_READY fnOnWe
                                 wil::unique_cotaskmem_string uri;
                                 args->get_Uri(&uri);
                                 std::wstring source(uri.get());
-                                if (source.substr(0, 5) != L"https") {
-                                    args->put_Cancel(true);
-                                }
                                 return S_OK;
                             }).Get(), &token);
                         // </NavigationEvents>
