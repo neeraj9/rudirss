@@ -59,6 +59,8 @@
     <ProjectGuid>{049772eb-1ed1-4563-920c-41dd8887b26f}</ProjectGuid>
     <RootNamespace>librssfetcher</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>
+    </ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

@@ -229,6 +229,15 @@ void RudiRSSMainWindow::InitFeedTitleListView(int x, int y, int width, int heigh
     lvColumn.cx = updatedColWidth;
     lvColumn.pszText = const_cast<wchar_t*>(L"Updated");
     SendMessage(m_feedTitleListView.m_hWnd, LVM_INSERTCOLUMN, 1, (LPARAM)&lvColumn);
+
+    HIMAGELIST imageList = ImageList_Create(16, 16, ILC_COLORDDB | ILC_MASK, 1, 0);
+    HICON hIcon = (HICON)LoadImage(m_hInstance, MAKEINTRESOURCE(IDI_ICON_NEW_FEED_ITEM), IMAGE_ICON, 0, 0, LR_DEFAULTCOLOR);
+    ImageList_AddIcon(imageList, hIcon);
+    DestroyIcon(hIcon);
+    hIcon = (HICON)LoadImage(m_hInstance, MAKEINTRESOURCE(IDI_ICON_CHECKED_FEED_ITEM), IMAGE_ICON, 0, 0, LR_DEFAULTCOLOR);
+    ImageList_AddIcon(imageList, hIcon);
+    DestroyIcon(hIcon);
+    ListView_SetImageList(m_feedTitleListView.m_hWnd, imageList, LVSIL_SMALL);
 }
 
 void RudiRSSMainWindow::InsertIntoFeedTitleListView(const FeedDatabase::FeedData& feedData)
@@ -240,7 +249,8 @@ void RudiRSSMainWindow::InsertIntoFeedTitleListView(const FeedDatabase::FeedData
     lvItem.pszText = text.data();
     lvItem.iItem = static_cast<int>(SendMessage(m_feedTitleListView.m_hWnd, LVM_GETITEMCOUNT, 0, 0));
     lvItem.iSubItem = col++;
-    lvItem.mask = LVIF_TEXT | LVIF_PARAM;
+    lvItem.mask = LVIF_TEXT | LVIF_PARAM | LVIF_IMAGE;
+    lvItem.iImage = 0 == feedData.read ? 0: 1;
     lvItem.lParam = (LPARAM)feedData.feeddataid;
     SendMessage(m_feedTitleListView.m_hWnd, LVM_INSERTITEM, 0, (LPARAM)&lvItem);
 
@@ -276,6 +286,16 @@ LPARAM RudiRSSMainWindow::GetLParamFromListView(LPNMITEMACTIVATE activateItem)
     lvItem.mask = LVIF_PARAM;
     SendMessage(activateItem->hdr.hwndFrom, LVM_GETITEM, 0, (LPARAM)&lvItem);
     return lvItem.lParam;
+}
+
+void RudiRSSMainWindow::MarkFeedDataAsReadOrUnRead(LPNMITEMACTIVATE activateItem, long long read)
+{
+    LVITEM lvItem{};
+    lvItem.iItem = activateItem->iItem;
+    lvItem.iSubItem = activateItem->iSubItem;
+    lvItem.mask = LVIF_IMAGE;
+    lvItem.iImage = 0 == read ? 0: 1;
+    SendMessage(activateItem->hdr.hwndFrom, LVM_SETITEM, 0, (LPARAM)&lvItem);
 }
 
 void RudiRSSMainWindow::UpdateControl()
@@ -344,7 +364,6 @@ LRESULT RudiRSSMainWindow::OnProcessFeedListView(HWND hWnd, UINT message, WPARAM
     {
         long long feedId = static_cast<long long>(GetLParamFromListView(itemActivate));
         SendMessage(m_feedTitleListView.m_hWnd, LVM_DELETEALLITEMS, 0, 0);
-        ClearFeedDataReadStateSet();
         if (FeedDatabase::INVALID_FEEDDATA_ID != feedId)
         {
             std::string guid;
@@ -354,14 +373,12 @@ LRESULT RudiRSSMainWindow::OnProcessFeedListView(HWND hWnd, UINT message, WPARAM
 
             m_rudiRSSClient.QueryFeedDataOrderByTimestamp(guid, [&](const FeedDatabase::FeedData& feedData) {
                 InsertIntoFeedTitleListView(feedData);
-                InsertFeedDataReadStateIntoSet(feedData.feeddataid, feedData.read);
                 });
         }
         else
         {
             m_rudiRSSClient.QueryAllFeedDataOrderByTimestamp([&](const FeedDatabase::FeedData& feedData) {
                 InsertIntoFeedTitleListView(feedData);
-                InsertFeedDataReadStateIntoSet(feedData.feeddataid, feedData.read);
                 });
         }
     }
@@ -390,39 +407,7 @@ LRESULT RudiRSSMainWindow::OnProcessFeedTitleListView(HWND hWnd, UINT message, W
                 m_viewer.Navigate(link);
                 });
             m_rudiRSSClient.UpdateFeedDataReadColumn(feedDataId, static_cast<long long>(true));
-            InsertFeedDataReadStateIntoSet(feedDataId, static_cast<long long>(true));
-        }
-    }
-    break;
-
-    case NM_CUSTOMDRAW:
-    {
-        LPNMLVCUSTOMDRAW lpNMCustomDraw = (LPNMLVCUSTOMDRAW)lParam;
-        if (CDDS_PREPAINT == lpNMCustomDraw->nmcd.dwDrawStage)
-        {
-            return CDRF_NOTIFYITEMDRAW;
-        }
-        else if (CDDS_ITEMPREPAINT == lpNMCustomDraw->nmcd.dwDrawStage)
-        {
-            return CDRF_NOTIFYSUBITEMDRAW;
-        }
-        // Flag combined with CDDS_ITEMPREPAINT or CDDS_ITEMPOSTPAINT if a subitem is being drawn.
-        else if ((CDDS_ITEMPREPAINT | CDDS_SUBITEM) == lpNMCustomDraw->nmcd.dwDrawStage)
-        {
-            if (lpNMCustomDraw->iSubItem == 0)
-            {
-                auto feedDataId = static_cast<long long>(lpNMCustomDraw->nmcd.lItemlParam);
-                if (FeedDataIsRead(feedDataId))
-                {
-                    SelectObject(lpNMCustomDraw->nmcd.hdc, m_font);
-                }
-                else
-                {
-                    SelectObject(lpNMCustomDraw->nmcd.hdc, m_boldFont);
-                }
-
-                return CDRF_NEWFONT;
-            }
+            MarkFeedDataAsReadOrUnRead(itemActivate, static_cast<long long>(true));
         }
     }
     break;
@@ -432,7 +417,7 @@ LRESULT RudiRSSMainWindow::OnProcessFeedTitleListView(HWND hWnd, UINT message, W
     }
 
     return DefWindowProc(hWnd, message, wParam, lParam);
-    }
+}
 
 bool RudiRSSMainWindow::FeedIdExistInSet(long long feedid)
 {
@@ -450,29 +435,4 @@ void RudiRSSMainWindow::ClearFeedIdSet()
 {
     ATL::CComCritSecLock lock(m_feedListLock);
     m_feedIdSet.clear();
-}
-
-bool RudiRSSMainWindow::FeedDataIsRead(long long feeddataid)
-{
-    ATL::CComCritSecLock lock(m_feedListLock);
-    bool read = false;
-    auto it = m_feedReadStateSet.find(feeddataid);
-    if (it != m_feedReadStateSet.end())
-    {
-        read = 0 != it->second;
-    }
-
-    return read;
-}
-
-void RudiRSSMainWindow::InsertFeedDataReadStateIntoSet(long long feeddataid, long long read)
-{
-    ATL::CComCritSecLock lock(m_feedListLock);
-    m_feedReadStateSet[feeddataid] = read;
-}
-
-void RudiRSSMainWindow::ClearFeedDataReadStateSet()
-{
-    ATL::CComCritSecLock lock(m_feedListLock);
-    m_feedReadStateSet.clear();
 }

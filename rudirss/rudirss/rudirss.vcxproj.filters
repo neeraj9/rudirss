@@ -32,6 +32,18 @@
     <Image Include="rudirss.ico">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="icon1.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="icon2.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="new_feed_item.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="checked_feed_item.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">

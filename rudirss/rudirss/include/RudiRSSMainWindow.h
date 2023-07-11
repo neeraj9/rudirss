@@ -28,7 +28,6 @@ protected:
     BOOL m_initViewer;
     RudiRSSClient m_rudiRSSClient;
     std::set<long long> m_feedIdSet;
-    std::map<long long, long long> m_feedReadStateSet;
     ATL::CComCriticalSection m_feedListLock;
 
     HFONT m_font;
@@ -48,6 +47,7 @@ protected:
     void InsertIntoFeedTitleListView(const FeedDatabase::FeedData& feedData);
     long long GetFeedIdFromFeedTitleListView();
     LPARAM GetLParamFromListView(LPNMITEMACTIVATE activateItem);
+    void MarkFeedDataAsReadOrUnRead(LPNMITEMACTIVATE activateItem, long long read);
 
     LRESULT OnProcessListViewCommand(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
     LRESULT OnProcessFeedListView(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
@@ -56,10 +56,6 @@ protected:
     bool FeedIdExistInSet(long long feedid);
     void InsertFeedIdIntoSet(long long feedid);
     void ClearFeedIdSet();
-
-    bool FeedDataIsRead(long long feeddataid);
-    void InsertFeedDataReadStateIntoSet(long long feeddataid, long long read);
-    void ClearFeedDataReadStateSet();
 
 public:
     RudiRSSMainWindow();
