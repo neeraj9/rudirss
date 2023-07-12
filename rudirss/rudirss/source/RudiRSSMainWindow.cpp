@@ -40,7 +40,7 @@ void RudiRSSMainWindow::OnRegister(WNDCLASSEXW& wcex)
     //wcex.lpszMenuName   = MAKEINTRESOURCEW(IDC_RUDIRSS);
     wcex.lpszMenuName = nullptr;
     wcex.lpszClassName = m_className.c_str();
-    wcex.hIconSm = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
+    wcex.hIconSm = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_RUDIRSS));
 }
 
 HWND RudiRSSMainWindow::Create()
