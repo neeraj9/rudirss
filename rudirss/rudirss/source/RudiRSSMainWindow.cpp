@@ -302,6 +302,7 @@ void RudiRSSMainWindow::UpdateControl()
             break;
 
         MoveWindow(m_feedListView.m_hWnd, 0, 0, m_feedListViewWidth, height, FALSE);
+        ::RedrawWindow(m_feedListView.m_hWnd, nullptr, nullptr, RDW_INVALIDATE);
         GetClientRect(m_feedListView.m_hWnd, &rc);
         viewerX += rc.right - rc.left;
 
@@ -309,6 +310,7 @@ void RudiRSSMainWindow::UpdateControl()
             break;
 
         MoveWindow(m_feedTitleListView.m_hWnd, rc.right + 1, 0, m_feedTitleListWidth, height, FALSE);
+        ::RedrawWindow(m_feedTitleListView.m_hWnd, nullptr, nullptr, RDW_INVALIDATE);
         GetClientRect(m_feedTitleListView.m_hWnd, &rc);
         viewerX += rc.right - rc.left;
 
