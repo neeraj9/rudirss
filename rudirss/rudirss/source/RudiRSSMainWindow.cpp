@@ -74,10 +74,8 @@ bool RudiRSSMainWindow::Initialize(HINSTANCE hInstance)
             m_rudiRSSClient.StartRefreshFeedTimer(0, 1800 * 1000, [&](const FeedDatabase::FeedConsumptionUnit& consumptionUnit) {
                 if (FeedDatabase::FeedConsumptionUnit::OperationType::NOTIFY_INSERTION_COMPLETE == consumptionUnit.opType)
                 {
-                    m_rudiRSSClient.QueryFeedByGuid(consumptionUnit.feed.guid, [&](const FeedDatabase::Feed& feed) {
-                        if (!FeedIdExistInSet(feed.feedid))
-                            InsertIntoFeedListView(feed);
-                        });
+                    if (!FeedIdExistInSet(consumptionUnit.feed.feedid))
+                        InsertIntoFeedListView(consumptionUnit.feed);
                 }
                 });
         }

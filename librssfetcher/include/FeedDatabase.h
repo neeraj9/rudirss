@@ -110,11 +110,12 @@ public:
         OperationType opType;
         Feed feed;
         std::vector<FeedData> feedDataContainer;
-        FeedConsumptionUnit() : opType{ OperationType::INSERT_DATA } {}
+        bool allowInsertionNotification;
+        FeedConsumptionUnit() : opType{ OperationType::INSERT_DATA }, allowInsertionNotification{ true } {}
         FeedConsumptionUnit(const FeedConsumptionUnit& rhs) :opType{ rhs.opType }, feed{ rhs.feed },
-            feedDataContainer{ rhs.feedDataContainer } {}
+            feedDataContainer{ rhs.feedDataContainer }, allowInsertionNotification{ rhs.allowInsertionNotification } {}
         FeedConsumptionUnit(FeedConsumptionUnit&& rhs) noexcept :opType{ rhs.opType }, feed{ std::move(rhs.feed) },
-            feedDataContainer{ std::move(rhs.feedDataContainer) } {}
+            feedDataContainer{ std::move(rhs.feedDataContainer) }, allowInsertionNotification{ rhs.allowInsertionNotification } {}
         FeedConsumptionUnit& operator=(FeedConsumptionUnit&& rhs) noexcept
         {
             if (this != &rhs)
@@ -122,6 +123,7 @@ public:
                 opType = rhs.opType;
                 feed = std::move(rhs.feed);
                 feedDataContainer = std::move(rhs.feedDataContainer);
+                allowInsertionNotification = rhs.allowInsertionNotification;
             }
 
             return *this;

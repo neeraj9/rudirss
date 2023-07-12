@@ -53,8 +53,6 @@ void RudiRSSClient::OnFeedReady(const std::unique_ptr<Feed>& feed)
 {
     if (feed)
         PushDBConsumptionUnit(feed);
-
-    NotifyDbInsertionComplete(feed);
 }
 
 unsigned __stdcall RudiRSSClient::ThreadDBConsumption(void* param)
@@ -85,23 +83,24 @@ void RudiRSSClient::OnDBConsumption()
         if (FeedDatabase::FeedConsumptionUnit::OperationType::INSERT_DATA == consumptionUnit.opType)
         {
             m_db.InsertFeed(consumptionUnit.feed);
-            long long feedid = 0;
             m_db.QueryFeedByGuid(consumptionUnit.feed.guid, [&](const FeedDatabase::Feed& feed) {
-                feedid = feed.feedid;
+                consumptionUnit.feed.feedid = feed.feedid;
                 });
             for (auto& feedData : consumptionUnit.feedDataContainer)
             {
-                feedData.feedid = feedid;
+                feedData.feedid = consumptionUnit.feed.feedid;
                 m_db.InsertFeedData(feedData);
+            }
+
+            if (consumptionUnit.allowInsertionNotification)
+            {
+                consumptionUnit.opType = FeedDatabase::FeedConsumptionUnit::OperationType::NOTIFY_INSERTION_COMPLETE;
+                NotifyDbEvent(std::move(consumptionUnit));
             }
         }
         else
         {
-            {
-                ATL::CComCritSecLock lock(m_notificationLock);
-                m_notificationQueue.push(std::move(consumptionUnit));
-            }
-            ::ReleaseSemaphore(m_notificationSemaphore, 1, nullptr);
+            NotifyDbEvent(std::move(consumptionUnit));
         }
     }
 }
@@ -192,18 +191,13 @@ void RudiRSSClient::PushDBConsumptionUnit(const std::unique_ptr<Feed>& feed)
     ::ReleaseSemaphore(m_dbSemaphore, 1, nullptr);
 }
 
-void RudiRSSClient::NotifyDbInsertionComplete(const std::unique_ptr<Feed>& feed)
+void RudiRSSClient::NotifyDbEvent(FeedDatabase::FeedConsumptionUnit&& consumptionUnit)
 {
-    FeedDatabase::FeedConsumptionUnit consumptionUnit;
-    consumptionUnit.opType = FeedDatabase::FeedConsumptionUnit::OperationType::NOTIFY_INSERTION_COMPLETE;
-    FeedBase* feedBase = reinterpret_cast<FeedBase*>(feed.get());
-    FeedCommon::ConvertWideStringToString(feedBase->GetFeedUrl(), consumptionUnit.feed.guid);
-
     {
-        ATL::CComCritSecLock lock(m_dbLock);
-        m_dbQueue.push(std::move(consumptionUnit));
+        ATL::CComCritSecLock lock(m_notificationLock);
+        m_notificationQueue.push(std::move(consumptionUnit));
     }
-    ::ReleaseSemaphore(m_dbSemaphore, 1, nullptr);
+    ::ReleaseSemaphore(m_notificationSemaphore, 1, nullptr);
 }
 
 bool RudiRSSClient::PopDBConsumptionUnit(FeedDatabase::FeedConsumptionUnit& consumptionUnit)

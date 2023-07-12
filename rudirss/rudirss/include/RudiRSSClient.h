@@ -70,7 +70,7 @@ protected:
     FN_ON_DB_NOTIFICATION m_fnOnDbNotification;
 
     virtual void OnFeedReady(const std::unique_ptr<Feed>& feed);
-    void NotifyDbInsertionComplete(const std::unique_ptr<Feed>& feed);
+    void NotifyDbEvent(FeedDatabase::FeedConsumptionUnit &&consumptionUnit);
 
     static unsigned __stdcall ThreadDBConsumption(void* param);
     static unsigned __stdcall ThreadDBNotification(void* param);
