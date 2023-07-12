@@ -6,9 +6,7 @@
 #include "FeedDatabase.h"
 
 #include <string>
-#include <list>
 #include <set>
-#include <map>
 #include <atlcore.h>
 #include <CommCtrl.h>
 

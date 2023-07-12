@@ -2,9 +2,6 @@
 #include "Resource.h"
 #include "FeedBase.h"
 
-#include <format>
-#include <vector>
-
 RudiRSSMainWindow::RudiRSSMainWindow() : m_initViewer{ FALSE }, m_font{ nullptr }
 {
     m_feedListViewWidth = 250;
