@@ -73,6 +73,15 @@
     <ClInclude Include="include\RudiRSSClient.h">
       <Filter>Header Files\include</Filter>
     </ClInclude>
+    <ClInclude Include="include\FeedListView.h">
+      <Filter>Header Files\include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\FeedItemListView.h">
+      <Filter>Header Files\include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ListView.h">
+      <Filter>Header Files\include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="rudirss.cpp">
@@ -91,6 +100,12 @@
       <Filter>Source Files\source</Filter>
     </ClCompile>
     <ClCompile Include="source\RudiRSSClient.cpp">
+      <Filter>Source Files\source</Filter>
+    </ClCompile>
+    <ClCompile Include="source\FeedListView.cpp">
+      <Filter>Source Files\source</Filter>
+    </ClCompile>
+    <ClCompile Include="source\FeedItemListView.cpp">
       <Filter>Source Files\source</Filter>
     </ClCompile>
   </ItemGroup>

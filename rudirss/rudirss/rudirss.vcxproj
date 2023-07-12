@@ -160,6 +160,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h" />
+    <ClInclude Include="include\FeedItemListView.h" />
+    <ClInclude Include="include\FeedListView.h" />
+    <ClInclude Include="include\ListView.h" />
     <ClInclude Include="include\MainWindow.h" />
     <ClInclude Include="include\RudiRSSClient.h" />
     <ClInclude Include="include\RudiRSSMainWindow.h" />
@@ -171,6 +174,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="rudirss.cpp" />
+    <ClCompile Include="source\FeedItemListView.cpp" />
+    <ClCompile Include="source\FeedListView.cpp" />
     <ClCompile Include="source\MainWindow.cpp" />
     <ClCompile Include="source\RudiRSSClient.cpp" />
     <ClCompile Include="source\RudiRSSMainWindow.cpp" />

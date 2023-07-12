@@ -4,6 +4,8 @@
 #include "Viewer.h"
 #include "RudiRSSClient.h"
 #include "FeedDatabase.h"
+#include "FeedListView.h"
+#include "FeedItemListView.h"
 
 #include <string>
 #include <set>
@@ -15,17 +17,11 @@ class RudiRSSMainWindow : public MainWindow
 protected:
     std::wstring m_title;
     std::wstring m_className;
-    WindowHandle m_feedListView;
-    WindowHandle m_feedTitleListView;
-    int m_feedListViewWidth;
-    int m_feedTitleListWidth;
-    int m_feedTitleListTitleColumnWidth;
-    int m_feedTitleListUpdatedWidth;
+    FeedListView m_feedListView;
+    FeedItemListView m_feedItemListView;
     Viewer m_viewer;
     BOOL m_initViewer;
     RudiRSSClient m_rudiRSSClient;
-    std::set<long long> m_feedIdSet;
-    ATL::CComCriticalSection m_feedListLock;
 
     HFONT m_font;
 
@@ -37,23 +33,8 @@ protected:
     void InittializeControl();
     void UpdateControl();
     void InitFont();
-    void InitFeedListView(int x, int y, int width, int height);
-    void InsertIntoFeedListView(const FeedDatabase::Feed& feed);
-    void InitFeedTitleListView(int x, int y, int width, int height, int titleColWidth, int updatedColWidth);
-    void InsertIntoFeedTitleListView(const FeedDatabase::FeedData& feedData);
-    long long GetFeedIdFromFeedTitleListView();
-    LPARAM GetLParamFromListView(LPNMITEMACTIVATE activateItem);
-
-    std::wstring GetReadStateSymbol(long long read);
-    void MarkFeedDataAsReadOrUnRead(LPNMITEMACTIVATE activateItem, const std::wstring &title, long long read);
 
     LRESULT OnProcessListViewCommand(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
-    LRESULT OnProcessFeedListView(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
-    LRESULT OnProcessFeedTitleListView(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
-
-    bool FeedIdExistInSet(long long feedid);
-    void InsertFeedIdIntoSet(long long feedid);
-    void ClearFeedIdSet();
 
 public:
     RudiRSSMainWindow();
