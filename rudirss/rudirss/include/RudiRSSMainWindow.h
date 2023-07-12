@@ -33,6 +33,7 @@ protected:
     void InittializeControl();
     void UpdateControl();
     void InitFont();
+    void UpdateSelectedFeed(long long feedid);
 
     LRESULT OnProcessListViewCommand(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 

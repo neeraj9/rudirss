@@ -67,7 +67,23 @@ bool RudiRSSMainWindow::Initialize(HINSTANCE hInstance)
                 if (FeedDatabase::FeedConsumptionUnit::OperationType::NOTIFY_INSERTION_COMPLETE == consumptionUnit.opType)
                 {
                     if (!m_feedListView.FeedIdExistInSet(consumptionUnit.feed.feedid))
+                    {
                         m_feedListView.InsertFeed(consumptionUnit.feed);
+                    }
+                    else
+                    {
+                        // Update the feed items in FeedItemListView that belong to the selected feed in FeedListView
+                        auto selectedIndex = SendMessage(m_feedListView.m_hWnd, LVM_GETNEXTITEM, -1, LVNI_SELECTED);
+                        if (-1 != selectedIndex)
+                        {
+                            auto feedid = static_cast<long long>(ListView::GetLParamFromSelectedItem(m_feedListView.m_hWnd, selectedIndex));
+                            if (consumptionUnit.feed.feedid == feedid)
+                            {
+                                // Only update the selected feed to which feedid belongs
+                                UpdateSelectedFeed(feedid);
+                            }
+                        }
+                    }
                 }
                 });
         }
@@ -135,20 +151,8 @@ void RudiRSSMainWindow::InittializeControl()
             {
             case NM_CLICK:
             {
-                long long feedId = static_cast<long long>(ListView::GetLParamFromActivatedItem(itemActivate));
-                SendMessage(m_feedItemListView.m_hWnd, LVM_DELETEALLITEMS, 0, 0);
-                if (FeedDatabase::INVALID_FEEDDATA_ID != feedId)
-                {
-                    m_rudiRSSClient.QueryFeedDataOrderByTimestamp(feedId, [&](const FeedDatabase::FeedData& feedData) {
-                        m_feedItemListView.InsertFeedItem(feedData);
-                        });
-                }
-                else
-                {
-                    m_rudiRSSClient.QueryAllFeedDataOrderByTimestamp([&](const FeedDatabase::FeedData& feedData) {
-                        m_feedItemListView.InsertFeedItem(feedData);
-                        });
-                }
+                long long feedid = static_cast<long long>(ListView::GetLParamFromActivatedItem(itemActivate));
+                UpdateSelectedFeed(feedid);
             }
             break;
 
@@ -193,7 +197,6 @@ void RudiRSSMainWindow::InittializeControl()
             }
 
             return DefWindowProc(hWnd, message, wParam, lParam);
-
         });
     SendMessage(m_feedItemListView.m_hWnd, WM_SETFONT, (WPARAM)m_font, TRUE);
     GetClientRect(m_feedItemListView.m_hWnd, &rc);
@@ -213,6 +216,23 @@ void RudiRSSMainWindow::InitFont()
     SystemParametersInfo(SPI_GETICONTITLELOGFONT, sizeof(font), &font, 0);
     m_font = CreateFont(font.lfHeight, font.lfWidth, font.lfEscapement, font.lfOrientation, font.lfWeight, font.lfItalic, font.lfUnderline, font.lfStrikeOut,
         font.lfCharSet, font.lfOutPrecision, font.lfClipPrecision, font.lfQuality, font.lfPitchAndFamily, font.lfFaceName);
+}
+
+void RudiRSSMainWindow::UpdateSelectedFeed(long long feedid)
+{
+    SendMessage(m_feedItemListView.m_hWnd, LVM_DELETEALLITEMS, 0, 0);
+    if (FeedDatabase::INVALID_FEEDDATA_ID != feedid)
+    {
+        m_rudiRSSClient.QueryFeedDataOrderByTimestamp(feedid, [&](const FeedDatabase::FeedData& feedData) {
+            m_feedItemListView.InsertFeedItem(feedData);
+            });
+    }
+    else
+    {
+        m_rudiRSSClient.QueryAllFeedDataOrderByTimestamp([&](const FeedDatabase::FeedData& feedData) {
+            m_feedItemListView.InsertFeedItem(feedData);
+            });
+    }
 }
 
 void RudiRSSMainWindow::UpdateControl()

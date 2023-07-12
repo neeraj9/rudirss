@@ -23,6 +23,16 @@ public:
         return lvItem.lParam;
     }
 
+    static LPARAM GetLParamFromSelectedItem(HWND hwnd, int selectedIndex)
+    {
+        LVITEM lvItem{};
+        lvItem.iItem = selectedIndex;
+        lvItem.iSubItem = 0;
+        lvItem.mask = LVIF_PARAM;
+        SendMessage(hwnd, LVM_GETITEM, 0, (LPARAM)&lvItem);
+        return lvItem.lParam;
+    }
+
 protected:
     FN_PROCESS_MESSAGE m_fnProcessMessage;
 };
