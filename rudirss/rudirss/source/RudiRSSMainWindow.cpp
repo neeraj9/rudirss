@@ -188,8 +188,8 @@ void RudiRSSMainWindow::InittializeControl()
                         FeedCommon::ConvertStringToWideString(feedData.link, link);
                         m_viewer.Navigate(link);
                         });
-                    m_rudiRSSClient.UpdateFeedDataReadColumn(feedDataId, static_cast<long long>(true));
-                    m_feedItemListView.MarkFeedDataAsReadOrUnRead(itemActivate, title, static_cast<long long>(true));
+                    if (m_rudiRSSClient.UpdateFeedDataReadColumn(feedDataId, static_cast<long long>(true)))
+                        m_feedItemListView.MarkFeedDataAsReadOrUnRead(itemActivate, title, static_cast<long long>(true));
                 }
             }
             break;
