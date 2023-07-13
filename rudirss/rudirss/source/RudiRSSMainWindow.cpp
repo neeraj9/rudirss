@@ -63,28 +63,31 @@ bool RudiRSSMainWindow::Initialize(HINSTANCE hInstance)
                 m_feedListView.InsertFeed(feed);
                 });
 
-            m_rudiRSSClient.StartRefreshFeedTimer(0, 1800 * 1000, [&](const FeedDatabase::FeedConsumptionUnit& consumptionUnit) {
-                if (FeedDatabase::FeedConsumptionUnit::OperationType::NOTIFY_INSERTION_COMPLETE == consumptionUnit.opType)
-                {
-                    if (!m_feedListView.FeedIdExistInSet(consumptionUnit.feed.feedid))
+            m_rudiRSSClient.StartRefreshFeedTimer(0, 1800 * 1000,
+                [&](const RudiRSSClient::Configuration& configuration) {
+                },
+                [&](const FeedDatabase::FeedConsumptionUnit& consumptionUnit) {
+                    if (FeedDatabase::FeedConsumptionUnit::OperationType::NOTIFY_INSERTION_COMPLETE == consumptionUnit.opType)
                     {
-                        m_feedListView.InsertFeed(consumptionUnit.feed);
-                    }
-                    else
-                    {
-                        // Update the feed items in FeedItemListView that belong to the selected feed in FeedListView
-                        auto selectedIndex = SendMessage(m_feedListView.m_hWnd, LVM_GETNEXTITEM, -1, LVNI_SELECTED);
-                        if (-1 != selectedIndex)
+                        if (!m_feedListView.FeedIdExistInSet(consumptionUnit.feed.feedid))
                         {
-                            auto feedid = static_cast<long long>(ListView::GetLParamFromSelectedItem(m_feedListView.m_hWnd, selectedIndex));
-                            if (consumptionUnit.feed.feedid == feedid)
+                            m_feedListView.InsertFeed(consumptionUnit.feed);
+                        }
+                        else
+                        {
+                            // Update the feed items in FeedItemListView that belong to the selected feed in FeedListView
+                            auto selectedIndex = SendMessage(m_feedListView.m_hWnd, LVM_GETNEXTITEM, -1, LVNI_SELECTED);
+                            if (-1 != selectedIndex)
                             {
-                                // Only update the selected feed to which feedid belongs
-                                UpdateSelectedFeed(feedid);
+                                auto feedid = static_cast<long long>(ListView::GetLParamFromSelectedItem(m_feedListView.m_hWnd, selectedIndex));
+                                if (consumptionUnit.feed.feedid == feedid)
+                                {
+                                    // Only update the selected feed to which feedid belongs
+                                    UpdateSelectedFeed(feedid);
+                                }
                             }
                         }
                     }
-                }
                 });
         }
     }
@@ -144,7 +147,7 @@ void RudiRSSMainWindow::InittializeControl()
     LONG height = rc.bottom - rc.top;
     LONG viewerX = 0;
 
-    m_feedListView.Initialize(m_hWnd, m_hInstance, (HMENU)IDC_FEED_LIST_VIEW, 0, 0, 300, height, 
+    m_feedListView.Initialize(m_hWnd, m_hInstance, (HMENU)IDC_FEED_LIST_VIEW, 0, 0, 300, height,
         [&](HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) -> LRESULT {
             LPNMITEMACTIVATE itemActivate = (LPNMITEMACTIVATE)lParam;
             switch (itemActivate->hdr.code)
@@ -169,7 +172,7 @@ void RudiRSSMainWindow::InittializeControl()
     const int titleColWidth = 250;
     const int updatedColWidth = 150;
     m_feedItemListView.Initialize(m_hWnd, m_hInstance, (HMENU)IDC_FEED_ITEM_LIST_VIEW, rc.right + 1, 0,
-        titleColWidth + updatedColWidth, height, titleColWidth, updatedColWidth, 
+        titleColWidth + updatedColWidth, height, titleColWidth, updatedColWidth,
         [&](HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) -> LRESULT {
             LPNMITEMACTIVATE itemActivate = (LPNMITEMACTIVATE)lParam;
             switch (itemActivate->hdr.code)

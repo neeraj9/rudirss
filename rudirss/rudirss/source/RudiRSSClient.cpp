@@ -252,21 +252,28 @@ bool RudiRSSClient::UpdateFeedDataReadColumn(long long feeddataid, long long rea
     return m_db.UpdateFeedDataReadColumn(feeddataid, read);
 }
 
-void RudiRSSClient::StartRefreshFeedTimer(DWORD dueTime, DWORD period, FN_ON_DB_NOTIFICATION fnOnDbNotification)
+VOID CALLBACK RudiRSSClient::WaitOrTimerCallback(PVOID param, BOOLEAN TimerOrWaitFired)
 {
-    m_fnOnDbNotification = fnOnDbNotification;
-    m_refreshFeedTimer.Create([](PVOID param, BOOLEAN timerOrWaitFired) {
-        RudiRSSClient* rudiRSSClient = reinterpret_cast<RudiRSSClient*>(param);
-        RudiRSSClient::Configuration config;
-        if (rudiRSSClient->LoadConfig(config))
-        {
-            for (const auto& feedUrl : config.feedUrls)
-            {
-                rudiRSSClient->ConsumeFeed(feedUrl);
-            }
-        }
+    RudiRSSClient* pThis = reinterpret_cast<RudiRSSClient*>(param);
+    RudiRSSClient::Configuration config;
+    if (pThis->LoadConfig(config))
+    {
+        if (pThis->m_fnOnPrepareRefreshFeed)
+            pThis->m_fnOnPrepareRefreshFeed(config);
 
-        }, this, dueTime, period, WT_EXECUTEDEFAULT);
+        for (const auto& feedUrl : config.feedUrls)
+        {
+            pThis->ConsumeFeed(feedUrl);
+        }
+    }
+}
+
+void RudiRSSClient::StartRefreshFeedTimer(DWORD dueTime, DWORD period,
+    FN_ON_PREPARE_REFRESH_FEED fnOnPrepareRefreshFeed, FN_ON_DB_NOTIFICATION fnOnDbNotification)
+{
+    m_fnOnPrepareRefreshFeed = fnOnPrepareRefreshFeed;
+    m_fnOnDbNotification = fnOnDbNotification;
+    m_refreshFeedTimer.Create(WaitOrTimerCallback, this, dueTime, period, WT_EXECUTEDEFAULT);
 }
 
 bool RudiRSSClient::LoadConfig(Configuration& config)

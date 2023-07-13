@@ -25,9 +25,6 @@ public:
     bool QueryFeedDataByFeedDataId(long long feeddataid, FeedDatabase::FN_QUERY_FEED_DATA fnQueryFeedData);
     bool UpdateFeedDataReadColumn(long long feeddataid, long long read);
 
-    using FN_ON_DB_NOTIFICATION = std::function<void(const FeedDatabase::FeedConsumptionUnit &)>;
-    void StartRefreshFeedTimer(DWORD dueTime, DWORD period, FN_ON_DB_NOTIFICATION fnOnDbNotification);
-
     struct Configuration
     {
         std::vector<std::wstring> feedUrls;
@@ -44,7 +41,11 @@ public:
             return *this;
         }
     };
-    bool LoadConfig(Configuration &config);
+
+    using FN_ON_DB_NOTIFICATION = std::function<void(const FeedDatabase::FeedConsumptionUnit &)>;
+    using FN_ON_PREPARE_REFRESH_FEED = std::function<void(const Configuration& congiguration)>;
+    void StartRefreshFeedTimer(DWORD dueTime, DWORD period,
+        FN_ON_PREPARE_REFRESH_FEED fnOnPrepareRefreshFeed, FN_ON_DB_NOTIFICATION fnOnDbNotification);
 
 protected:
     static const size_t DEFAULT_MAX_CONSUMPTION_COUNT = 32768;
@@ -67,7 +68,10 @@ protected:
     std::wstring m_rudirssIni;
     std::wstring m_rudirssDbPath;
 
+    FN_ON_PREPARE_REFRESH_FEED m_fnOnPrepareRefreshFeed;
     FN_ON_DB_NOTIFICATION m_fnOnDbNotification;
+
+    bool LoadConfig(Configuration &config);
 
     virtual void OnFeedReady(const std::unique_ptr<Feed>& feed);
     void NotifyDbEvent(FeedDatabase::FeedConsumptionUnit &&consumptionUnit);
@@ -80,4 +84,6 @@ protected:
     bool PopDBConsumptionUnit(FeedDatabase::FeedConsumptionUnit &consumptionUnit);
     void OnDBConsumption();
     void OnDBNotification();
+
+    static VOID CALLBACK WaitOrTimerCallback(PVOID param, BOOLEAN TimerOrWaitFired);
 };
