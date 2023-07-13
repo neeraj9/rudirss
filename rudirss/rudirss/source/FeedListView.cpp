@@ -5,7 +5,7 @@
 #include <atlbase.h>
 #include <CommCtrl.h>
 
-FeedListView::FeedListView() : m_width{ 0 }, m_height{ 0 }
+FeedListView::FeedListView()
 {
     m_lock.Init();
 }

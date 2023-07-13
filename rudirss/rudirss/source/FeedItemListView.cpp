@@ -1,7 +1,7 @@
 #include "FeedItemListView.h"
 #include "FeedCommon.h"
 
-FeedItemListView::FeedItemListView() : m_width{ 0 }, m_height{ 0 }, m_titleColumnWidth{ 0 }, m_updatedColumnWidth{ 0 }
+FeedItemListView::FeedItemListView() : m_titleColumnWidth{ 0 }, m_updatedColumnWidth{ 0 }
 {
 }
 

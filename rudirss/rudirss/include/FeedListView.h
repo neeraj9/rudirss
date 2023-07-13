@@ -23,12 +23,7 @@ public:
 
     virtual LRESULT OnProcessMessage(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
-    const int GetWidth() const { return m_width; }
-    const int GetHeight() const { return m_height; }
-
 protected:
-    int m_width;
-    int m_height;
     std::set<long long> m_feedIdSet;
     ATL::CComCriticalSection m_lock;
 };
