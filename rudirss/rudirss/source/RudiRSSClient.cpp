@@ -16,6 +16,8 @@ m_runDbConsumption{ FALSE }, m_keepNotification{ FALSE }, m_dbNotificationThread
     m_notificationLock.Init();
     m_notificationSemaphore = CreateSemaphore(nullptr, 0, DEFAULT_MAX_CONSUMPTION_COUNT, nullptr);
 
+    m_configurationLock.Init();
+
     WCHAR appDataDir[MAX_PATH]{};
     SHGetSpecialFolderPath(NULL, appDataDir, CSIDL_APPDATA, FALSE);
     m_rudirssDirectory = std::wstring(appDataDir) + L"\\rudirss";
@@ -31,6 +33,17 @@ RudiRSSClient::~RudiRSSClient()
 
     CloseHandle(m_dbSemaphore);
     CloseHandle(m_notificationSemaphore);
+
+    {
+        ATL::CComCritSecLock lock(m_configurationLock);
+        m_lastLoadedConfig.feedUrls.clear();
+        QueryAllFeeds([&](const FeedDatabase::Feed& feed) {
+            std::wstring url;
+            FeedCommon::ConvertStringToWideString(feed.url, url);
+            m_lastLoadedConfig.feedUrls.push_back(url);
+            });
+        SaveConfiguration(m_lastLoadedConfig);
+    }
 }
 
 bool RudiRSSClient::Initialize()
@@ -42,7 +55,8 @@ bool RudiRSSClient::Initialize()
 
         DatabaseConfiguration dbConfig;
         LoadDatabaseConfiguration(dbConfig);
-        DeleteOutdatedFeedData(dbConfig.reserveDays);
+        if (dbConfig.allowDeleteOutdatedFeedItems)
+            DeleteOutdatedFeedData(dbConfig.reserveDays);
     }
     catch (const std::exception& e)
     {
@@ -80,7 +94,7 @@ void RudiRSSClient::OnDBConsumption()
     {
         if (!InterlockedOr(reinterpret_cast<LONG*>(&m_runDbConsumption), 0))
             break;
-        
+
         FeedDatabase::FeedConsumptionUnit consumptionUnit;
         if (!PopDBConsumptionUnit(consumptionUnit))
             continue;
@@ -116,7 +130,7 @@ void RudiRSSClient::OnDBNotification()
     {
         if (!InterlockedOr(reinterpret_cast<LONG*>(&m_keepNotification), 0))
             break;
-        
+
         ATL::CComCritSecLock lock(m_notificationLock);
         if (!m_notificationQueue.empty())
         {
@@ -272,6 +286,11 @@ VOID CALLBACK RudiRSSClient::WaitOrTimerCallback(PVOID param, BOOLEAN TimerOrWai
     Configuration config;
     if (pThis->LoadConfiguration(config))
     {
+        {
+            ATL::CComCritSecLock lock(pThis->m_configurationLock);
+            pThis->m_lastLoadedConfig = config;
+        }
+
         if (pThis->m_fnOnPrepareRefreshFeed)
             pThis->m_fnOnPrepareRefreshFeed(config);
 
@@ -294,13 +313,13 @@ void RudiRSSClient::StartRefreshFeedTimer(FN_ON_PREPARE_REFRESH_FEED fnOnPrepare
 
 void RudiRSSClient::LoadTimerConfiguration(TimerConfiguration& timerConfig)
 {
-    timerConfig.dueTime = GetPrivateProfileInt(L"Timer", L"duetime", TimerConfiguration::DEFAULT_DUETIME, m_rudirssIni.c_str());
-    timerConfig.period = GetPrivateProfileInt(L"Timer", L"period", TimerConfiguration::DEFAULT_PERIOD, m_rudirssIni.c_str());
+    timerConfig.dueTime = GetPrivateProfileInt(L"Timer", L"DueTime", TimerConfiguration::DEFAULT_DUETIME, m_rudirssIni.c_str());
+    timerConfig.period = GetPrivateProfileInt(L"Timer", L"Period", TimerConfiguration::DEFAULT_PERIOD, m_rudirssIni.c_str());
 }
 
 void RudiRSSClient::LoadDatabaseConfiguration(DatabaseConfiguration& dbConfig)
 {
-    dbConfig.deleteOutdatedFeedItems = !!GetPrivateProfileInt(L"Database", L"AllowDeleteOutdatedFeedItems", 1, m_rudirssIni.c_str());
+    dbConfig.allowDeleteOutdatedFeedItems = !!GetPrivateProfileInt(L"Database", L"AllowDeleteOutdatedFeedItems", 1, m_rudirssIni.c_str());
     dbConfig.reserveDays = GetPrivateProfileInt(L"Database", L"ReserveDays", DatabaseConfiguration::DEFAULT_RESERVE_DAYS, m_rudirssIni.c_str());
 }
 
@@ -319,5 +338,30 @@ bool RudiRSSClient::LoadConfiguration(Configuration& config)
     }
 
     return !config.feedUrls.empty();
+}
+
+void RudiRSSClient::SaveTimerConfiguration(TimerConfiguration& timerConfig)
+{
+    WritePrivateProfileString(L"Timer", L"DueTime", std::to_wstring(timerConfig.dueTime).c_str(), m_rudirssIni.c_str());
+    WritePrivateProfileString(L"Timer", L"Period", std::to_wstring(timerConfig.period).c_str(), m_rudirssIni.c_str());
+}
+
+void RudiRSSClient::SaveDatabaseConfiguration(DatabaseConfiguration& dbConfig)
+{
+    WritePrivateProfileString(L"Database", L"AllowDeleteOutdatedFeedItems",
+        std::to_wstring(static_cast<unsigned>(dbConfig.allowDeleteOutdatedFeedItems)).c_str(), m_rudirssIni.c_str());
+    WritePrivateProfileString(L"Database", L"ReserveDays", std::to_wstring(dbConfig.reserveDays).c_str(), m_rudirssIni.c_str());
+}
+
+void RudiRSSClient::SaveConfiguration(Configuration& config)
+{
+    SaveTimerConfiguration(config.timerConfiguration);
+    SaveDatabaseConfiguration(config.dbConfiguration);
+
+    WritePrivateProfileString(L"Feed", L"Count", std::to_wstring(config.feedUrls.size()).c_str(), m_rudirssIni.c_str());
+    for (size_t c = 0; c < config.feedUrls.size(); c++)
+    {
+        WritePrivateProfileString(L"Feed", std::format(L"Feed_{}", c).c_str(), config.feedUrls[c].c_str(), m_rudirssIni.c_str());
+    }
 }
 

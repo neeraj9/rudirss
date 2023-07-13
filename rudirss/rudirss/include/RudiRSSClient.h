@@ -55,9 +55,15 @@ protected:
     FN_ON_PREPARE_REFRESH_FEED m_fnOnPrepareRefreshFeed;
     FN_ON_DB_NOTIFICATION m_fnOnDbNotification;
 
+    Configuration m_lastLoadedConfig;
+    ATL::CComCriticalSection m_configurationLock;
+
     void LoadTimerConfiguration(TimerConfiguration &timerConfig);
     void LoadDatabaseConfiguration(DatabaseConfiguration& dbConfig);
     bool LoadConfiguration(Configuration &config);
+    void SaveTimerConfiguration(TimerConfiguration &timerConfig);
+    void SaveDatabaseConfiguration(DatabaseConfiguration& dbConfig);
+    void SaveConfiguration(Configuration &config);
 
     virtual void OnFeedReady(const std::unique_ptr<Feed>& feed);
     void NotifyDbEvent(FeedDatabase::FeedConsumptionUnit &&consumptionUnit);
