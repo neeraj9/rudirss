@@ -160,6 +160,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h" />
+    <ClInclude Include="include\Configuration.h" />
     <ClInclude Include="include\FeedItemListView.h" />
     <ClInclude Include="include\FeedListView.h" />
     <ClInclude Include="include\ListView.h" />

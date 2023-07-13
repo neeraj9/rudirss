@@ -255,8 +255,8 @@ bool RudiRSSClient::UpdateFeedDataReadColumn(long long feeddataid, long long rea
 VOID CALLBACK RudiRSSClient::WaitOrTimerCallback(PVOID param, BOOLEAN TimerOrWaitFired)
 {
     RudiRSSClient* pThis = reinterpret_cast<RudiRSSClient*>(param);
-    RudiRSSClient::Configuration config;
-    if (pThis->LoadConfig(config))
+    Configuration config;
+    if (pThis->LoadConfiguration(config))
     {
         if (pThis->m_fnOnPrepareRefreshFeed)
             pThis->m_fnOnPrepareRefreshFeed(config);
@@ -268,16 +268,26 @@ VOID CALLBACK RudiRSSClient::WaitOrTimerCallback(PVOID param, BOOLEAN TimerOrWai
     }
 }
 
-void RudiRSSClient::StartRefreshFeedTimer(DWORD dueTime, DWORD period,
-    FN_ON_PREPARE_REFRESH_FEED fnOnPrepareRefreshFeed, FN_ON_DB_NOTIFICATION fnOnDbNotification)
+void RudiRSSClient::StartRefreshFeedTimer(FN_ON_PREPARE_REFRESH_FEED fnOnPrepareRefreshFeed, FN_ON_DB_NOTIFICATION fnOnDbNotification)
 {
     m_fnOnPrepareRefreshFeed = fnOnPrepareRefreshFeed;
     m_fnOnDbNotification = fnOnDbNotification;
-    m_refreshFeedTimer.Create(WaitOrTimerCallback, this, dueTime, period, WT_EXECUTEDEFAULT);
+
+    TimerConfiguration timerConfig;
+    LoadTimerConfiguration(timerConfig);
+    m_refreshFeedTimer.Create(WaitOrTimerCallback, this, timerConfig.dueTime, timerConfig.period, WT_EXECUTEDEFAULT);
 }
 
-bool RudiRSSClient::LoadConfig(Configuration& config)
+void RudiRSSClient::LoadTimerConfiguration(TimerConfiguration& timerConfig)
 {
+    timerConfig.dueTime = GetPrivateProfileInt(L"Timer", L"duetime", TimerConfiguration::DEFAULT_DUETIME, m_rudirssIni.c_str());
+    timerConfig.period = GetPrivateProfileInt(L"Timer", L"period", TimerConfiguration::DEFAULT_PERIOD, m_rudirssIni.c_str());
+}
+
+bool RudiRSSClient::LoadConfiguration(Configuration& config)
+{
+    LoadTimerConfiguration(config.timerConfiguration);
+
     config.feedUrls.clear();
     std::vector<WCHAR> data(2048, 0);
     int feedCount = GetPrivateProfileInt(L"Feed", L"Count", 0, m_rudirssIni.c_str());

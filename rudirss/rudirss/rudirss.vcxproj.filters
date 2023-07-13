@@ -82,6 +82,9 @@
     <ClInclude Include="include\ListView.h">
       <Filter>Header Files\include</Filter>
     </ClInclude>
+    <ClInclude Include="include\Configuration.h">
+      <Filter>Header Files\include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="rudirss.cpp">

@@ -63,8 +63,7 @@ bool RudiRSSMainWindow::Initialize(HINSTANCE hInstance)
                 m_feedListView.InsertFeed(feed);
                 });
 
-            m_rudiRSSClient.StartRefreshFeedTimer(0, 1800 * 1000,
-                [&](const RudiRSSClient::Configuration& configuration) {
+            m_rudiRSSClient.StartRefreshFeedTimer([&](const Configuration& configuration) {
                 },
                 [&](const FeedDatabase::FeedConsumptionUnit& consumptionUnit) {
                     if (FeedDatabase::FeedConsumptionUnit::OperationType::NOTIFY_INSERTION_COMPLETE == consumptionUnit.opType)
