@@ -23,6 +23,7 @@ protected:
     SQLite3StmtHandle m_queryAllFeedDataOrderByTimestampStmt;
     SQLite3StmtHandle m_deleteAllFeedStmt;
     SQLite3StmtHandle m_deleteAllFeedDataStmt;
+    SQLite3StmtHandle m_deleteOutdatedFeedDataStmt;
     SQLite3StmtHandle m_updateFeedDataReadStmt;
     ATL::CComCriticalSection m_dbLock;
 
@@ -145,5 +146,6 @@ public:
     bool QueryFeedDataByFeedDataId(long long feeddataid, FN_QUERY_FEED_DATA fnQueryFeedData);
     bool DeleteAllFeeds();
     bool DeleteAllFeedData();
+    bool DeleteOutdatedFeedData(long long timestamp);
     bool UpdateFeedDataReadColumn(long long feeddataid, long long read);
 };

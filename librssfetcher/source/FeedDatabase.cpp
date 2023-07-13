@@ -84,7 +84,12 @@ void FeedDatabase::Initialize()
     stmt = "DELETE FROM FeedData";
     ret = sqlite3_prepare_v2(m_sql.m_handle, stmt.c_str(), stmt.length(), &m_deleteAllFeedDataStmt.m_handle, nullptr);
     if (0 != ret)
-        throw std::runtime_error("Error: cannot prepare deletion statement for feed data.");
+        throw std::runtime_error("Error: cannot prepare deletion statement for all feed data.");
+
+    stmt = "DELETE FROM FeedData WHERE timestamp < ?";
+    ret = sqlite3_prepare_v2(m_sql.m_handle, stmt.c_str(), stmt.length(), &m_deleteOutdatedFeedDataStmt.m_handle, nullptr);
+    if (0 != ret)
+        throw std::runtime_error("Error: cannot prepare deletion statement for outdated feed data.");
 
     stmt = "UPDATE FeedData SET read = ? WHERE feeddataid = ?";
     ret = sqlite3_prepare_v2(m_sql.m_handle, stmt.c_str(), stmt.length(), &m_updateFeedDataReadStmt.m_handle, nullptr);
@@ -105,6 +110,7 @@ void FeedDatabase::Close()
     m_queryAllFeedDataOrderByTimestampStmt.Close();
     m_deleteAllFeedStmt.Close();
     m_deleteAllFeedDataStmt.Close();
+    m_deleteOutdatedFeedDataStmt.Close();
     m_updateFeedDataReadStmt.Close();
     m_sql.Close();
 }
@@ -380,6 +386,22 @@ bool FeedDatabase::DeleteAllFeedData()
 
     int ret = sqlite3_step(m_deleteAllFeedDataStmt.m_handle);
     sqlite3_reset(m_deleteAllFeedDataStmt.m_handle);
+
+    return SQLITE_DONE == ret;
+}
+
+bool FeedDatabase::DeleteOutdatedFeedData(long long timestamp)
+{
+    ATL::CComCritSecLock lock(m_dbLock);
+    if (!m_deleteOutdatedFeedDataStmt.m_handle)
+        return false;
+
+    int ret = SQLITE_OK;;
+    if (SQLITE_OK == (ret = sqlite3_bind_int64(m_deleteOutdatedFeedDataStmt.m_handle, 1, timestamp)))
+    {
+        ret = sqlite3_step(m_deleteOutdatedFeedDataStmt.m_handle);
+    }
+    sqlite3_reset(m_deleteOutdatedFeedDataStmt.m_handle);
 
     return SQLITE_DONE == ret;
 }

@@ -24,6 +24,7 @@ public:
     bool QueryFeedDataOrderByTimestamp(long long feedid, FeedDatabase::FN_QUERY_FEED_DATA fnQueryFeedData);
     bool QueryAllFeedDataOrderByTimestamp(FeedDatabase::FN_QUERY_FEED_DATA fnQueryFeedData);
     bool QueryFeedDataByFeedDataId(long long feeddataid, FeedDatabase::FN_QUERY_FEED_DATA fnQueryFeedData);
+    bool DeleteOutdatedFeedData(unsigned reserveDays);
     bool UpdateFeedDataReadColumn(long long feeddataid, long long read);
 
     using FN_ON_DB_NOTIFICATION = std::function<void(const FeedDatabase::FeedConsumptionUnit &)>;
@@ -55,6 +56,7 @@ protected:
     FN_ON_DB_NOTIFICATION m_fnOnDbNotification;
 
     void LoadTimerConfiguration(TimerConfiguration &timerConfig);
+    void LoadDatabaseConfiguration(DatabaseConfiguration& dbConfig);
     bool LoadConfiguration(Configuration &config);
 
     virtual void OnFeedReady(const std::unique_ptr<Feed>& feed);

@@ -5,6 +5,7 @@
 #include <userenv.h>
 #include <shlobj_core.h>
 #include <format>
+#include <atltime.h>
 
 RudiRSSClient::RudiRSSClient() : m_dbSemaphore{ nullptr }, m_dbConsumptionThread{ nullptr },
 m_runDbConsumption{ FALSE }, m_keepNotification{ FALSE }, m_dbNotificationThread{ nullptr }
@@ -38,6 +39,10 @@ bool RudiRSSClient::Initialize()
     {
         m_db.Open(m_rudirssDbPath);
         m_db.Initialize();
+
+        DatabaseConfiguration dbConfig;
+        LoadDatabaseConfiguration(dbConfig);
+        DeleteOutdatedFeedData(dbConfig.reserveDays);
     }
     catch (const std::exception& e)
     {
@@ -247,6 +252,15 @@ bool RudiRSSClient::QueryFeedDataByFeedDataId(long long feeddataid, FeedDatabase
     return m_db.QueryFeedDataByFeedDataId(feeddataid, fnQueryFeedData);
 }
 
+bool RudiRSSClient::DeleteOutdatedFeedData(unsigned reserveDays)
+{
+    CTime current(time(nullptr));
+    CTime today(current.GetYear(), current.GetMonth(), current.GetDay(), 0, 0, 0);
+    CTimeSpan span(reserveDays, 0, 0, 0);
+    today -= span;
+    return m_db.DeleteOutdatedFeedData(today.GetTime());
+}
+
 bool RudiRSSClient::UpdateFeedDataReadColumn(long long feeddataid, long long read)
 {
     return m_db.UpdateFeedDataReadColumn(feeddataid, read);
@@ -284,9 +298,16 @@ void RudiRSSClient::LoadTimerConfiguration(TimerConfiguration& timerConfig)
     timerConfig.period = GetPrivateProfileInt(L"Timer", L"period", TimerConfiguration::DEFAULT_PERIOD, m_rudirssIni.c_str());
 }
 
+void RudiRSSClient::LoadDatabaseConfiguration(DatabaseConfiguration& dbConfig)
+{
+    dbConfig.deleteOutdatedFeedItems = !!GetPrivateProfileInt(L"Database", L"AllowDeleteOutdatedFeedItems", 1, m_rudirssIni.c_str());
+    dbConfig.reserveDays = GetPrivateProfileInt(L"Database", L"ReserveDays", DatabaseConfiguration::DEFAULT_RESERVE_DAYS, m_rudirssIni.c_str());
+}
+
 bool RudiRSSClient::LoadConfiguration(Configuration& config)
 {
     LoadTimerConfiguration(config.timerConfiguration);
+    LoadDatabaseConfiguration(config.dbConfiguration);
 
     config.feedUrls.clear();
     std::vector<WCHAR> data(2048, 0);
