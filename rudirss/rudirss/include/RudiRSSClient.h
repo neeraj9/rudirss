@@ -4,11 +4,12 @@
 #include "FeedCommon.h"
 #include "FeedDatabase.h"
 #include "Timer.h"
+#include "RefreshTimer.h"
 #include "Configuration.h"
 
 #include <functional>
-#include <vector>
 #include <queue>
+#include <map>
 
 class RudiRSSClient : public FeedClient
 {
@@ -47,20 +48,16 @@ protected:
     ATL::CComCriticalSection m_notificationLock;
     std::queue<FeedDatabase::FeedConsumptionUnit> m_notificationQueue;
 
-    Timer m_refreshFeedTimer;
+    std::map<std::wstring, RefreshTimer> m_refreshTimer;
+    ATL::CComCriticalSection m_refreshTimerLock;
     std::wstring m_rudirssDirectory;
     std::wstring m_rudirssIni;
     std::wstring m_rudirssDbPath;
 
     FN_ON_DB_NOTIFICATION m_fnOnDbNotification;
 
-    Configuration m_lastLoadedConfig;
-    ATL::CComCriticalSection m_configurationLock;
-
-    void LoadTimerConfiguration(TimerConfiguration &timerConfig);
     void LoadDatabaseConfiguration(DatabaseConfiguration& dbConfig);
     bool LoadConfiguration(Configuration &config);
-    void SaveTimerConfiguration(TimerConfiguration &timerConfig);
     void SaveDatabaseConfiguration(DatabaseConfiguration& dbConfig);
     void SaveConfiguration(Configuration &config);
 

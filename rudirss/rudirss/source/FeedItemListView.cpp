@@ -67,7 +67,7 @@ void FeedItemListView::MarkFeedDataAsReadOrUnRead(LPNMITEMACTIVATE activateItem,
     std::wstring text = GetReadStateSymbol(read) + title;;
     LVITEM lvItem{};
     lvItem.iItem = activateItem->iItem;
-    lvItem.iSubItem = activateItem->iSubItem;
+    lvItem.iSubItem = 0;
     lvItem.mask = LVIF_TEXT;
     lvItem.pszText = text.data();
     SendMessage(activateItem->hdr.hwndFrom, LVM_SETITEM, 0, (LPARAM)&lvItem);

@@ -16,8 +16,6 @@ m_runDbConsumption{ FALSE }, m_keepNotification{ FALSE }, m_dbNotificationThread
     m_notificationLock.Init();
     m_notificationSemaphore = CreateSemaphore(nullptr, 0, DEFAULT_MAX_CONSUMPTION_COUNT, nullptr);
 
-    m_configurationLock.Init();
-
     WCHAR appDataDir[MAX_PATH]{};
     SHGetSpecialFolderPath(NULL, appDataDir, CSIDL_APPDATA, FALSE);
     m_rudirssDirectory = std::wstring(appDataDir) + L"\\rudirss";
@@ -28,21 +26,19 @@ m_runDbConsumption{ FALSE }, m_keepNotification{ FALSE }, m_dbNotificationThread
 
 RudiRSSClient::~RudiRSSClient()
 {
-    m_refreshFeedTimer.Delete();
     StopDBConsumption();
 
     CloseHandle(m_dbSemaphore);
     CloseHandle(m_notificationSemaphore);
 
     {
-        ATL::CComCritSecLock lock(m_configurationLock);
-        m_lastLoadedConfig.feedUrls.clear();
+        Configuration config;
         QueryAllFeeds([&](const FeedDatabase::Feed& feed) {
             std::wstring url;
             FeedCommon::ConvertStringToWideString(feed.url, url);
-            m_lastLoadedConfig.feedUrls.push_back(url);
+            config.feedUrls.push_back(url);
             });
-        SaveConfiguration(m_lastLoadedConfig);
+        SaveConfiguration(config);
     }
 }
 
@@ -161,6 +157,8 @@ void RudiRSSClient::StartDBConsumption()
 
 void RudiRSSClient::StopDBConsumption()
 {
+    m_refreshTimer.clear();
+
     if (m_dbNotificationThread)
     {
         InterlockedExchange(reinterpret_cast<unsigned long*>(&m_keepNotification), FALSE);
@@ -287,35 +285,46 @@ bool RudiRSSClient::QueryFeedTableDataExist(long long& exist)
 
 VOID CALLBACK RudiRSSClient::WaitOrTimerCallback(PVOID param, BOOLEAN TimerOrWaitFired)
 {
-    RudiRSSClient* pThis = reinterpret_cast<RudiRSSClient*>(param);
-    Configuration config;
-    if (pThis->LoadConfiguration(config))
-    {
-        {
-            ATL::CComCritSecLock lock(pThis->m_configurationLock);
-            pThis->m_lastLoadedConfig = config;
-        }
-
-        for (const auto& feedUrl : config.feedUrls)
-        {
-            pThis->ConsumeFeed(feedUrl);
-        }
-    }
+    auto refreshTimer = reinterpret_cast<RefreshTimer*>(param);
+    auto pThis = reinterpret_cast<RudiRSSClient*>(refreshTimer->GetParam());
+    // By design, guid is identical to url in Feed table
+    pThis->ConsumeFeed(refreshTimer->GetFeedGuid());
 }
 
 void RudiRSSClient::StartRefreshFeedTimer(FN_ON_DB_NOTIFICATION fnOnDbNotification)
 {
     m_fnOnDbNotification = fnOnDbNotification;
 
-    TimerConfiguration timerConfig;
-    LoadTimerConfiguration(timerConfig);
-    m_refreshFeedTimer.Create(WaitOrTimerCallback, this, timerConfig.dueTime, timerConfig.period, WT_EXECUTEDEFAULT);
-}
-
-void RudiRSSClient::LoadTimerConfiguration(TimerConfiguration& timerConfig)
-{
-    timerConfig.dueTime = GetPrivateProfileInt(L"Timer", L"DueTime", TimerConfiguration::DEFAULT_DUETIME, m_rudirssIni.c_str());
-    timerConfig.period = GetPrivateProfileInt(L"Timer", L"Period", TimerConfiguration::DEFAULT_PERIOD, m_rudirssIni.c_str());
+    long long feedTableHasData = 0;
+    if (QueryFeedTableDataExist(feedTableHasData)
+        && 1 == feedTableHasData)
+    {
+        QueryAllFeeds([&](const FeedDatabase::Feed& feed) {
+            std::wstring guid;
+            FeedCommon::ConvertStringToWideString(feed.guid, guid);
+            auto pair = m_refreshTimer.insert(std::pair<std::wstring, RefreshTimer>(std::move(guid), std::move(RefreshTimer(this, guid))));
+            if (pair.second)
+            {
+                pair.first->second.Create(WaitOrTimerCallback, &pair.first->second, feed.duetime, feed.updateinterval, WT_EXECUTEDEFAULT);
+            }
+            });
+    }
+    else
+    {
+        Configuration config;
+        if (LoadConfiguration(config))
+        {
+            for (const auto& feedUrl : config.feedUrls)
+            {
+                auto pair = m_refreshTimer.insert(std::pair<std::wstring, RefreshTimer>(feedUrl, std::move(RefreshTimer(this, feedUrl))));
+                if (pair.second)
+                {
+                    pair.first->second.Create(WaitOrTimerCallback, &pair.first->second, FeedDatabase::Feed::DEFAULT_FEED_UPDATE_DUETIME,
+                        FeedDatabase::Feed::DEFAULT_FEED_UPDATE_INTERVAL, WT_EXECUTEDEFAULT);
+                }
+            }
+        }
+    }
 }
 
 void RudiRSSClient::LoadDatabaseConfiguration(DatabaseConfiguration& dbConfig)
@@ -326,7 +335,6 @@ void RudiRSSClient::LoadDatabaseConfiguration(DatabaseConfiguration& dbConfig)
 
 bool RudiRSSClient::LoadConfiguration(Configuration& config)
 {
-    LoadTimerConfiguration(config.timerConfiguration);
     LoadDatabaseConfiguration(config.dbConfiguration);
 
     config.feedUrls.clear();
@@ -341,12 +349,6 @@ bool RudiRSSClient::LoadConfiguration(Configuration& config)
     return !config.feedUrls.empty();
 }
 
-void RudiRSSClient::SaveTimerConfiguration(TimerConfiguration& timerConfig)
-{
-    WritePrivateProfileString(L"Timer", L"DueTime", std::to_wstring(timerConfig.dueTime).c_str(), m_rudirssIni.c_str());
-    WritePrivateProfileString(L"Timer", L"Period", std::to_wstring(timerConfig.period).c_str(), m_rudirssIni.c_str());
-}
-
 void RudiRSSClient::SaveDatabaseConfiguration(DatabaseConfiguration& dbConfig)
 {
     WritePrivateProfileString(L"Database", L"AllowDeleteOutdatedFeedItems",
@@ -356,7 +358,6 @@ void RudiRSSClient::SaveDatabaseConfiguration(DatabaseConfiguration& dbConfig)
 
 void RudiRSSClient::SaveConfiguration(Configuration& config)
 {
-    SaveTimerConfiguration(config.timerConfiguration);
     SaveDatabaseConfiguration(config.dbConfiguration);
 
     WritePrivateProfileString(L"Feed", L"Count", std::to_wstring(config.feedUrls.size()).c_str(), m_rudirssIni.c_str());
