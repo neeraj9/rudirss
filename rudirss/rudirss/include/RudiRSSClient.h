@@ -26,6 +26,7 @@ public:
     bool QueryFeedDataByFeedDataId(long long feeddataid, FeedDatabase::FN_QUERY_FEED_DATA fnQueryFeedData);
     bool DeleteOutdatedFeedData(unsigned reserveDays);
     bool UpdateFeedDataReadColumn(long long feeddataid, long long read);
+    bool QueryFeedTableDataExist(long long& exitst);
 
     using FN_ON_DB_NOTIFICATION = std::function<void(const FeedDatabase::FeedConsumptionUnit &)>;
     void StartRefreshFeedTimer(FN_ON_DB_NOTIFICATION fnOnDbNotification);

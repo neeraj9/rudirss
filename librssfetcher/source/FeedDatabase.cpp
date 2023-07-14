@@ -95,6 +95,11 @@ void FeedDatabase::Initialize()
     ret = sqlite3_prepare_v2(m_sql.m_handle, stmt.c_str(), stmt.length(), &m_updateFeedDataReadStmt.m_handle, nullptr);
     if (0 != ret)
         throw std::runtime_error("Error: cannot prepare update statement for read column of feed data.");
+
+    stmt = "SELECT EXISTS (SELECT 1 FROM Feed LIMIT 1)";
+    ret = sqlite3_prepare_v2(m_sql.m_handle, stmt.c_str(), stmt.length(), &m_queryFeedTableDataExist.m_handle, nullptr);
+    if (0 != ret)
+        throw std::runtime_error("Error: cannot prepare query statement of checking whether feed table is empty.");
 }
 
 void FeedDatabase::Close()
@@ -112,6 +117,7 @@ void FeedDatabase::Close()
     m_deleteAllFeedDataStmt.Close();
     m_deleteOutdatedFeedDataStmt.Close();
     m_updateFeedDataReadStmt.Close();
+    m_queryFeedTableDataExist.Close();
     m_sql.Close();
 }
 
@@ -432,6 +438,22 @@ bool FeedDatabase::UpdateFeedDataReadColumn(long long feeddataid, long long read
         ret = sqlite3_step(m_updateFeedDataReadStmt.m_handle);
     } while (0);
     sqlite3_reset(m_updateFeedDataReadStmt.m_handle);
+
+    return SQLITE_DONE == ret;
+}
+
+bool FeedDatabase::QueryFeedTableDataExist(long long& exist)
+{
+    ATL::CComCritSecLock lock(m_dbLock);
+    if (!m_queryFeedTableDataExist.m_handle)
+        return false;
+
+    int ret = SQLITE_OK;;
+    while (SQLITE_ROW == (ret = sqlite3_step(m_queryFeedTableDataExist.m_handle)))
+    {
+        exist = sqlite3_column_int64(m_queryFeedTableDataExist.m_handle, 0);
+    }
+    sqlite3_reset(m_queryFeedTableDataExist.m_handle);
 
     return SQLITE_DONE == ret;
 }

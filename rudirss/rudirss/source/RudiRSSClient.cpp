@@ -280,6 +280,11 @@ bool RudiRSSClient::UpdateFeedDataReadColumn(long long feeddataid, long long rea
     return m_db.UpdateFeedDataReadColumn(feeddataid, read);
 }
 
+bool RudiRSSClient::QueryFeedTableDataExist(long long& exist)
+{
+    return m_db.QueryFeedTableDataExist(exist);
+}
+
 VOID CALLBACK RudiRSSClient::WaitOrTimerCallback(PVOID param, BOOLEAN TimerOrWaitFired)
 {
     RudiRSSClient* pThis = reinterpret_cast<RudiRSSClient*>(param);
