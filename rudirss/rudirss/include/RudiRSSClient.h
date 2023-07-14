@@ -26,6 +26,8 @@ public:
     bool QueryAllFeedDataOrderByTimestamp(FeedDatabase::FN_QUERY_FEED_DATA fnQueryFeedData);
     bool QueryFeedDataByFeedDataId(long long feeddataid, FeedDatabase::FN_QUERY_FEED_DATA fnQueryFeedData);
     bool DeleteOutdatedFeedData(unsigned reserveDays);
+    bool DeleteFeedByFeedId(long long feedid);
+    bool DeleteFeedDataByFeedId(long long feedid);
     bool UpdateFeedDataReadColumn(long long feeddataid, long long read);
     bool QueryFeedTableDataExist(long long& exitst);
 

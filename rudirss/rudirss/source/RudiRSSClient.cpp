@@ -273,6 +273,16 @@ bool RudiRSSClient::DeleteOutdatedFeedData(unsigned reserveDays)
     return m_db.DeleteOutdatedFeedData(today.GetTime());
 }
 
+bool RudiRSSClient::DeleteFeedByFeedId(long long feedid)
+{
+    return m_db.DeleteFeedByFeedId(feedid);
+}
+
+bool RudiRSSClient::DeleteFeedDataByFeedId(long long feedid)
+{
+    return m_db.DeleteFeedDataByFeedId(feedid);
+}
+
 bool RudiRSSClient::UpdateFeedDataReadColumn(long long feeddataid, long long read)
 {
     return m_db.UpdateFeedDataReadColumn(feeddataid, read);

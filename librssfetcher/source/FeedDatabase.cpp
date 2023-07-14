@@ -91,6 +91,17 @@ void FeedDatabase::Initialize()
     if (0 != ret)
         throw std::runtime_error("Error: cannot prepare deletion statement for outdated feed data.");
 
+
+    stmt = "DELETE FROM Feed WHERE feedid = ?";
+    ret = sqlite3_prepare_v2(m_sql.m_handle, stmt.c_str(), stmt.length(), &m_deleteFeedByFeedIdStmt.m_handle, nullptr);
+    if (0 != ret)
+        throw std::runtime_error("Error: cannot prepare deletion statement by feedid for feed.");
+
+    stmt = "DELETE FROM FeedData WHERE feedid = ?";
+    ret = sqlite3_prepare_v2(m_sql.m_handle, stmt.c_str(), stmt.length(), &m_deleteFeedDataByFeedIdStmt.m_handle, nullptr);
+    if (0 != ret)
+        throw std::runtime_error("Error: cannot prepare deletion statement by feedid for feed data.");
+
     stmt = "UPDATE FeedData SET read = ? WHERE feeddataid = ?";
     ret = sqlite3_prepare_v2(m_sql.m_handle, stmt.c_str(), stmt.length(), &m_updateFeedDataReadStmt.m_handle, nullptr);
     if (0 != ret)
@@ -116,6 +127,8 @@ void FeedDatabase::Close()
     m_deleteAllFeedStmt.Close();
     m_deleteAllFeedDataStmt.Close();
     m_deleteOutdatedFeedDataStmt.Close();
+    m_deleteFeedByFeedIdStmt.Close();;
+    m_deleteFeedDataByFeedIdStmt.Close();
     m_updateFeedDataReadStmt.Close();
     m_queryFeedTableDataExist.Close();
     m_sql.Close();
@@ -420,6 +433,38 @@ bool FeedDatabase::DeleteOutdatedFeedData(long long timestamp)
     return SQLITE_DONE == ret;
 }
 
+bool FeedDatabase::DeleteFeedByFeedId(long long feedid)
+{
+    ATL::CComCritSecLock lock(m_dbLock);
+    if (!m_deleteFeedByFeedIdStmt.m_handle)
+        return false;
+
+    int ret = SQLITE_OK;;
+    if (SQLITE_OK == (ret = sqlite3_bind_int64(m_deleteFeedByFeedIdStmt.m_handle, 1, feedid)))
+    {
+        ret = sqlite3_step(m_deleteFeedByFeedIdStmt.m_handle);
+    }
+    sqlite3_reset(m_deleteFeedByFeedIdStmt.m_handle);
+
+    return SQLITE_DONE == ret;
+}
+
+bool FeedDatabase::DeleteFeedDataByFeedId(long long feedid)
+{
+    ATL::CComCritSecLock lock(m_dbLock);
+    if (!m_deleteFeedDataByFeedIdStmt.m_handle)
+        return false;
+
+    int ret = SQLITE_OK;;
+    if (SQLITE_OK == (ret = sqlite3_bind_int64(m_deleteFeedDataByFeedIdStmt.m_handle, 1, feedid)))
+    {
+        ret = sqlite3_step(m_deleteFeedDataByFeedIdStmt.m_handle);
+    }
+    sqlite3_reset(m_deleteFeedDataByFeedIdStmt.m_handle);
+
+    return SQLITE_DONE == ret;
+}
+
 bool FeedDatabase::UpdateFeedDataReadColumn(long long feeddataid, long long read)
 {
     ATL::CComCritSecLock lock(m_dbLock);
@@ -431,7 +476,7 @@ bool FeedDatabase::UpdateFeedDataReadColumn(long long feeddataid, long long read
     {
         if (SQLITE_OK != (ret = sqlite3_bind_int64(m_updateFeedDataReadStmt.m_handle, 1, read)))
             break;
-        
+
         if (SQLITE_OK != (ret = sqlite3_bind_int64(m_updateFeedDataReadStmt.m_handle, 2, feeddataid)))
             break;
 
