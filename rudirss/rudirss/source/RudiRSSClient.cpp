@@ -319,19 +319,20 @@ void RudiRSSClient::StartRefreshFeedTimer(FN_ON_DB_NOTIFICATION fnOnDbNotificati
             }
             });
     }
-    else
+}
+
+void RudiRSSClient::ImportFromOPML(const std::wstring& opml)
+{
+    std::vector<std::wstring> feedUrls;
+    if (FeedCommon::LoadFeedUrlsFromOPML(opml, feedUrls))
     {
-        Configuration config;
-        if (LoadConfiguration(config))
+        for (const auto& feedUrl : feedUrls)
         {
-            for (const auto& feedUrl : config.feedUrls)
+            auto pair = m_refreshTimer.insert(std::pair<std::wstring, RefreshTimer>(feedUrl, std::move(RefreshTimer(this, feedUrl))));
+            if (pair.second)
             {
-                auto pair = m_refreshTimer.insert(std::pair<std::wstring, RefreshTimer>(feedUrl, std::move(RefreshTimer(this, feedUrl))));
-                if (pair.second)
-                {
-                    pair.first->second.Create(WaitOrTimerCallback, &pair.first->second, FeedDatabase::Feed::DEFAULT_FEED_UPDATE_DUETIME,
-                        FeedDatabase::Feed::DEFAULT_FEED_UPDATE_INTERVAL, WT_EXECUTEDEFAULT);
-                }
+                pair.first->second.Create(WaitOrTimerCallback, &pair.first->second, FeedDatabase::Feed::DEFAULT_FEED_UPDATE_DUETIME,
+                    FeedDatabase::Feed::DEFAULT_FEED_UPDATE_INTERVAL, WT_EXECUTEDEFAULT);
             }
         }
     }
@@ -343,20 +344,9 @@ void RudiRSSClient::LoadDatabaseConfiguration(DatabaseConfiguration& dbConfig)
     dbConfig.reserveDays = GetPrivateProfileInt(L"Database", L"ReserveDays", DatabaseConfiguration::DEFAULT_RESERVE_DAYS, m_rudirssIni.c_str());
 }
 
-bool RudiRSSClient::LoadConfiguration(Configuration& config)
+void RudiRSSClient::LoadConfiguration(Configuration& config)
 {
     LoadDatabaseConfiguration(config.dbConfiguration);
-
-    config.feedUrls.clear();
-    std::vector<WCHAR> data(2048, 0);
-    int feedCount = GetPrivateProfileInt(L"Feed", L"Count", 0, m_rudirssIni.c_str());
-    for (int c = 0; c < feedCount; c++)
-    {
-        DWORD size = GetPrivateProfileString(L"Feed", std::format(L"Feed_{}", c).c_str(), L"", data.data(), data.size(), m_rudirssIni.c_str());
-        config.feedUrls.push_back(std::wstring(data.data(), size));
-    }
-
-    return !config.feedUrls.empty();
 }
 
 void RudiRSSClient::SaveDatabaseConfiguration(DatabaseConfiguration& dbConfig)
@@ -369,11 +359,5 @@ void RudiRSSClient::SaveDatabaseConfiguration(DatabaseConfiguration& dbConfig)
 void RudiRSSClient::SaveConfiguration(Configuration& config)
 {
     SaveDatabaseConfiguration(config.dbConfiguration);
-
-    WritePrivateProfileString(L"Feed", L"Count", std::to_wstring(config.feedUrls.size()).c_str(), m_rudirssIni.c_str());
-    for (size_t c = 0; c < config.feedUrls.size(); c++)
-    {
-        WritePrivateProfileString(L"Feed", std::format(L"Feed_{}", c).c_str(), config.feedUrls[c].c_str(), m_rudirssIni.c_str());
-    }
 }
 

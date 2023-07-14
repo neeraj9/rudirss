@@ -33,6 +33,7 @@ public:
 
     using FN_ON_DB_NOTIFICATION = std::function<void(const FeedDatabase::FeedConsumptionUnit &)>;
     void StartRefreshFeedTimer(FN_ON_DB_NOTIFICATION fnOnDbNotification);
+    void ImportFromOPML(const std::wstring &opml);
 
 protected:
     static const size_t DEFAULT_MAX_CONSUMPTION_COUNT = 32768;
@@ -59,7 +60,7 @@ protected:
     FN_ON_DB_NOTIFICATION m_fnOnDbNotification;
 
     void LoadDatabaseConfiguration(DatabaseConfiguration& dbConfig);
-    bool LoadConfiguration(Configuration &config);
+    void LoadConfiguration(Configuration &config);
     void SaveDatabaseConfiguration(DatabaseConfiguration& dbConfig);
     void SaveConfiguration(Configuration &config);
 

@@ -3,6 +3,8 @@
 #include "FeedBase.h"
 #include "ListView.h"
 
+#include <commdlg.h>
+
 RudiRSSMainWindow::RudiRSSMainWindow() : m_initViewer{ FALSE }, m_font{ nullptr }
 {
 }
@@ -29,8 +31,8 @@ void RudiRSSMainWindow::OnRegister(WNDCLASSEXW& wcex)
     wcex.hIcon = LoadIcon(m_hInstance, MAKEINTRESOURCE(IDI_RUDIRSS));
     wcex.hCursor = LoadCursor(nullptr, IDC_ARROW);
     wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
-    //wcex.lpszMenuName   = MAKEINTRESOURCEW(IDC_RUDIRSS);
-    wcex.lpszMenuName = nullptr;
+    wcex.lpszMenuName   = MAKEINTRESOURCEW(IDC_RUDIRSS);
+    //wcex.lpszMenuName = nullptr;
     wcex.lpszClassName = m_className.c_str();
     wcex.hIconSm = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_RUDIRSS));
 }
@@ -96,6 +98,22 @@ LRESULT RudiRSSMainWindow::OnProcessMessage(HWND hWnd, UINT message, WPARAM wPar
 {
     switch (message)
     {
+    case WM_COMMAND:
+    {
+        switch (LOWORD(wParam))
+        {
+        case ID_FILE_IMPORT_FROM_OPML:
+        {
+            OpenImportOPMLDialog();
+        }
+        break;
+
+        default:
+            break;
+        }
+    }
+    break;
+
     case WM_NOTIFY:
     {
         return OnProcessListViewCommand(hWnd, message, wParam, lParam);
@@ -293,4 +311,18 @@ LRESULT RudiRSSMainWindow::OnProcessListViewCommand(HWND hWnd, UINT message, WPA
     }
 
     return DefWindowProc(hWnd, message, wParam, lParam);
+}
+
+void RudiRSSMainWindow::OpenImportOPMLDialog()
+{
+    WCHAR szPath[MAX_PATH] = {};
+    OPENFILENAME ofn = { sizeof(ofn) };
+    ofn.hwndOwner = m_hWnd;
+    ofn.lpstrFilter = L"OPML file\0*.opml\0";
+    ofn.lpstrFile = szPath;
+    ofn.nMaxFile = ARRAYSIZE(szPath);
+    if (GetOpenFileName(&ofn))
+    {
+        m_rudiRSSClient.ImportFromOPML(ofn.lpstrFile);
+    }
 }

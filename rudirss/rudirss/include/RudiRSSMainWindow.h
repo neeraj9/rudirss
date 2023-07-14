@@ -34,6 +34,7 @@ protected:
     void UpdateControl();
     void InitFont();
     void UpdateSelectedFeed(long long feedid);
+    void OpenImportOPMLDialog();
 
     LRESULT OnProcessListViewCommand(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
