@@ -56,7 +56,15 @@ void AtomFeed::Parse(WinMSXML& xml)
                     FeedData feedData;
                     IterateSiblingElements(entryFirstChild, [&](const std::wstring_view& name, const std::wstring_view& value,
                         const WinMSXML::XMLElement& elementIter) -> bool {
-                            feedData.SetValue(std::wstring(name), std::wstring(value));
+                            if (L"link" == name)
+                            {
+                                auto link = xml.GetAttributeValue(elementIter, L"href");
+                                feedData.SetValue(std::wstring(name), link);
+                            }
+                            else
+                            {
+                                feedData.SetValue(std::wstring(name), std::wstring(value));
+                            }
                             return true;
                         });
 

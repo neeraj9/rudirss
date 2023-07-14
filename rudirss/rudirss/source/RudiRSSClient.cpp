@@ -190,7 +190,7 @@ void RudiRSSClient::PushDBConsumptionUnit(const std::unique_ptr<Feed>& feed)
 
     feed->IterateFeeds([&](const FeedData& feedData) -> bool {
         FeedDatabase::FeedData dbFeedData;
-        FeedCommon::ConvertWideStringToString(feedData.GetValue(FeedCommon::FeedSpecification::RSS == spec ? L"link" : L"id"), dbFeedData.guid);
+        FeedCommon::ConvertWideStringToString(feedData.GetValue(L"link"), dbFeedData.guid);
         dbFeedData.feedid = consumptionUnit.feed.feedid;
         dbFeedData.link = dbFeedData.guid;
         FeedCommon::ConvertWideStringToString(feedData.GetValue(L"title"), dbFeedData.title);

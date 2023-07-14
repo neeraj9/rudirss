@@ -1,0 +1,558 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom" xmlns:media="http://search.yahoo.com/mrss/">
+  <category term="emacs" label="r/emacs"/>
+  <updated>2023-07-14T13:48:15+00:00
+  </updated>
+  <icon>https://www.redditstatic.com/icon.png/
+  </icon>
+  <id>/r/emacs/.rss
+  </id>
+  <link rel="self" href="https://www.reddit.com/r/emacs/.rss" type="application/atom+xml" />
+  <link rel="alternate" href="https://www.reddit.com/r/emacs/" type="text/html" />
+  <logo>https://f.thumbs.redditmedia.com/1CBmBnoqVxNCXdVS.png
+  </logo>
+  <subtitle>The extensible, customizable, self-documenting real-time display editor.
+  </subtitle>
+  <title>M-x emacs-reddit
+  </title>
+  <entry>
+    <author>
+      <name>/u/bandali
+      </name>
+      <uri>https://www.reddit.com/user/bandali
+      </uri>
+    </author>
+    <category term="emacs" label="r/emacs"/>
+    <content type="html">&amp;#32; submitted by &amp;#32; &lt;a href=&quot;https://www.reddit.com/user/bandali&quot;&gt; /u/bandali &lt;/a&gt; &lt;br/&gt; &lt;span&gt;&lt;a href=&quot;https://emacsconf.org/2023/cfp/&quot;&gt;[link]&lt;/a&gt;&lt;/span&gt; &amp;#32; &lt;span&gt;&lt;a href=&quot;https://www.reddit.com/r/emacs/comments/14joeny/emacsconf_2023_call_for_participation/&quot;&gt;[留言]&lt;/a&gt;&lt;/span&gt;
+    </content>
+    <id>t3_14joeny
+    </id>
+    <link href="https://www.reddit.com/r/emacs/comments/14joeny/emacsconf_2023_call_for_participation/" />
+    <updated>2023-06-26T18:01:29+00:00
+    </updated>
+    <published>2023-06-26T18:01:29+00:00
+    </published>
+    <title>EmacsConf 2023 Call for Participation
+    </title>
+  </entry>
+  <entry>
+    <author>
+      <name>/u/AutoModerator
+      </name>
+      <uri>https://www.reddit.com/user/AutoModerator
+      </uri>
+    </author>
+    <category term="emacs" label="r/emacs"/>
+    <content type="html">&lt;!-- SC_OFF --&gt;&lt;div class=&quot;md&quot;&gt;&lt;p&gt;This is a thread for smaller, miscellaneous items that might not warrant a full post on their own.&lt;/p&gt; &lt;p&gt;&lt;a href=&quot;https://www.reddit.com/r/emacs/search?q=Weekly+tips&amp;amp;restrict_sr=on&amp;amp;sort=new&amp;amp;t=all&quot;&gt;See this search for previous &amp;quot;Weekly Tips, Tricks, &amp;amp;c.&amp;quot; Threads.&lt;/a&gt;&lt;/p&gt; &lt;p&gt;Don&amp;#39;t feel constrained in regards to what you post, just keep your post vaguely, generally on the topic of emacs.&lt;/p&gt; &lt;/div&gt;&lt;!-- SC_ON --&gt; &amp;#32; submitted by &amp;#32; &lt;a href=&quot;https://www.reddit.com/user/AutoModerator&quot;&gt; /u/AutoModerator &lt;/a&gt; &lt;br/&gt; &lt;span&gt;&lt;a href=&quot;https://www.reddit.com/r/emacs/comments/14xi1di/weekly_tips_tricks_c_thread/&quot;&gt;[link]&lt;/a&gt;&lt;/span&gt; &amp;#32; &lt;span&gt;&lt;a href=&quot;https://www.reddit.com/r/emacs/comments/14xi1di/weekly_tips_tricks_c_thread/&quot;&gt;[留言]&lt;/a&gt;&lt;/span&gt;
+    </content>
+    <id>t3_14xi1di
+    </id>
+    <link href="https://www.reddit.com/r/emacs/comments/14xi1di/weekly_tips_tricks_c_thread/" />
+    <updated>2023-07-12T08:15:09+00:00
+    </updated>
+    <published>2023-07-12T08:15:09+00:00
+    </published>
+    <title>Weekly Tips, Tricks, &amp;c. Thread
+    </title>
+  </entry>
+  <entry>
+    <author>
+      <name>/u/jaafartrull
+      </name>
+      <uri>https://www.reddit.com/user/jaafartrull
+      </uri>
+    </author>
+    <category term="emacs" label="r/emacs"/>
+    <content type="html">&amp;#32; submitted by &amp;#32; &lt;a href=&quot;https://www.reddit.com/user/jaafartrull&quot;&gt; /u/jaafartrull &lt;/a&gt; &lt;br/&gt; &lt;span&gt;&lt;a href=&quot;http://www.yummymelon.com/devnull/using-ediff-in-2023.html&quot;&gt;[link]&lt;/a&gt;&lt;/span&gt; &amp;#32; &lt;span&gt;&lt;a href=&quot;https://www.reddit.com/r/emacs/comments/14z59e3/using_ediff_in_2023/&quot;&gt;[留言]&lt;/a&gt;&lt;/span&gt;
+    </content>
+    <id>t3_14z59e3
+    </id>
+    <link href="https://www.reddit.com/r/emacs/comments/14z59e3/using_ediff_in_2023/" />
+    <updated>2023-07-14T03:37:18+00:00
+    </updated>
+    <published>2023-07-14T03:37:18+00:00
+    </published>
+    <title>Using Ediff in 2023
+    </title>
+  </entry>
+  <entry>
+    <author>
+      <name>/u/youngwook_kim
+      </name>
+      <uri>https://www.reddit.com/user/youngwook_kim
+      </uri>
+    </author>
+    <category term="emacs" label="r/emacs"/>
+    <content type="html">&lt;!-- SC_OFF --&gt;&lt;div class=&quot;md&quot;&gt;&lt;p&gt;Hello, I wanted to share a tool I&amp;#39;ve been working on called &lt;a href=&quot;https://github.com/ywkim/gpt-commit&quot;&gt;GPT-Commit&lt;/a&gt;. It&amp;#39;s an Emacs package that uses OpenAI&amp;#39;s GPT model to automatically generate commit messages. It aims to save developers&amp;#39; time and increase efficiency by automating the task of writing commit messages. You can find more information and a detailed guide on how to install and use it in this &lt;a href=&quot;https://ywkim.github.io/automating-commit-messages-with-gpt-commit/&quot;&gt;blog post&lt;/a&gt;. I&amp;#39;d love to hear your thoughts and feedback!&lt;/p&gt; &lt;/div&gt;&lt;!-- SC_ON --&gt; &amp;#32; submitted by &amp;#32; &lt;a href=&quot;https://www.reddit.com/user/youngwook_kim&quot;&gt; /u/youngwook_kim &lt;/a&gt; &lt;br/&gt; &lt;span&gt;&lt;a href=&quot;https://www.reddit.com/r/emacs/comments/14z0vcl/introducing_gptcommit_an_emacs_package_for/&quot;&gt;[link]&lt;/a&gt;&lt;/span&gt; &amp;#32; &lt;span&gt;&lt;a href=&quot;https://www.reddit.com/r/emacs/comments/14z0vcl/introducing_gptcommit_an_emacs_package_for/&quot;&gt;[留言]&lt;/a&gt;&lt;/span&gt;
+    </content>
+    <id>t3_14z0vcl
+    </id>
+    <link href="https://www.reddit.com/r/emacs/comments/14z0vcl/introducing_gptcommit_an_emacs_package_for/" />
+    <updated>2023-07-14T00:08:00+00:00
+    </updated>
+    <published>2023-07-14T00:08:00+00:00
+    </published>
+    <title>Introducing GPT-Commit: An Emacs Package for AI-Generated Commit Messages
+    </title>
+  </entry>
+  <entry>
+    <author>
+      <name>/u/zamansky
+      </name>
+      <uri>https://www.reddit.com/user/zamansky
+      </uri>
+    </author>
+    <category term="emacs" label="r/emacs"/>
+    <content type="html">&lt;!-- SC_OFF --&gt;&lt;div class=&quot;md&quot;&gt;&lt;p&gt;Covering some basics before we can dive in to some useful Emacs customizations: &lt;/p&gt; &lt;p&gt;Learning elisp 2 - &lt;a href=&quot;https://cestlaz.github.io/post/learning-elisp-2/&quot;&gt;https://cestlaz.github.io/post/learning-elisp-2/&lt;/a&gt;&lt;/p&gt; &lt;/div&gt;&lt;!-- SC_ON --&gt; &amp;#32; submitted by &amp;#32; &lt;a href=&quot;https://www.reddit.com/user/zamansky&quot;&gt; /u/zamansky &lt;/a&gt; &lt;br/&gt; &lt;span&gt;&lt;a href=&quot;https://www.reddit.com/r/emacs/comments/14yp107/learning_elisp_2_variables/&quot;&gt;[link]&lt;/a&gt;&lt;/span&gt; &amp;#32; &lt;span&gt;&lt;a href=&quot;https://www.reddit.com/r/emacs/comments/14yp107/learning_elisp_2_variables/&quot;&gt;[留言]&lt;/a&gt;&lt;/span&gt;
+    </content>
+    <id>t3_14yp107
+    </id>
+    <link href="https://www.reddit.com/r/emacs/comments/14yp107/learning_elisp_2_variables/" />
+    <updated>2023-07-13T16:13:18+00:00
+    </updated>
+    <published>2023-07-13T16:13:18+00:00
+    </published>
+    <title>Learning Elisp 2 - variables
+    </title>
+  </entry>
+  <entry>
+    <author>
+      <name>/u/iwasjusttwittering
+      </name>
+      <uri>https://www.reddit.com/user/iwasjusttwittering
+      </uri>
+    </author>
+    <category term="emacs" label="r/emacs"/>
+    <content type="html">&amp;#32; submitted by &amp;#32; &lt;a href=&quot;https://www.reddit.com/user/iwasjusttwittering&quot;&gt; /u/iwasjusttwittering &lt;/a&gt; &lt;br/&gt; &lt;span&gt;&lt;a href=&quot;https://lwn.net/Articles/936576/&quot;&gt;[link]&lt;/a&gt;&lt;/span&gt; &amp;#32; &lt;span&gt;&lt;a href=&quot;https://www.reddit.com/r/emacs/comments/14yt2ds/emacs_for_android_lwnnet/&quot;&gt;[留言]&lt;/a&gt;&lt;/span&gt;
+    </content>
+    <id>t3_14yt2ds
+    </id>
+    <link href="https://www.reddit.com/r/emacs/comments/14yt2ds/emacs_for_android_lwnnet/" />
+    <updated>2023-07-13T18:52:09+00:00
+    </updated>
+    <published>2023-07-13T18:52:09+00:00
+    </published>
+    <title>Emacs for Android [LWN.net]
+    </title>
+  </entry>
+  <entry>
+    <author>
+      <name>/u/kn0xchad
+      </name>
+      <uri>https://www.reddit.com/user/kn0xchad
+      </uri>
+    </author>
+    <category term="emacs" label="r/emacs"/>
+    <content type="html">&lt;!-- SC_OFF --&gt;&lt;div class=&quot;md&quot;&gt;&lt;p&gt;Hi all,&lt;/p&gt; &lt;p&gt;I&amp;#39;m currently in the process of trying out (and hopefully embracing) emacs. Coming from a vim past, I&amp;#39;m playing around with doom emacs and was wondering, is there a way to make the vi-style fringe (indicating end-of-file) bold faced in it?&lt;/p&gt; &lt;p&gt;My apologies if this isn&amp;#39;t the right subreddit to ask (please feel free to let me know the right one). Thanks in advance!&lt;/p&gt; &lt;/div&gt;&lt;!-- SC_ON --&gt; &amp;#32; submitted by &amp;#32; &lt;a href=&quot;https://www.reddit.com/user/kn0xchad&quot;&gt; /u/kn0xchad &lt;/a&gt; &lt;br/&gt; &lt;span&gt;&lt;a href=&quot;https://www.reddit.com/r/emacs/comments/14ys7cn/how_to_make_vistyle_fringe_to_be_bold/&quot;&gt;[link]&lt;/a&gt;&lt;/span&gt; &amp;#32; &lt;span&gt;&lt;a href=&quot;https://www.reddit.com/r/emacs/comments/14ys7cn/how_to_make_vistyle_fringe_to_be_bold/&quot;&gt;[留言]&lt;/a&gt;&lt;/span&gt;
+    </content>
+    <id>t3_14ys7cn
+    </id>
+    <link href="https://www.reddit.com/r/emacs/comments/14ys7cn/how_to_make_vistyle_fringe_to_be_bold/" />
+    <updated>2023-07-13T18:17:54+00:00
+    </updated>
+    <published>2023-07-13T18:17:54+00:00
+    </published>
+    <title>How to make vi-style fringe to be bold?
+    </title>
+  </entry>
+  <entry>
+    <author>
+      <name>/u/zhaozhemin
+      </name>
+      <uri>https://www.reddit.com/user/zhaozhemin
+      </uri>
+    </author>
+    <category term="emacs" label="r/emacs"/>
+    <content type="html">&lt;!-- SC_OFF --&gt;&lt;div class=&quot;md&quot;&gt;&lt;p&gt;A usual scenario goes like this:&lt;/p&gt; &lt;ul&gt; &lt;li&gt;work on a file;&lt;/li&gt; &lt;li&gt;want to see the commit history of the file;&lt;/li&gt; &lt;li&gt;call &lt;code&gt;magit-file-dispatch&lt;/code&gt; then press &lt;code&gt;l&lt;/code&gt;;&lt;/li&gt; &lt;li&gt;jump into one of the commits;&lt;/li&gt; &lt;li&gt;end up in a &lt;code&gt;magit-revision&lt;/code&gt; buffer showing only the changes of the file.&lt;/li&gt; &lt;/ul&gt; &lt;p&gt;All went well. But now I want to see other changes in the commit. What&amp;#39;s the best way to do that? Currently I just copy the commit hash and do a &lt;code&gt;git show&lt;/code&gt; in terminal. It&amp;#39;s not very convenient.&lt;/p&gt; &lt;p&gt;Thanks.&lt;/p&gt; &lt;/div&gt;&lt;!-- SC_ON --&gt; &amp;#32; submitted by &amp;#32; &lt;a href=&quot;https://www.reddit.com/user/zhaozhemin&quot;&gt; /u/zhaozhemin &lt;/a&gt; &lt;br/&gt; &lt;span&gt;&lt;a href=&quot;https://www.reddit.com/r/emacs/comments/14ygy84/how_to_discard_the_limit_to_files_flag_in_a/&quot;&gt;[link]&lt;/a&gt;&lt;/span&gt; &amp;#32; &lt;span&gt;&lt;a href=&quot;https://www.reddit.com/r/emacs/comments/14ygy84/how_to_discard_the_limit_to_files_flag_in_a/&quot;&gt;[留言]&lt;/a&gt;&lt;/span&gt;
+    </content>
+    <id>t3_14ygy84
+    </id>
+    <link href="https://www.reddit.com/r/emacs/comments/14ygy84/how_to_discard_the_limit_to_files_flag_in_a/" />
+    <updated>2023-07-13T10:19:42+00:00
+    </updated>
+    <published>2023-07-13T10:19:42+00:00
+    </published>
+    <title>How to discard the 'limit to files' flag in a `magit-revision` buffer?
+    </title>
+  </entry>
+  <entry>
+    <author>
+      <name>/u/bahcodad
+      </name>
+      <uri>https://www.reddit.com/user/bahcodad
+      </uri>
+    </author>
+    <category term="emacs" label="r/emacs"/>
+    <content type="html">&lt;!-- SC_OFF --&gt;&lt;div class=&quot;md&quot;&gt;&lt;p&gt;Hi all,&lt;/p&gt; &lt;p&gt;I&amp;#39;ve just installed emacs and I&amp;#39;m working through the tutorial. I&amp;#39;ve come across this bit &lt;code&gt;Type C-h k C-f. See how this window shrinks, while a new one appears&lt;/code&gt; but the window doesn&amp;#39;t shrink, it&amp;#39;s just replaced by the new one.&lt;/p&gt; &lt;p&gt;Any advice?&lt;/p&gt; &lt;/div&gt;&lt;!-- SC_ON --&gt; &amp;#32; submitted by &amp;#32; &lt;a href=&quot;https://www.reddit.com/user/bahcodad&quot;&gt; /u/bahcodad &lt;/a&gt; &lt;br/&gt; &lt;span&gt;&lt;a href=&quot;https://www.reddit.com/r/emacs/comments/14yht75/newbie_unexpected_behaviour/&quot;&gt;[link]&lt;/a&gt;&lt;/span&gt; &amp;#32; &lt;span&gt;&lt;a href=&quot;https://www.reddit.com/r/emacs/comments/14yht75/newbie_unexpected_behaviour/&quot;&gt;[留言]&lt;/a&gt;&lt;/span&gt;
+    </content>
+    <id>t3_14yht75
+    </id>
+    <link href="https://www.reddit.com/r/emacs/comments/14yht75/newbie_unexpected_behaviour/" />
+    <updated>2023-07-13T11:05:29+00:00
+    </updated>
+    <published>2023-07-13T11:05:29+00:00
+    </published>
+    <title>Newbie. Unexpected behaviour
+    </title>
+  </entry>
+  <entry>
+    <author>
+      <name>/u/xenodium
+      </name>
+      <uri>https://www.reddit.com/user/xenodium
+      </uri>
+    </author>
+    <category term="emacs" label="r/emacs"/>
+    <content type="html">&amp;#32; submitted by &amp;#32; &lt;a href=&quot;https://www.reddit.com/user/xenodium&quot;&gt; /u/xenodium &lt;/a&gt; &lt;br/&gt; &lt;span&gt;&lt;a href=&quot;https://i.redd.it/itj1e6bmwkbb1.gif&quot;&gt;[link]&lt;/a&gt;&lt;/span&gt; &amp;#32; &lt;span&gt;&lt;a href=&quot;https://www.reddit.com/r/emacs/comments/14xwue3/chatgpt_visits_the_emacs_doctor/&quot;&gt;[留言]&lt;/a&gt;&lt;/span&gt;
+    </content>
+    <id>t3_14xwue3
+    </id>
+    <link href="https://www.reddit.com/r/emacs/comments/14xwue3/chatgpt_visits_the_emacs_doctor/" />
+    <updated>2023-07-12T18:39:29+00:00
+    </updated>
+    <published>2023-07-12T18:39:29+00:00
+    </published>
+    <title>ChatGPT visits the Emacs doctor
+    </title>
+  </entry>
+  <entry>
+    <author>
+      <name>/u/fmou67
+      </name>
+      <uri>https://www.reddit.com/user/fmou67
+      </uri>
+    </author>
+    <category term="emacs" label="r/emacs"/>
+    <content type="html">&lt;!-- SC_OFF --&gt;&lt;div class=&quot;md&quot;&gt;&lt;p&gt;I am using org-roam dailies. When entering a new entry using dailies capture, I enter for instance&lt;/p&gt; &lt;p&gt;&lt;code&gt; 12:19 reproduced problem of ticket-1234 &lt;/code&gt; At this point I&amp;#39;d like to open a second capture window and create an entry using another capture-template &amp;quot;Ticket test&amp;quot;, where I protocol everything regarding the test I have made for the ticket.&lt;/p&gt; &lt;p&gt;I am not sure I am doing this in the right order.&lt;/p&gt; &lt;p&gt;Maybe starting with the capture of the ticket testing, but in this case, how to get an automatic entry in the dailies without having to capture manually a new dailies entry?&lt;/p&gt; &lt;p&gt;Thanks for your insights!&lt;/p&gt; &lt;/div&gt;&lt;!-- SC_ON --&gt; &amp;#32; submitted by &amp;#32; &lt;a href=&quot;https://www.reddit.com/user/fmou67&quot;&gt; /u/fmou67 &lt;/a&gt; &lt;br/&gt; &lt;span&gt;&lt;a href=&quot;https://www.reddit.com/r/emacs/comments/14yhb5u/orgroam_dailies_and_capture_looking_for_advise_on/&quot;&gt;[link]&lt;/a&gt;&lt;/span&gt; &amp;#32; &lt;span&gt;&lt;a href=&quot;https://www.reddit.com/r/emacs/comments/14yhb5u/orgroam_dailies_and_capture_looking_for_advise_on/&quot;&gt;[留言]&lt;/a&gt;&lt;/span&gt;
+    </content>
+    <id>t3_14yhb5u
+    </id>
+    <link href="https://www.reddit.com/r/emacs/comments/14yhb5u/orgroam_dailies_and_capture_looking_for_advise_on/" />
+    <updated>2023-07-13T10:39:10+00:00
+    </updated>
+    <published>2023-07-13T10:39:10+00:00
+    </published>
+    <title>Org-roam, dailies and capture: looking for advise on how to reference automatically captured blocks oäon dailies
+    </title>
+  </entry>
+  <entry>
+    <author>
+      <name>/u/NotFromSkane
+      </name>
+      <uri>https://www.reddit.com/user/NotFromSkane
+      </uri>
+    </author>
+    <category term="emacs" label="r/emacs"/>
+    <content type="html">&lt;!-- SC_OFF --&gt;&lt;div class=&quot;md&quot;&gt;&lt;p&gt;So I can bind rustic-format-buffer to a key in rustic mode and normal indent-according-to-mode to the same key in a lisp buffer etc.&lt;/p&gt; &lt;p&gt;Binding a key in a specific major mode is rather straight forward, but I only want it bound in normal mode. How would I do that? Do I need to create a new combination mode or something along those lines?&lt;/p&gt; &lt;/div&gt;&lt;!-- SC_ON --&gt; &amp;#32; submitted by &amp;#32; &lt;a href=&quot;https://www.reddit.com/user/NotFromSkane&quot;&gt; /u/NotFromSkane &lt;/a&gt; &lt;br/&gt; &lt;span&gt;&lt;a href=&quot;https://www.reddit.com/r/emacs/comments/14yp0li/evil_bind_a_key_only_in_normal_mode_in_a_specific/&quot;&gt;[link]&lt;/a&gt;&lt;/span&gt; &amp;#32; &lt;span&gt;&lt;a href=&quot;https://www.reddit.com/r/emacs/comments/14yp0li/evil_bind_a_key_only_in_normal_mode_in_a_specific/&quot;&gt;[留言]&lt;/a&gt;&lt;/span&gt;
+    </content>
+    <id>t3_14yp0li
+    </id>
+    <link href="https://www.reddit.com/r/emacs/comments/14yp0li/evil_bind_a_key_only_in_normal_mode_in_a_specific/" />
+    <updated>2023-07-13T16:12:51+00:00
+    </updated>
+    <published>2023-07-13T16:12:51+00:00
+    </published>
+    <title>Evil: Bind a key only in normal mode in a specific major mode?
+    </title>
+  </entry>
+  <entry>
+    <author>
+      <name>/u/JohnDoe365
+      </name>
+      <uri>https://www.reddit.com/user/JohnDoe365
+      </uri>
+    </author>
+    <category term="emacs" label="r/emacs"/>
+    <content type="html">&lt;!-- SC_OFF --&gt;&lt;div class=&quot;md&quot;&gt;&lt;p&gt;When I edit markdown, i usually set Emacs to word wrap mode (visual line).&lt;/p&gt; &lt;p&gt;I would prefer the following: If I press END, point moves to the end of the screen line. That already works because of visual-line-mode. If cursor is already at the end of the screen line, point should move to the end of the physical line.&lt;/p&gt; &lt;p&gt;Pos1 should behave likewise, with an additional twist: If point is at the beginning of a screen line but not at the beginning of the physical line, it moves to the beginning of the physical line. If I additionally press pos1 and the beginning of the physical line is a blank character (character class), it moves to the first non-blank character of the line. Another Pos1 again toggles jumping to the first physical character in the line.&lt;/p&gt; &lt;p&gt;I am sure this can be configured - as pretty much everything in Emacs. There likely is even a package for that?&lt;/p&gt; &lt;/div&gt;&lt;!-- SC_ON --&gt; &amp;#32; submitted by &amp;#32; &lt;a href=&quot;https://www.reddit.com/user/JohnDoe365&quot;&gt; /u/JohnDoe365 &lt;/a&gt; &lt;br/&gt; &lt;span&gt;&lt;a href=&quot;https://www.reddit.com/r/emacs/comments/14ybdkk/smart_end_of_line_movement_beginning_of_line_in/&quot;&gt;[link]&lt;/a&gt;&lt;/span&gt; &amp;#32; &lt;span&gt;&lt;a href=&quot;https://www.reddit.com/r/emacs/comments/14ybdkk/smart_end_of_line_movement_beginning_of_line_in/&quot;&gt;[留言]&lt;/a&gt;&lt;/span&gt;
+    </content>
+    <id>t3_14ybdkk
+    </id>
+    <link href="https://www.reddit.com/r/emacs/comments/14ybdkk/smart_end_of_line_movement_beginning_of_line_in/" />
+    <updated>2023-07-13T05:07:12+00:00
+    </updated>
+    <published>2023-07-13T05:07:12+00:00
+    </published>
+    <title>Smart end of line movement / beginning of line in visual line mode
+    </title>
+  </entry>
+  <entry>
+    <author>
+      <name>/u/unixbhaskar
+      </name>
+      <uri>https://www.reddit.com/user/unixbhaskar
+      </uri>
+    </author>
+    <category term="emacs" label="r/emacs"/>
+    <content type="html">&amp;#32; submitted by &amp;#32; &lt;a href=&quot;https://www.reddit.com/user/unixbhaskar&quot;&gt; /u/unixbhaskar &lt;/a&gt; &lt;br/&gt; &lt;span&gt;&lt;a href=&quot;https://youtu.be/fgizHHd7nOo&quot;&gt;[link]&lt;/a&gt;&lt;/span&gt; &amp;#32; &lt;span&gt;&lt;a href=&quot;https://www.reddit.com/r/emacs/comments/14y6lzx/org_mode_is_awesome_john_kitchin/&quot;&gt;[留言]&lt;/a&gt;&lt;/span&gt;
+    </content>
+    <id>t3_14y6lzx
+    </id>
+    <link href="https://www.reddit.com/r/emacs/comments/14y6lzx/org_mode_is_awesome_john_kitchin/" />
+    <updated>2023-07-13T01:17:52+00:00
+    </updated>
+    <published>2023-07-13T01:17:52+00:00
+    </published>
+    <title>Org mode is awesome-- John Kitchin
+    </title>
+  </entry>
+  <entry>
+    <author>
+      <name>/u/zck
+      </name>
+      <uri>https://www.reddit.com/user/zck
+      </uri>
+    </author>
+    <category term="emacs" label="r/emacs"/>
+    <content type="html">&amp;#32; submitted by &amp;#32; &lt;a href=&quot;https://www.reddit.com/user/zck&quot;&gt; /u/zck &lt;/a&gt; &lt;br/&gt; &lt;span&gt;&lt;a href=&quot;https://www.evalapply.org/posts/emerging-from-dotemacs-bankruptcy-packages/index.html&quot;&gt;[link]&lt;/a&gt;&lt;/span&gt; &amp;#32; &lt;span&gt;&lt;a href=&quot;https://www.reddit.com/r/emacs/comments/14yb266/emerging_from_dotemacs_bankruptcy_the_hard_way/&quot;&gt;[留言]&lt;/a&gt;&lt;/span&gt;
+    </content>
+    <id>t3_14yb266
+    </id>
+    <link href="https://www.reddit.com/r/emacs/comments/14yb266/emerging_from_dotemacs_bankruptcy_the_hard_way/" />
+    <updated>2023-07-13T04:51:14+00:00
+    </updated>
+    <published>2023-07-13T04:51:14+00:00
+    </published>
+    <title>Emerging from dotemacs bankruptcy the hard way: package management
+    </title>
+  </entry>
+  <entry>
+    <author>
+      <name>/u/g_tb
+      </name>
+      <uri>https://www.reddit.com/user/g_tb
+      </uri>
+    </author>
+    <category term="emacs" label="r/emacs"/>
+    <content type="html">&lt;!-- SC_OFF --&gt;&lt;div class=&quot;md&quot;&gt;&lt;p&gt;OK, so I am getting to the point where Emacs is my main editor (have not even used vim for a couple of weeks!) but I still have some questions.&lt;/p&gt; &lt;ul&gt; &lt;li&gt;&lt;p&gt;How do you set the Treemacs face? Using describe face, there are lots of different ones and I would like to make them all the same, a non-monospace font. They seem to inherit directly from the default font, so I am not changing that.&lt;/p&gt;&lt;/li&gt; &lt;li&gt;&lt;p&gt;I have been playing with layouts and, no matter what I do (spc-l-l or spc-p-l), all the layouts still seem to include files from the other layouts when i do c-x,c-b or spc-b-b. What am I missing? &lt;/p&gt;&lt;/li&gt; &lt;li&gt;&lt;p&gt;One more - how do I force things to always appear on the same window? I want magit to always replace my main code editor and nothing else, and all vterms to always to appear at the bottom, like in VSCode.&lt;/p&gt;&lt;/li&gt; &lt;/ul&gt; &lt;p&gt;Thanks&lt;/p&gt; &lt;/div&gt;&lt;!-- SC_ON --&gt; &amp;#32; submitted by &amp;#32; &lt;a href=&quot;https://www.reddit.com/user/g_tb&quot;&gt; /u/g_tb &lt;/a&gt; &lt;br/&gt; &lt;span&gt;&lt;a href=&quot;https://www.reddit.com/r/emacs/comments/14yewtn/some_spacemacs_questions/&quot;&gt;[link]&lt;/a&gt;&lt;/span&gt; &amp;#32; &lt;span&gt;&lt;a href=&quot;https://www.reddit.com/r/emacs/comments/14yewtn/some_spacemacs_questions/&quot;&gt;[留言]&lt;/a&gt;&lt;/span&gt;
+    </content>
+    <id>t3_14yewtn
+    </id>
+    <link href="https://www.reddit.com/r/emacs/comments/14yewtn/some_spacemacs_questions/" />
+    <updated>2023-07-13T08:24:16+00:00
+    </updated>
+    <published>2023-07-13T08:24:16+00:00
+    </published>
+    <title>Some Spacemacs questions
+    </title>
+  </entry>
+  <entry>
+    <author>
+      <name>/u/bradmont
+      </name>
+      <uri>https://www.reddit.com/user/bradmont
+      </uri>
+    </author>
+    <category term="emacs" label="r/emacs"/>
+    <content type="html">&amp;#32; submitted by &amp;#32; &lt;a href=&quot;https://www.reddit.com/user/bradmont&quot;&gt; /u/bradmont &lt;/a&gt; &lt;br/&gt; &lt;span&gt;&lt;a href=&quot;https://i.redd.it/ko8do6nm8kbb1.png&quot;&gt;[link]&lt;/a&gt;&lt;/span&gt; &amp;#32; &lt;span&gt;&lt;a href=&quot;https://www.reddit.com/r/emacs/comments/14xtaj2/is_there_a_way_to_style_orgmodes_headings_similar/&quot;&gt;[留言]&lt;/a&gt;&lt;/span&gt;
+    </content>
+    <id>t3_14xtaj2
+    </id>
+    <link href="https://www.reddit.com/r/emacs/comments/14xtaj2/is_there_a_way_to_style_orgmodes_headings_similar/" />
+    <updated>2023-07-12T16:25:16+00:00
+    </updated>
+    <published>2023-07-12T16:25:16+00:00
+    </published>
+    <title>Is there a way to style org-mode's headings similar to the bullet threading plug-in from logseq?
+    </title>
+  </entry>
+  <entry>
+    <author>
+      <name>/u/dolosuMi2
+      </name>
+      <uri>https://www.reddit.com/user/dolosuMi2
+      </uri>
+    </author>
+    <category term="emacs" label="r/emacs"/>
+    <content type="html">&lt;!-- SC_OFF --&gt;&lt;div class=&quot;md&quot;&gt;&lt;p&gt;A wrote up on how you can access your password-manager from within Emacs:&lt;/p&gt; &lt;p&gt;&lt;a href=&quot;https://ph-uhl.com/emacs-password-management-on-linux/&quot;&gt;https://ph-uhl.com/emacs-password-management-on-linux/&lt;/a&gt;&lt;/p&gt; &lt;/div&gt;&lt;!-- SC_ON --&gt; &amp;#32; submitted by &amp;#32; &lt;a href=&quot;https://www.reddit.com/user/dolosuMi2&quot;&gt; /u/dolosuMi2 &lt;/a&gt; &lt;br/&gt; &lt;span&gt;&lt;a href=&quot;https://www.reddit.com/r/emacs/comments/14xjcje/access_your_passwordmanager_from_emacs_on_linux/&quot;&gt;[link]&lt;/a&gt;&lt;/span&gt; &amp;#32; &lt;span&gt;&lt;a href=&quot;https://www.reddit.com/r/emacs/comments/14xjcje/access_your_passwordmanager_from_emacs_on_linux/&quot;&gt;[留言]&lt;/a&gt;&lt;/span&gt;
+    </content>
+    <id>t3_14xjcje
+    </id>
+    <link href="https://www.reddit.com/r/emacs/comments/14xjcje/access_your_passwordmanager_from_emacs_on_linux/" />
+    <updated>2023-07-12T09:23:07+00:00
+    </updated>
+    <published>2023-07-12T09:23:07+00:00
+    </published>
+    <title>Access Your Password-Manager from Emacs on Linux Using KeePassXC
+    </title>
+  </entry>
+  <entry>
+    <author>
+      <name>/u/crossaleph
+      </name>
+      <uri>https://www.reddit.com/user/crossaleph
+      </uri>
+    </author>
+    <category term="emacs" label="r/emacs"/>
+    <content type="html">&lt;!-- SC_OFF --&gt;&lt;div class=&quot;md&quot;&gt;&lt;p&gt;I use &lt;a href=&quot;https://github.com/chenyanming/calibredb.el&quot;&gt;calibredb&lt;/a&gt; to manage my ebooks (mainly epubs) and I&amp;#39;m quite happy with it. I was wondering if there was an emacs package that would do the same for research papers. Namely, allowing to&lt;/p&gt; &lt;p&gt;- store and manage them&lt;/p&gt; &lt;p&gt;- automatically retrieve and store their metadata (author, title, year, etc.) in a database,&lt;/p&gt; &lt;p&gt;- open them in a pdf viewer.&lt;/p&gt; &lt;p&gt;&amp;#x200B;&lt;/p&gt; &lt;p&gt;EDIT&lt;/p&gt; &lt;p&gt;I installed Zotero, but I didn&amp;#39;t like it so I removed it. Finally, I decided to go with &lt;code&gt;ebib&lt;/code&gt;, and here is what I did it:&lt;/p&gt; &lt;h1&gt;Config&lt;/h1&gt; &lt;h2&gt;biblio&lt;/h2&gt; &lt;pre&gt;&lt;code&gt;(use-package biblio) &lt;/code&gt;&lt;/pre&gt; &lt;h2&gt;ebib-biblio&lt;/h2&gt; &lt;pre&gt;&lt;code&gt;(use-package ebib-biblio :after (ebib biblio) :bind (:map ebib-index-mode-map (&amp;quot;B&amp;quot; . ebib-biblio-import-doi) :map biblio-selection-mode-map (&amp;quot;e&amp;quot; . ebib-biblio-selection-import))) &lt;/code&gt;&lt;/pre&gt; &lt;h2&gt;ebib&lt;/h2&gt; &lt;pre&gt;&lt;code&gt;(use-package ebib :config (setq ebib-file-associations &amp;#39;((&amp;quot;pdf&amp;quot; . &amp;quot;evince&amp;quot;) (&amp;quot;ps&amp;quot; . &amp;quot;evince&amp;quot;)) ebib-preload-bib-files (list (concat academic-path &amp;quot;db.bib&amp;quot;)))) &lt;/code&gt;&lt;/pre&gt; &lt;h1&gt;Usage&lt;/h1&gt; &lt;h2&gt;Add a new entry&lt;/h2&gt; &lt;p&gt;When inside an &lt;code&gt;ebib&lt;/code&gt; buffer, do B (&lt;code&gt;ebib-biblio-import-doi&lt;/code&gt;) or &lt;code&gt;M-x crossref-lookup&lt;/code&gt; to retrieve the appropriate &lt;code&gt;bib&lt;/code&gt; formated metadata, then press &lt;code&gt;e&lt;/code&gt; (&lt;code&gt;ebib-biblio-selection-import&lt;/code&gt;) to add this &lt;code&gt;bib&lt;/code&gt; as a new ebib entry.&lt;/p&gt; &lt;h2&gt;Link the new entry to a PDF&lt;/h2&gt; &lt;p&gt;Select the new entry, do &lt;code&gt;e&lt;/code&gt;, select the &lt;code&gt;file&lt;/code&gt; field, and press &lt;code&gt;e&lt;/code&gt; to enter the PDF file path.&lt;/p&gt; &lt;h2&gt;Useful commands&lt;/h2&gt; &lt;table&gt;&lt;thead&gt; &lt;tr&gt; &lt;th align=&quot;left&quot;&gt;K&lt;/th&gt; &lt;th align=&quot;left&quot;&gt;Command&lt;/th&gt; &lt;th align=&quot;left&quot;&gt;Description&lt;/th&gt; &lt;/tr&gt; &lt;/thead&gt;&lt;tbody&gt; &lt;tr&gt; &lt;td align=&quot;left&quot;&gt;&lt;code&gt;E&lt;/code&gt;&lt;/td&gt; &lt;td align=&quot;left&quot;&gt;&lt;code&gt;ebib-edit-keyname&lt;/code&gt;&lt;/td&gt; &lt;td align=&quot;left&quot;&gt;Change the key of a BibTeX entry&lt;/td&gt; &lt;/tr&gt; &lt;tr&gt; &lt;td align=&quot;left&quot;&gt;&lt;code&gt;e&lt;/code&gt;&lt;/td&gt; &lt;td align=&quot;left&quot;&gt;&lt;code&gt;ebib-edit-entry&lt;/code&gt;&lt;/td&gt; &lt;td align=&quot;left&quot;&gt;Edit the current BibTeX entry&lt;/td&gt; &lt;/tr&gt; &lt;tr&gt; &lt;td align=&quot;left&quot;&gt;&lt;code&gt;f&lt;/code&gt;&lt;/td&gt; &lt;td align=&quot;left&quot;&gt;&lt;code&gt;ebib-view-file&lt;/code&gt;&lt;/td&gt; &lt;td align=&quot;left&quot;&gt;Open pdf in evince&lt;/td&gt; &lt;/tr&gt; &lt;tr&gt; &lt;td align=&quot;left&quot;&gt;&lt;code&gt;r&lt;/code&gt;&lt;/td&gt; &lt;td align=&quot;left&quot;&gt;&lt;code&gt;ebib-toggle-raw-current-field&lt;/code&gt;&lt;/td&gt; &lt;td align=&quot;left&quot;&gt;Toggle the &amp;quot;special&amp;quot; status of the current field contents&lt;/td&gt; &lt;/tr&gt; &lt;tr&gt; &lt;td align=&quot;left&quot;&gt;&lt;code&gt;B&lt;/code&gt;&lt;/td&gt; &lt;td align=&quot;left&quot;&gt;&lt;code&gt;ebib-biblio-import-doi&lt;/code&gt;&lt;/td&gt; &lt;td align=&quot;left&quot;&gt;Fetch a BibTeX entry by its DOI using&lt;/td&gt; &lt;/tr&gt; &lt;/tbody&gt;&lt;/table&gt; &lt;p&gt;&amp;#x200B;&lt;/p&gt; &lt;/div&gt;&lt;!-- SC_ON --&gt; &amp;#32; submitted by &amp;#32; &lt;a href=&quot;https://www.reddit.com/user/crossaleph&quot;&gt; /u/crossaleph &lt;/a&gt; &lt;br/&gt; &lt;span&gt;&lt;a href=&quot;https://www.reddit.com/r/emacs/comments/14y42de/is_there_an_equivalent_of_calibredb_for_research/&quot;&gt;[link]&lt;/a&gt;&lt;/span&gt; &amp;#32; &lt;span&gt;&lt;a href=&quot;https://www.reddit.com/r/emacs/comments/14y42de/is_there_an_equivalent_of_calibredb_for_research/&quot;&gt;[留言]&lt;/a&gt;&lt;/span&gt;
+  </content>
+  <id>t3_14y42de
+  </id>
+  <link href="https://www.reddit.com/r/emacs/comments/14y42de/is_there_an_equivalent_of_calibredb_for_research/" />
+  <updated>2023-07-12T23:18:14+00:00
+  </updated>
+  <published>2023-07-12T23:18:14+00:00
+  </published>
+  <title>Is there an equivalent of calibredb for research papers?
+  </title>
+</entry>
+<entry>
+  <author>
+    <name>/u/cidra_
+    </name>
+    <uri>https://www.reddit.com/user/cidra_
+    </uri>
+  </author>
+  <category term="emacs" label="r/emacs"/>
+  <content type="html">&lt;!-- SC_OFF --&gt;&lt;div class=&quot;md&quot;&gt;&lt;p&gt;I have Flymake enabled with the following setting:&lt;/p&gt; &lt;p&gt;&lt;code&gt; (setopt elisp-flymake-byte-compile-load-path load-path) &lt;/code&gt;&lt;/p&gt; &lt;p&gt;Given the following code:&lt;/p&gt; &lt;p&gt;&lt;code&gt; (require &amp;#39;consult) (global-set-key (kbd &amp;quot;C-c M-x&amp;quot;) #&amp;#39;consult-mode-command) &lt;/code&gt;&lt;/p&gt; &lt;p&gt;There&amp;#39;s no warning, since i &lt;code&gt;require&lt;/code&gt;&amp;#39;d the &lt;code&gt;consult&lt;/code&gt; feature. The package will eagerly load as that line is evaluated (or before).&lt;/p&gt; &lt;p&gt;However, given this other piece of code:&lt;/p&gt; &lt;p&gt;&lt;code&gt; (global-set-key (kbd &amp;quot;C-.&amp;quot;) #&amp;#39;embark-act) (global-set-key (kbd &amp;quot;M-.&amp;quot;) #&amp;#39;embark-dwim) (global-set-key (kbd &amp;quot;C-h B&amp;quot;) #&amp;#39;embark-bindings) &lt;/code&gt;&lt;/p&gt; &lt;p&gt;I get the following warnings:&lt;/p&gt; &lt;p&gt;&lt;code&gt; warning e-f-b-c the function ‘embark-act’ might not be defined at runtime. warning e-f-b-c the function ‘embark-dwim’ might not be defined at runtime. warning e-f-b-c the function ‘embark-bindings’ might not be defined at runtime. &lt;/code&gt;&lt;/p&gt; &lt;p&gt;That&amp;#39;s because I didn&amp;#39;t &lt;code&gt;require&lt;/code&gt;&amp;#39;d the &lt;code&gt;embark&lt;/code&gt; feature. At runtime that&amp;#39;s not an issue since the three functions are autoloaded.&lt;/p&gt; &lt;p&gt;It seems a waste for me to suppress warnings. On the other hand, one could define declare the functions before using them (or use some comfy macros like &lt;code&gt;use-package&lt;/code&gt; and &lt;code&gt;bind-keys&lt;/code&gt;). My question is the following: &lt;strong&gt;isn&amp;#39;t there some way for the byte compiler to detect all autoloaded packages, either in the load-path or in a specific feature?&lt;/strong&gt;&lt;/p&gt; &lt;/div&gt;&lt;!-- SC_ON --&gt; &amp;#32; submitted by &amp;#32; &lt;a href=&quot;https://www.reddit.com/user/cidra_&quot;&gt; /u/cidra_ &lt;/a&gt; &lt;br/&gt; &lt;span&gt;&lt;a href=&quot;https://www.reddit.com/r/emacs/comments/14y127r/let_byte_compiler_flymake_detect_autoloaded/&quot;&gt;[link]&lt;/a&gt;&lt;/span&gt; &amp;#32; &lt;span&gt;&lt;a href=&quot;https://www.reddit.com/r/emacs/comments/14y127r/let_byte_compiler_flymake_detect_autoloaded/&quot;&gt;[留言]&lt;/a&gt;&lt;/span&gt;
+  </content>
+  <id>t3_14y127r
+  </id>
+  <link href="https://www.reddit.com/r/emacs/comments/14y127r/let_byte_compiler_flymake_detect_autoloaded/" />
+  <updated>2023-07-12T21:20:42+00:00
+  </updated>
+  <published>2023-07-12T21:20:42+00:00
+  </published>
+  <title>Let byte compiler (Flymake) detect autoloaded functions
+  </title>
+</entry>
+<entry>
+  <author>
+    <name>/u/cidra_
+    </name>
+    <uri>https://www.reddit.com/user/cidra_
+    </uri>
+  </author>
+  <category term="emacs" label="r/emacs"/>
+  <content type="html">&lt;!-- SC_OFF --&gt;&lt;div class=&quot;md&quot;&gt;&lt;p&gt;Let&amp;#39;s take, for example, this snippet:&lt;/p&gt; &lt;p&gt;&lt;code&gt; (use-package transcribe :custom (a-custom-variable &amp;quot;Hello!&amp;quot;)) &lt;/code&gt;&lt;/p&gt; &lt;p&gt;I&amp;#39;ll have &lt;code&gt;use-package-expand-minimally&lt;/code&gt; set to &lt;code&gt;t&lt;/code&gt;. Having it set to &lt;code&gt;nil&lt;/code&gt; will just add additional code that it&amp;#39;s not relevant for the question.&lt;/p&gt; &lt;p&gt;Let&amp;#39;s see how the macro expands (with &lt;code&gt;pp-macroexpand-expression&lt;/code&gt;):&lt;/p&gt; &lt;p&gt;&lt;code&gt; (progn (let ((custom--inhibit-theme-enable nil)) (unless (memq &amp;#39;use-package custom-known-themes) (deftheme use-package) (enable-theme &amp;#39;use-package) &lt;/code&gt;&lt;/p&gt; &lt;p&gt;Why is the custom variable set this way? This looks more complex than how it should be, but I&amp;#39;m sure there is a clear reason behind it.&lt;/p&gt; &lt;/div&gt;&lt;!-- SC_ON --&gt; &amp;#32; submitted by &amp;#32; &lt;a href=&quot;https://www.reddit.com/user/cidra_&quot;&gt; /u/cidra_ &lt;/a&gt; &lt;br/&gt; &lt;span&gt;&lt;a href=&quot;https://www.reddit.com/r/emacs/comments/14xpo55/why_custom_argument_in_the_usepackage_macro_is/&quot;&gt;[link]&lt;/a&gt;&lt;/span&gt; &amp;#32; &lt;span&gt;&lt;a href=&quot;https://www.reddit.com/r/emacs/comments/14xpo55/why_custom_argument_in_the_usepackage_macro_is/&quot;&gt;[留言]&lt;/a&gt;&lt;/span&gt;
+  </content>
+  <id>t3_14xpo55
+  </id>
+  <link href="https://www.reddit.com/r/emacs/comments/14xpo55/why_custom_argument_in_the_usepackage_macro_is/" />
+  <updated>2023-07-12T14:10:31+00:00
+  </updated>
+  <published>2023-07-12T14:10:31+00:00
+  </published>
+  <title>Why :custom argument in the use-package macro is expanded this way?
+  </title>
+</entry>
+<entry>
+  <author>
+    <name>/u/simon_ximon
+    </name>
+    <uri>https://www.reddit.com/user/simon_ximon
+    </uri>
+  </author>
+  <category term="emacs" label="r/emacs"/>
+  <content type="html">&lt;!-- SC_OFF --&gt;&lt;div class=&quot;md&quot;&gt;&lt;p&gt;I&amp;#39;m trying to get rid of the &amp;quot;$&amp;quot; characters being displayed on long lines for Neotree.&lt;/p&gt; &lt;p&gt;Any help would be appreciated. Thanks.&lt;/p&gt; &lt;p&gt;&amp;#x200B;&lt;/p&gt; &lt;p&gt;&amp;#x200B;&lt;/p&gt; &lt;p&gt;&lt;a href=&quot;https://preview.redd.it/17yqzhhd5mbb1.png?width=655&amp;amp;format=png&amp;amp;auto=webp&amp;amp;s=834d851022a003d48b945710f0ce949739c633dd&quot;&gt;https://preview.redd.it/17yqzhhd5mbb1.png?width=655&amp;amp;format=png&amp;amp;auto=webp&amp;amp;s=834d851022a003d48b945710f0ce949739c633dd&lt;/a&gt;&lt;/p&gt; &lt;/div&gt;&lt;!-- SC_ON --&gt; &amp;#32; submitted by &amp;#32; &lt;a href=&quot;https://www.reddit.com/user/simon_ximon&quot;&gt; /u/simon_ximon &lt;/a&gt; &lt;br/&gt; &lt;span&gt;&lt;a href=&quot;https://www.reddit.com/r/emacs/comments/14y3c3d/noob_question_remove_displayed_on_neotree/&quot;&gt;[link]&lt;/a&gt;&lt;/span&gt; &amp;#32; &lt;span&gt;&lt;a href=&quot;https://www.reddit.com/r/emacs/comments/14y3c3d/noob_question_remove_displayed_on_neotree/&quot;&gt;[留言]&lt;/a&gt;&lt;/span&gt;
+  </content>
+  <id>t3_14y3c3d
+  </id>
+  <link href="https://www.reddit.com/r/emacs/comments/14y3c3d/noob_question_remove_displayed_on_neotree/" />
+  <updated>2023-07-12T22:49:16+00:00
+  </updated>
+  <published>2023-07-12T22:49:16+00:00
+  </published>
+  <title>NOOB QUESTION - Remove &quot;$&quot; displayed on NeoTree
+  </title>
+</entry>
+<entry>
+  <author>
+    <name>/u/poorlymadepoint
+    </name>
+    <uri>https://www.reddit.com/user/poorlymadepoint
+    </uri>
+  </author>
+  <category term="emacs" label="r/emacs"/>
+  <content type="html">&lt;!-- SC_OFF --&gt;&lt;div class=&quot;md&quot;&gt;&lt;p&gt;I&amp;#39;ve been a happy denote user for the last year, but with the launch of Bear 2, I decided to look at the app again. What I realized I missed was an over-arching system for organization. In Bear I can see all my tags and sub-tags in a sidebar and I can move one sub-tag to another tag group, rename, etc. I just felt like I had a little more control over my notes. Denote does have keywords, and if there was a way to nest keywords and also show all keywords in a sidebar, denote would be perfect.&lt;/p&gt; &lt;p&gt;Is there any package that does this? Either on top of denote or some other standalone package that works with org-mode file? I know org-mode has nested tags, but I don&amp;#39;t want a predefined tag list, I&amp;#39;d like it to change organically and on the fly and going the org-mode nested tag route doesn&amp;#39;t really work for me.&lt;/p&gt; &lt;/div&gt;&lt;!-- SC_ON --&gt; &amp;#32; submitted by &amp;#32; &lt;a href=&quot;https://www.reddit.com/user/poorlymadepoint&quot;&gt; /u/poorlymadepoint &lt;/a&gt; &lt;br/&gt; &lt;span&gt;&lt;a href=&quot;https://www.reddit.com/r/emacs/comments/14xnelz/looking_for_notetaking_package_that_implements/&quot;&gt;[link]&lt;/a&gt;&lt;/span&gt; &amp;#32; &lt;span&gt;&lt;a href=&quot;https://www.reddit.com/r/emacs/comments/14xnelz/looking_for_notetaking_package_that_implements/&quot;&gt;[留言]&lt;/a&gt;&lt;/span&gt;
+  </content>
+  <id>t3_14xnelz
+  </id>
+  <link href="https://www.reddit.com/r/emacs/comments/14xnelz/looking_for_notetaking_package_that_implements/" />
+  <updated>2023-07-12T12:36:50+00:00
+  </updated>
+  <published>2023-07-12T12:36:50+00:00
+  </published>
+  <title>Looking for note-taking package that implements nested tags similar to Bear app on Macos
+  </title>
+</entry>
+<entry>
+  <author>
+    <name>/u/makesourcenotcode
+    </name>
+    <uri>https://www.reddit.com/user/makesourcenotcode
+    </uri>
+  </author>
+  <category term="emacs" label="r/emacs"/>
+  <content type="html">&lt;!-- SC_OFF --&gt;&lt;div class=&quot;md&quot;&gt;&lt;p&gt;I&amp;#39;ve been working on what I hope is the Next Generation of the Open Source movement.&lt;/p&gt; &lt;p&gt;&amp;#x200B;&lt;/p&gt; &lt;p&gt;See here to read about how Open Source fails in certain serious ways to be properly open and what I propose be done about it:&lt;/p&gt; &lt;p&gt;&lt;a href=&quot;https://makesourcenotcode.github.io/freedom_respecting_technology.html&quot;&gt;https://makesourcenotcode.github.io/freedom_respecting_technology.html&lt;/a&gt;&lt;/p&gt; &lt;p&gt;&amp;#x200B;&lt;/p&gt; &lt;p&gt;I&amp;#39;m also working on some FRT demo projects so people can viscerally feel the difference between FRTs and mere FOSS.&lt;/p&gt; &lt;p&gt;&amp;#x200B;&lt;/p&gt; &lt;p&gt;You can help by:&lt;/p&gt; &lt;ol&gt; &lt;li&gt;&lt;p&gt;spreading the word if you agree with the ideas behind FRTs&lt;/p&gt;&lt;/li&gt; &lt;li&gt;&lt;p&gt;helping me tighten the arguments in the Freedom Respecting Technology Definition&lt;/p&gt;&lt;/li&gt; &lt;li&gt;&lt;p&gt;proposing ideas for FRT projects you&amp;#39;d like to see to help me prioritize the most impactful demos&lt;/p&gt;&lt;/li&gt; &lt;/ol&gt; &lt;/div&gt;&lt;!-- SC_ON --&gt; &amp;#32; submitted by &amp;#32; &lt;a href=&quot;https://www.reddit.com/user/makesourcenotcode&quot;&gt; /u/makesourcenotcode &lt;/a&gt; &lt;br/&gt; &lt;span&gt;&lt;a href=&quot;https://www.reddit.com/r/emacs/comments/14y864z/help_me_bring_about_freedom_respecting_technology/&quot;&gt;[link]&lt;/a&gt;&lt;/span&gt; &amp;#32; &lt;span&gt;&lt;a href=&quot;https://www.reddit.com/r/emacs/comments/14y864z/help_me_bring_about_freedom_respecting_technology/&quot;&gt;[留言]&lt;/a&gt;&lt;/span&gt;
+  </content>
+  <id>t3_14y864z
+  </id>
+  <link href="https://www.reddit.com/r/emacs/comments/14y864z/help_me_bring_about_freedom_respecting_technology/" />
+  <updated>2023-07-13T02:29:41+00:00
+  </updated>
+  <published>2023-07-13T02:29:41+00:00
+  </published>
+  <title>Help me bring about Freedom Respecting Technology the Next Generation of Open Source and Open Knowledge
+  </title>
+</entry>
+<entry>
+  <author>
+    <name>/u/oantolin
+    </name>
+    <uri>https://www.reddit.com/user/oantolin
+    </uri>
+  </author>
+  <category term="emacs" label="r/emacs"/>
+  <content type="html">&lt;!-- SC_OFF --&gt;&lt;div class=&quot;md&quot;&gt;&lt;p&gt;Do you have some frequently used keyboard macros saved in your configuration? Do you name them or bind them to a key? Please share examples!&lt;/p&gt; &lt;p&gt;I only have one keyboard macro in my configuration: I often read papers from arXiv.org inside Emacs using pdf-tools, and for those I want to set the margins from the bounding box on the second page (since the first page has a bulky watermark), so I use a keyboard macro to go to the next page, set the margins from the bounding box and go back to the page I was on.&lt;/p&gt; &lt;p&gt;I made this post because I just realized that I often give people the advice to give a key binding to a keyboard macro and put that in their configuration, but don&amp;#39;t often follow that advice myself. (It usually goes like this: someone complains, that something is too many keystrokes, and I say, &amp;quot;this is Emacs, no-one can force you to use more than one keystroke for anything!&amp;quot;, and proceed to explain keyboard macros).&lt;/p&gt; &lt;/div&gt;&lt;!-- SC_ON --&gt; &amp;#32; submitted by &amp;#32; &lt;a href=&quot;https://www.reddit.com/user/oantolin&quot;&gt; /u/oantolin &lt;/a&gt; &lt;br/&gt; &lt;span&gt;&lt;a href=&quot;https://www.reddit.com/r/emacs/comments/14xcir1/share_your_keyboard_macros/&quot;&gt;[link]&lt;/a&gt;&lt;/span&gt; &amp;#32; &lt;span&gt;&lt;a href=&quot;https://www.reddit.com/r/emacs/comments/14xcir1/share_your_keyboard_macros/&quot;&gt;[留言]&lt;/a&gt;&lt;/span&gt;
+  </content>
+  <id>t3_14xcir1
+  </id>
+  <link href="https://www.reddit.com/r/emacs/comments/14xcir1/share_your_keyboard_macros/" />
+  <updated>2023-07-12T03:22:35+00:00
+  </updated>
+  <published>2023-07-12T03:22:35+00:00
+  </published>
+  <title>Share your keyboard macros!
+  </title>
+</entry>
+<entry>
+  <author>
+    <name>/u/geospeck
+    </name>
+    <uri>https://www.reddit.com/user/geospeck
+    </uri>
+  </author>
+  <category term="emacs" label="r/emacs"/>
+  <content type="html">&amp;#32; submitted by &amp;#32; &lt;a href=&quot;https://www.reddit.com/user/geospeck&quot;&gt; /u/geospeck &lt;/a&gt; &lt;br/&gt; &lt;span&gt;&lt;a href=&quot;https://andreyor.st/posts/2023-07-11-emacs-gui-library/&quot;&gt;[link]&lt;/a&gt;&lt;/span&gt; &amp;#32; &lt;span&gt;&lt;a href=&quot;https://www.reddit.com/r/emacs/comments/14x1c96/emacs_gui_library/&quot;&gt;[留言]&lt;/a&gt;&lt;/span&gt;
+  </content>
+  <id>t3_14x1c96
+  </id>
+  <link href="https://www.reddit.com/r/emacs/comments/14x1c96/emacs_gui_library/" />
+  <updated>2023-07-11T19:45:19+00:00
+  </updated>
+  <published>2023-07-11T19:45:19+00:00
+  </published>
+  <title>Emacs GUI library
+  </title>
+</entry>
+<entry>
+  <author>
+    <name>/u/Sea_Inevitable_5522
+    </name>
+    <uri>https://www.reddit.com/user/Sea_Inevitable_5522
+    </uri>
+  </author>
+  <category term="emacs" label="r/emacs"/>
+  <content type="html">&lt;!-- SC_OFF --&gt;&lt;div class=&quot;md&quot;&gt;&lt;p&gt;I have defined an org capture template that includes:&lt;/p&gt; &lt;pre&gt;&lt;code&gt; (file &amp;quot;~/templates/hotdog.txt&amp;quot;) &lt;/code&gt;&lt;/pre&gt; &lt;p&gt;and the contents of &amp;quot;~/templates/hotdog.txt&amp;quot; is:&lt;/p&gt; &lt;pre&gt;&lt;code&gt;* Hot Dog Prompt: %^{HOT_SAUCE|yes|no} %(format &amp;quot;Hot Sauce? %s&amp;quot; &amp;quot;%\\1&amp;quot;) %(format &amp;quot;%s&amp;quot; (if (string-equal &amp;quot;%\\1&amp;quot; &amp;quot;yes&amp;quot;) &amp;quot;Sign waiver&amp;quot; &amp;quot;Enjoy&amp;quot;)) &lt;/code&gt;&lt;/pre&gt; &lt;p&gt;When I run the capture template, before I enter the value of HOT_SAUCE, the preview looks like this:&lt;/p&gt; &lt;pre&gt;&lt;code&gt;* Hot Dog Prompt: Hot Sauce? %\1 Enjoy &lt;/code&gt;&lt;/pre&gt; &lt;p&gt;This tells me that the value of &amp;quot;%\\1&amp;quot; at this point is &lt;code&gt;%\1&lt;/code&gt;. I&amp;#39;m under the impression that string-equal is comparing &amp;quot;yes&amp;quot; and &amp;quot;%\\1&amp;quot; and thus evaluating to &amp;quot;Enjoy&amp;quot;.&lt;/p&gt; &lt;p&gt;&lt;strong&gt;Yes case:&lt;/strong&gt; If I type in &lt;strong&gt;yes&lt;/strong&gt; at the HOT_SAUCE prompt and press ENTER, the preview changes to:&lt;/p&gt; &lt;pre&gt;&lt;code&gt;***** Hot Dog Prompt: yes Hot Sauce? yes Enjoy &lt;/code&gt;&lt;/pre&gt; &lt;p&gt;&lt;strong&gt;No case:&lt;/strong&gt; If I type in &lt;strong&gt;no&lt;/strong&gt; at the HOT_SAUCE prompt and press ENTER, the preview changes to:&lt;/p&gt; &lt;pre&gt;&lt;code&gt;***** Hot Dog Prompt: no Hot Sauce? no Enjoy &lt;/code&gt;&lt;/pre&gt; &lt;p&gt;In both cases the first &lt;code&gt;format&lt;/code&gt; function is re-evaluated with the value entered at the prompt.&lt;/p&gt; &lt;p&gt;In &lt;strong&gt;neither&lt;/strong&gt; case is the second &lt;code&gt;format&lt;/code&gt; function re-evaluated.&lt;/p&gt; &lt;p&gt;According to the &lt;a href=&quot;https://orgmode.org/manual/Template-expansion.html&quot;&gt;documentation&lt;/a&gt; on &lt;code&gt;%(EXP)&lt;/code&gt;:&lt;/p&gt; &lt;blockquote&gt; &lt;p&gt;Only placeholders pre-existing within the template, or introduced with ‘%[file]’, are expanded this way. Since this happens after expanding non-interactive “%-escapes”, those can be used to fill the expression.&lt;/p&gt; &lt;/blockquote&gt; &lt;p&gt;I&amp;#39;m not really sure how to interpret this.&lt;/p&gt; &lt;p&gt;&lt;strong&gt;Question&lt;/strong&gt;: How can I get the second &lt;code&gt;format&lt;/code&gt; function to re-evaluate after I&amp;#39;ve supplied the HOT_SAUCE value so that it says &amp;quot;Sign Waiver&amp;quot; if I enter yes at the prompt?&lt;/p&gt; &lt;p&gt;&lt;strong&gt;Goal&lt;/strong&gt;: My goal for my capture template to return significantly different text based on the value of prompt values.&lt;/p&gt; &lt;p&gt;Thanks!&lt;/p&gt; &lt;/div&gt;&lt;!-- SC_ON --&gt; &amp;#32; submitted by &amp;#32; &lt;a href=&quot;https://www.reddit.com/user/Sea_Inevitable_5522&quot;&gt; /u/Sea_Inevitable_5522 &lt;/a&gt; &lt;br/&gt; &lt;span&gt;&lt;a href=&quot;https://www.reddit.com/r/emacs/comments/14x0ulp/orgcapture_template_containing_conditional_logic/&quot;&gt;[link]&lt;/a&gt;&lt;/span&gt; &amp;#32; &lt;span&gt;&lt;a href=&quot;https://www.reddit.com/r/emacs/comments/14x0ulp/orgcapture_template_containing_conditional_logic/&quot;&gt;[留言]&lt;/a&gt;&lt;/span&gt;
+  </content>
+  <id>t3_14x0ulp
+  </id>
+  <link href="https://www.reddit.com/r/emacs/comments/14x0ulp/orgcapture_template_containing_conditional_logic/" />
+  <updated>2023-07-11T19:26:35+00:00
+  </updated>
+  <published>2023-07-11T19:26:35+00:00
+  </published>
+  <title>org-capture template containing conditional logic based on value read from prompt
+  </title>
+</entry>
+</feed>
