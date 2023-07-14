@@ -240,3 +240,18 @@ TEST(TestFeedCommon, TestParseDatetime)
     ASSERT_TRUE(2023 == t.GetYear() && 7 == t.GetMonth() && 9 == t.GetDay()
         && 7 == t.GetHour() && 57 == t.GetMinute() && 7 == t.GetSecond());
 }
+
+TEST(TestFeedCommon, TestLoadOPML)
+{
+    ASSERT_TRUE(SUCCEEDED(CoInitializeEx(nullptr, COINIT_MULTITHREADED)));
+
+    {
+        WCHAR dir[256]{};
+        GetCurrentDirectory(_countof(dir), dir);
+        std::vector<std::wstring> feedUrls;
+        FeedCommon::LoadFeedUrlsFromOPML(std::format(L"{}\\..\\..\\testdata\\subscriptionList.opml", dir), feedUrls);
+        ASSERT_TRUE(!feedUrls.empty());
+    }
+
+    CoUninitialize();
+}

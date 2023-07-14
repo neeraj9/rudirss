@@ -221,3 +221,63 @@ long long FeedCommon::ConvertDatetimeToTimestamp(FeedSpecification spec, const s
 
     return timestamp;
 }
+
+bool FeedCommon::LoadFeedUrlsFromOPML(const std::wstring& opml, std::vector<std::wstring>& feedUrls)
+{
+    bool result = false;
+    try
+    {
+        WinMSXML xml;
+        xml.Init();
+        xml.Load(opml);
+
+        auto xmlDoc = xml.GetXMLDocument();
+        CComBSTR xmlText;
+        xmlDoc->get_xml(&xmlText);
+
+        WinMSXML::XMLElement firstChild;
+        if (FAILED(xmlDoc->get_firstChild(&firstChild)) || !firstChild)
+            throw std::runtime_error("Error: unable to get first child of root.");
+
+        WinMSXML::XMLElement opml;
+        FeedCommon::IterateSiblingElements(firstChild, [&](const std::wstring_view& name, const std::wstring_view& value,
+            const WinMSXML::XMLElement& element) -> bool {
+                if (L"opml" == name)
+                {
+                    opml = element;
+                    return false;
+                }
+
+                return true;
+            });
+
+        // To get all elements with xmlUrl attribute regarless their hierarchy
+        CComBSTR query(L"//outline[@xmlUrl]");
+        WinMSXML::XMLElementList elementList;
+        if (FAILED(opml->selectNodes(query, &elementList)))
+            throw std::runtime_error("Error: unable to get outline.");
+
+        long length = 0;
+        if (SUCCEEDED(elementList->get_length(&length)))
+        {
+            elementList->reset();
+            for (long i = 0; i < length; i++)
+            {
+                WinMSXML::XMLElement element;
+                if (SUCCEEDED(elementList->get_item(i, &element)));
+                {
+                    auto xmlUrl = xml.GetAttributeValue(element, L"xmlUrl");
+                    feedUrls.push_back(xmlUrl);
+                }
+            }
+
+            result = true;
+        }
+
+    }
+    catch (const std::exception& e)
+    {
+    }
+
+    return result;
+}
