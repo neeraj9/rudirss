@@ -291,9 +291,6 @@ VOID CALLBACK RudiRSSClient::WaitOrTimerCallback(PVOID param, BOOLEAN TimerOrWai
             pThis->m_lastLoadedConfig = config;
         }
 
-        if (pThis->m_fnOnPrepareRefreshFeed)
-            pThis->m_fnOnPrepareRefreshFeed(config);
-
         for (const auto& feedUrl : config.feedUrls)
         {
             pThis->ConsumeFeed(feedUrl);
@@ -301,9 +298,8 @@ VOID CALLBACK RudiRSSClient::WaitOrTimerCallback(PVOID param, BOOLEAN TimerOrWai
     }
 }
 
-void RudiRSSClient::StartRefreshFeedTimer(FN_ON_PREPARE_REFRESH_FEED fnOnPrepareRefreshFeed, FN_ON_DB_NOTIFICATION fnOnDbNotification)
+void RudiRSSClient::StartRefreshFeedTimer(FN_ON_DB_NOTIFICATION fnOnDbNotification)
 {
-    m_fnOnPrepareRefreshFeed = fnOnPrepareRefreshFeed;
     m_fnOnDbNotification = fnOnDbNotification;
 
     TimerConfiguration timerConfig;

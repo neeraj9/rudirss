@@ -28,8 +28,7 @@ public:
     bool UpdateFeedDataReadColumn(long long feeddataid, long long read);
 
     using FN_ON_DB_NOTIFICATION = std::function<void(const FeedDatabase::FeedConsumptionUnit &)>;
-    using FN_ON_PREPARE_REFRESH_FEED = std::function<void(const Configuration& congiguration)>;
-    void StartRefreshFeedTimer(FN_ON_PREPARE_REFRESH_FEED fnOnPrepareRefreshFeed, FN_ON_DB_NOTIFICATION fnOnDbNotification);
+    void StartRefreshFeedTimer(FN_ON_DB_NOTIFICATION fnOnDbNotification);
 
 protected:
     static const size_t DEFAULT_MAX_CONSUMPTION_COUNT = 32768;
@@ -52,7 +51,6 @@ protected:
     std::wstring m_rudirssIni;
     std::wstring m_rudirssDbPath;
 
-    FN_ON_PREPARE_REFRESH_FEED m_fnOnPrepareRefreshFeed;
     FN_ON_DB_NOTIFICATION m_fnOnDbNotification;
 
     Configuration m_lastLoadedConfig;

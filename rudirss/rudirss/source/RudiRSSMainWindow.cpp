@@ -63,30 +63,28 @@ bool RudiRSSMainWindow::Initialize(HINSTANCE hInstance)
                 m_feedListView.InsertFeed(feed);
                 });
 
-            m_rudiRSSClient.StartRefreshFeedTimer([&](const Configuration& configuration) {
-                },
-                [&](const FeedDatabase::FeedConsumptionUnit& consumptionUnit) {
-                    if (FeedDatabase::FeedConsumptionUnit::OperationType::NOTIFY_INSERTION_COMPLETE == consumptionUnit.opType)
+            m_rudiRSSClient.StartRefreshFeedTimer([&](const FeedDatabase::FeedConsumptionUnit& consumptionUnit) {
+                if (FeedDatabase::FeedConsumptionUnit::OperationType::NOTIFY_INSERTION_COMPLETE == consumptionUnit.opType)
+                {
+                    if (!m_feedListView.FeedIdExistInSet(consumptionUnit.feed.feedid))
                     {
-                        if (!m_feedListView.FeedIdExistInSet(consumptionUnit.feed.feedid))
+                        m_feedListView.InsertFeed(consumptionUnit.feed);
+                    }
+                    else
+                    {
+                        // Update the feed items in FeedItemListView that belong to the selected feed in FeedListView
+                        auto selectedIndex = SendMessage(m_feedListView.m_hWnd, LVM_GETNEXTITEM, -1, LVNI_SELECTED);
+                        if (-1 != selectedIndex)
                         {
-                            m_feedListView.InsertFeed(consumptionUnit.feed);
-                        }
-                        else
-                        {
-                            // Update the feed items in FeedItemListView that belong to the selected feed in FeedListView
-                            auto selectedIndex = SendMessage(m_feedListView.m_hWnd, LVM_GETNEXTITEM, -1, LVNI_SELECTED);
-                            if (-1 != selectedIndex)
+                            auto feedid = static_cast<long long>(ListView::GetLParamFromSelectedItem(m_feedListView.m_hWnd, selectedIndex));
+                            if (consumptionUnit.feed.feedid == feedid)
                             {
-                                auto feedid = static_cast<long long>(ListView::GetLParamFromSelectedItem(m_feedListView.m_hWnd, selectedIndex));
-                                if (consumptionUnit.feed.feedid == feedid)
-                                {
-                                    // Only update the selected feed to which feedid belongs
-                                    UpdateSelectedFeed(feedid);
-                                }
+                                // Only update the selected feed to which feedid belongs
+                                UpdateSelectedFeed(feedid);
                             }
                         }
                     }
+                }
                 });
         }
     }
