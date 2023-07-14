@@ -20,7 +20,7 @@ bool FeedDatabase::Open(const std::wstring& dbPath)
 void FeedDatabase::Initialize()
 {
     int ret = sqlite3_exec(m_sql.m_handle, "CREATE TABLE IF NOT EXISTS Feed(feedid INTEGER PRIMARY KEY AUTOINCREMENT, guid TEXT NOT NULL, url TEXT NOT NULL,"\
-        "title TEXT NOT NULL)", nullptr, nullptr, nullptr);
+        "title TEXT NOT NULL, duetime INTEGER NOT NULL, updateinterval INTEGER NOT NULL)", nullptr, nullptr, nullptr);
     if (0 != ret)
         throw std::runtime_error("Error: cannot create Feed table.");
 
@@ -30,7 +30,7 @@ void FeedDatabase::Initialize()
     if (0 != ret)
         throw std::runtime_error("Error: cannot create FeedData table.");
 
-    std::string stmt = "INSERT INTO Feed(guid, url, title) SELECT ?, ?, ? WHERE NOT EXISTS(SELECT * FROM Feed WHERE guid = ?)";
+    std::string stmt = "INSERT INTO Feed(guid, url, title, duetime, updateinterval) SELECT ?, ?, ?, ?, ? WHERE NOT EXISTS(SELECT * FROM Feed WHERE guid = ?)";
     ret = sqlite3_prepare_v2(m_sql.m_handle, stmt.c_str(), stmt.length(), &m_insertFeedStmt.m_handle, nullptr);
     if (0 != ret)
         throw std::runtime_error("Error: cannot prepare insertion statement for feed.");
@@ -125,6 +125,8 @@ bool FeedDatabase::InsertFeed(const Feed& feed)
     sqlite3_bind_text(m_insertFeedStmt.m_handle, col++, feed.guid.c_str(), feed.guid.length(), nullptr);
     sqlite3_bind_text(m_insertFeedStmt.m_handle, col++, feed.url.c_str(), feed.url.length(), nullptr);
     sqlite3_bind_text(m_insertFeedStmt.m_handle, col++, feed.title.c_str(), feed.title.length(), nullptr);
+    sqlite3_bind_int64(m_insertFeedStmt.m_handle, col++, static_cast<long long>(feed.duetime));
+    sqlite3_bind_int64(m_insertFeedStmt.m_handle, col++, static_cast<long long>(feed.updateinterval));
     sqlite3_bind_text(m_insertFeedStmt.m_handle, col++, feed.guid.c_str(), feed.guid.length(), nullptr);
     int ret = sqlite3_step(m_insertFeedStmt.m_handle);
     sqlite3_reset(m_insertFeedStmt.m_handle);
@@ -180,6 +182,8 @@ bool FeedDatabase::QueryFeed(long long feedId, FN_QUERY_FEED fnQueryFeed)
             feed.guid = (const char*)sqlite3_column_text(m_queryFeedStmt.m_handle, col++);
             feed.url = (const char*)sqlite3_column_text(m_queryFeedStmt.m_handle, col++);
             feed.title = (const char*)sqlite3_column_text(m_queryFeedStmt.m_handle, col++);
+            feed.duetime = static_cast<unsigned>(sqlite3_column_int64(m_queryFeedStmt.m_handle, col++));
+            feed.updateinterval = static_cast<unsigned>(sqlite3_column_int64(m_queryFeedStmt.m_handle, col++));
             fnQueryFeed(feed);
         }
         sqlite3_reset(m_queryFeedStmt.m_handle);
@@ -206,6 +210,8 @@ bool FeedDatabase::QueryFeedByGuid(const std::string& guid, FN_QUERY_FEED fnQuer
             feed.guid = (const char*)sqlite3_column_text(m_queryFeedByGuidStmt.m_handle, col++);
             feed.url = (const char*)sqlite3_column_text(m_queryFeedByGuidStmt.m_handle, col++);
             feed.title = (const char*)sqlite3_column_text(m_queryFeedByGuidStmt.m_handle, col++);
+            feed.duetime = static_cast<unsigned>(sqlite3_column_int64(m_queryFeedByGuidStmt.m_handle, col++));
+            feed.updateinterval = static_cast<unsigned>(sqlite3_column_int64(m_queryFeedByGuidStmt.m_handle, col++));
             fnQueryFeed(feed);
         }
         sqlite3_reset(m_queryFeedByGuidStmt.m_handle);
@@ -230,6 +236,8 @@ bool FeedDatabase::QueryAllFeeds(FN_QUERY_FEED fnQueryFeed)
         feed.guid = (const char*)sqlite3_column_text(m_queryAllFeedsStmt.m_handle, col++);
         feed.url = (const char*)sqlite3_column_text(m_queryAllFeedsStmt.m_handle, col++);
         feed.title = (const char*)sqlite3_column_text(m_queryAllFeedsStmt.m_handle, col++);
+        feed.duetime = static_cast<unsigned>(sqlite3_column_int64(m_queryAllFeedsStmt.m_handle, col++));
+        feed.updateinterval = static_cast<unsigned>(sqlite3_column_int64(m_queryAllFeedsStmt.m_handle, col++));
         fnQueryFeed(feed);
     }
     sqlite3_reset(m_queryAllFeedsStmt.m_handle);

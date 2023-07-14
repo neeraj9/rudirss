@@ -37,13 +37,19 @@ public:
 
     struct Feed
     {
+        static const unsigned DEFAULT_FEED_UPDATE_DUETIME = 0;
+        static const unsigned DEFAULT_FEEDU_UPDATE_INTERVAL = 1800000;
         long long feedid;
         std::string guid;
         std::string url;
         std::string title;
-        Feed() : feedid{ 0 } {}
-        Feed(const Feed& rhs) : feedid{ rhs.feedid }, guid{ rhs.guid }, url{ rhs.url }, title{ rhs.title } {}
-        Feed(Feed&& rhs) noexcept : feedid{ rhs.feedid }, guid{ std::move(rhs.guid) }, url{ std::move(rhs.url) }, title{ rhs.title } {}
+        unsigned duetime;
+        unsigned updateinterval;
+        Feed() : feedid{ 0 }, duetime{ DEFAULT_FEED_UPDATE_DUETIME }, updateinterval{ DEFAULT_FEEDU_UPDATE_INTERVAL } {}
+        Feed(const Feed& rhs) : feedid{ rhs.feedid }, guid{ rhs.guid }, url{ rhs.url }, title{ rhs.title },
+            duetime{ rhs.duetime }, updateinterval{ rhs.updateinterval } {}
+        Feed(Feed&& rhs) noexcept : feedid{ rhs.feedid }, guid{ std::move(rhs.guid) }, url{ std::move(rhs.url) }, title{ rhs.title },
+            duetime{ rhs.duetime }, updateinterval{ rhs.updateinterval } {}
         Feed& operator=(Feed&& rhs) noexcept
         {
             if (this != &rhs)
@@ -52,6 +58,8 @@ public:
                 guid = std::move(rhs.guid);
                 url = std::move(rhs.url);
                 title = std::move(rhs.title);
+                duetime = rhs.duetime;
+                updateinterval = rhs.updateinterval;
             }
 
             return *this;
@@ -138,7 +146,7 @@ public:
     using FN_QUERY_FEED = std::function<void(const Feed&)>;
     using FN_QUERY_FEED_DATA = std::function<void(const FeedData&)>;
     bool QueryFeed(long long feedId, FN_QUERY_FEED fnQueryFeed);
-    bool QueryFeedByGuid(const std::string &guid, FN_QUERY_FEED fnQueryFeed);
+    bool QueryFeedByGuid(const std::string& guid, FN_QUERY_FEED fnQueryFeed);
     bool QueryAllFeeds(FN_QUERY_FEED fnQueryFeed);
     bool QueryFeedDataByFeedId(long long feedid, FN_QUERY_FEED_DATA fnQueryFeedData);
     bool QueryFeedDataOrderByTimestamp(long long feedid, FN_QUERY_FEED_DATA fnQueryFeedData);
