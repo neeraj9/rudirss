@@ -202,6 +202,9 @@ void RudiRSSMainWindow::InittializeControl()
                         FeedCommon::ConvertStringToWideString(feedData.title, title);
                         std::wstring link;
                         FeedCommon::ConvertStringToWideString(feedData.link, link);
+                        // To handle Protocol-Relative link
+                        if (L"//" == link.substr(0, 2))
+                            link.insert(0, L"https:");
                         m_viewer.Navigate(link);
                         });
                     if (m_rudiRSSClient.UpdateFeedDataReadColumn(feedDataId, static_cast<long long>(true)))
