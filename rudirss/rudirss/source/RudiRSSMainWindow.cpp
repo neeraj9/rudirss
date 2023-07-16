@@ -5,7 +5,8 @@
 
 #include <commdlg.h>
 
-RudiRSSMainWindow::RudiRSSMainWindow() : m_initViewer{ FALSE }, m_font{ nullptr }
+RudiRSSMainWindow::RudiRSSMainWindow() : m_initViewer{ FALSE }, m_font{ nullptr },
+m_lastSelectedFeedId{ FeedDatabase::INVALID_FEED_ID }, m_lastSelectedFeedIndex{ -1 }
 {
 }
 
@@ -59,32 +60,23 @@ bool RudiRSSMainWindow::Initialize(HINSTANCE hInstance)
 
         if (result)
         {
-            m_feedListView.ClearFeedIdSet();
-            m_rudiRSSClient.QueryAllFeeds([&](const FeedDatabase::Feed& feed) {
-                m_feedListView.InsertFeedIdIntoSet(feed.feedid);
-                m_feedListView.InsertFeed(feed);
-                });
+            long long cnt = 0;
+            m_rudiRSSClient.QueryFeedTableCount(cnt);
+            if (cnt > 0)
+            {
+                ListView_SetItemCount(m_feedListView.m_hWnd, cnt + 1); // Plus one for 'All feeds'
+            }
 
             m_rudiRSSClient.StartRefreshFeedTimer([&](const FeedDatabase::FeedConsumptionUnit& consumptionUnit) {
                 if (FeedDatabase::FeedConsumptionUnit::OperationType::NOTIFY_INSERTION_COMPLETE == consumptionUnit.opType)
                 {
-                    if (!m_feedListView.FeedIdExistInSet(consumptionUnit.feed.feedid))
+                    ::RedrawWindow(m_feedListView.m_hWnd, nullptr, nullptr, RDW_INVALIDATE);
+
+                    long long lastSelectedFeedId = InterlockedOr64(reinterpret_cast<LONG64*>(&m_lastSelectedFeedId), 0);
+                    if (ALL_FEEDS_LIST_INDEX != InterlockedOr64(reinterpret_cast<LONG64*>(&m_lastSelectedFeedIndex), 0) 
+                        && lastSelectedFeedId == consumptionUnit.feed.feedid)
                     {
-                        m_feedListView.InsertFeed(consumptionUnit.feed);
-                    }
-                    else
-                    {
-                        // Update the feed items in FeedItemListView that belong to the selected feed in FeedListView
-                        auto selectedIndex = SendMessage(m_feedListView.m_hWnd, LVM_GETNEXTITEM, -1, LVNI_SELECTED);
-                        if (-1 != selectedIndex)
-                        {
-                            auto feedid = static_cast<long long>(ListView::GetLParamFromSelectedItem(m_feedListView.m_hWnd, selectedIndex));
-                            if (consumptionUnit.feed.feedid == feedid)
-                            {
-                                // Only update the selected feed to which feedid belongs
-                                UpdateSelectedFeed(feedid);
-                            }
-                        }
+                        UpdateSelectedFeed(lastSelectedFeedId);
                     }
                 }
                 });
@@ -167,10 +159,43 @@ void RudiRSSMainWindow::InittializeControl()
             LPNMITEMACTIVATE itemActivate = (LPNMITEMACTIVATE)lParam;
             switch (itemActivate->hdr.code)
             {
+            case LVN_GETDISPINFO:
+            {
+                LV_DISPINFO* lpdi = (LV_DISPINFO*)lParam;
+                if (0 == lpdi->item.iSubItem
+                    && lpdi->item.mask & LVIF_TEXT)
+                {
+                    if (ALL_FEEDS_LIST_INDEX == lpdi->item.iItem)
+                    {
+                        _snwprintf_s(lpdi->item.pszText, lpdi->item.cchTextMax, _TRUNCATE, L"All feeds");
+                    }
+                    else
+                    {
+                        m_rudiRSSClient.QueryFeedByOffset(lpdi->item.iItem - 1, [&](const FeedDatabase::Feed& feed) {
+                            std::wstring title;
+                            FeedCommon::ConvertStringToWideString(feed.title, title);
+                            _snwprintf_s(lpdi->item.pszText, lpdi->item.cchTextMax, _TRUNCATE, L"%s", title.c_str());
+                            });
+                    }
+                }
+            }
+            break;
+
             case NM_CLICK:
             {
-                long long feedid = static_cast<long long>(ListView::GetLParamFromActivatedItem(itemActivate));
-                UpdateSelectedFeed(feedid);
+                InterlockedExchange64(reinterpret_cast<LONG64*>(&m_lastSelectedFeedIndex), itemActivate->iItem);
+                if (ALL_FEEDS_LIST_INDEX != itemActivate->iItem)
+                {
+                    m_rudiRSSClient.QueryFeedByOffset(itemActivate->iItem - 1, [&](const FeedDatabase::Feed& feed) {
+                        InterlockedExchange64(reinterpret_cast<LONG64*>(&m_lastSelectedFeedId), feed.feedid);
+                        });
+
+                    UpdateSelectedFeed(InterlockedOr64(reinterpret_cast<LONG64*>(&m_lastSelectedFeedId), 0));
+                }
+                else
+                {
+                    UpdateAllFeeds();
+                }
             }
             break;
 
@@ -189,26 +214,89 @@ void RudiRSSMainWindow::InittializeControl()
     m_feedItemListView.Initialize(m_hWnd, m_hInstance, (HMENU)IDC_FEED_ITEM_LIST_VIEW, rc.right + 1, 0,
         titleColWidth + updatedColWidth, height, titleColWidth, updatedColWidth,
         [&](HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) -> LRESULT {
-            LPNMITEMACTIVATE itemActivate = (LPNMITEMACTIVATE)lParam;
-            switch (itemActivate->hdr.code)
+            LPNMHDR lpNMHDR = (LPNMHDR)lParam;
+            switch (lpNMHDR->code)
             {
+            case LVN_GETDISPINFO:
+            {
+                LV_DISPINFO* lpdi = (LV_DISPINFO*)lParam;
+                if (lpdi->item.mask & LVIF_TEXT)
+                {
+                    if (ALL_FEEDS_LIST_INDEX == InterlockedOr64(reinterpret_cast<LONG64*>(&m_lastSelectedFeedIndex), 0))
+                    {
+                        if (0 == lpdi->item.iSubItem)
+                        {
+                            m_rudiRSSClient.QueryFeedDataByOffsetOrderByTimestamp(lpdi->item.iItem,
+                                [&](const FeedDatabase::FeedData& feedData) {
+                                    std::wstring title;
+                                    FeedCommon::ConvertStringToWideString(feedData.title, title);
+                                    _snwprintf_s(lpdi->item.pszText, lpdi->item.cchTextMax, _TRUNCATE, L"%s", title.c_str());
+                                });
+                        }
+                        else if (1 == lpdi->item.iSubItem)
+                        {
+                            m_rudiRSSClient.QueryFeedDataByOffsetOrderByTimestamp(lpdi->item.iItem,
+                                [&](const FeedDatabase::FeedData& feedData) {
+                                    std::wstring datetime;
+                                    FeedCommon::ConvertStringToWideString(feedData.datetime, datetime);
+                                    _snwprintf_s(lpdi->item.pszText, lpdi->item.cchTextMax, _TRUNCATE, L"%s", datetime.c_str());
+                                });
+                        }
+                    }
+                    else
+                    {
+                        long long lastSelectedFeedId = InterlockedOr64(reinterpret_cast<LONG64*>(&m_lastSelectedFeedId), 0);
+                        if (0 == lpdi->item.iSubItem)
+                        {
+                            m_rudiRSSClient.QueryFeedDataByFeedIdByOffsetOrderByTimestamp(lastSelectedFeedId, lpdi->item.iItem,
+                                [&](const FeedDatabase::FeedData& feedData) {
+                                    std::wstring title;
+                                    FeedCommon::ConvertStringToWideString(feedData.title, title);
+                                    _snwprintf_s(lpdi->item.pszText, lpdi->item.cchTextMax, _TRUNCATE, L"%s", title.c_str());
+                                });
+                        }
+                        else if (1 == lpdi->item.iSubItem)
+                        {
+                            m_rudiRSSClient.QueryFeedDataByFeedIdByOffsetOrderByTimestamp(lastSelectedFeedId, lpdi->item.iItem,
+                                [&](const FeedDatabase::FeedData& feedData) {
+                                    std::wstring datetime;
+                                    FeedCommon::ConvertStringToWideString(feedData.datetime, datetime);
+                                    _snwprintf_s(lpdi->item.pszText, lpdi->item.cchTextMax, _TRUNCATE, L"%s", datetime.c_str());
+                                });
+                        }
+                    }
+                }
+            }
+            break;
+
             case NM_CLICK:
             {
+                LPNMITEMACTIVATE itemActivate = (LPNMITEMACTIVATE)lParam;
                 if (InterlockedOr(reinterpret_cast<LONG*>(&m_initViewer), 0))
                 {
-                    long long feedDataId = static_cast<long long>(ListView::GetLParamFromActivatedItem(itemActivate));
                     std::wstring title;
-                    m_rudiRSSClient.QueryFeedDataByFeedDataId(feedDataId, [&](const FeedDatabase::FeedData& feedData) {
-                        FeedCommon::ConvertStringToWideString(feedData.title, title);
-                        std::wstring link;
-                        FeedCommon::ConvertStringToWideString(feedData.link, link);
-                        // To handle Protocol-Relative link
-                        if (L"//" == link.substr(0, 2))
-                            link.insert(0, L"https:");
-                        m_viewer.Navigate(link);
-                        });
-                    if (m_rudiRSSClient.UpdateFeedDataReadColumn(feedDataId, static_cast<long long>(true)))
-                        m_feedItemListView.MarkFeedDataAsReadOrUnRead(itemActivate, title, static_cast<long long>(true));
+                    std::wstring link;
+                    if (ALL_FEEDS_LIST_INDEX == InterlockedOr64(reinterpret_cast<LONG64*>(&m_lastSelectedFeedIndex), 0))
+                    {
+                        m_rudiRSSClient.QueryFeedDataByOffsetOrderByTimestamp(itemActivate->iItem,
+                            [&](const FeedDatabase::FeedData& feedData) {
+                                FeedCommon::ConvertStringToWideString(feedData.title, title);
+                                FeedCommon::ConvertStringToWideString(feedData.link, link);
+                            });
+                    }
+                    else
+                    {
+                        m_rudiRSSClient.QueryFeedDataByFeedIdByOffsetOrderByTimestamp(InterlockedOr64(reinterpret_cast<LONG64*>(&m_lastSelectedFeedId), 0),
+                            itemActivate->iItem,
+                            [&](const FeedDatabase::FeedData& feedData) {
+                                FeedCommon::ConvertStringToWideString(feedData.title, title);
+                                FeedCommon::ConvertStringToWideString(feedData.link, link);
+                            });
+                    }
+                    // To handle Protocol-Relative link
+                    if (L"//" == link.substr(0, 2))
+                        link.insert(0, L"https:");
+                    m_viewer.Navigate(link);
                 }
             }
             break;
@@ -242,17 +330,23 @@ void RudiRSSMainWindow::InitFont()
 void RudiRSSMainWindow::UpdateSelectedFeed(long long feedid)
 {
     SendMessage(m_feedItemListView.m_hWnd, LVM_DELETEALLITEMS, 0, 0);
-    if (FeedDatabase::INVALID_FEEDDATA_ID != feedid)
+    long long cnt = 0;
+    m_rudiRSSClient.QueryFeedDataTableCountByFeedId(feedid, cnt);
+
+    if (cnt > 0)
     {
-        m_rudiRSSClient.QueryFeedDataOrderByTimestamp(feedid, [&](const FeedDatabase::FeedData& feedData) {
-            m_feedItemListView.InsertFeedItem(feedData);
-            });
+        ListView_SetItemCount(m_feedItemListView.m_hWnd, cnt);
     }
-    else
+}
+
+void RudiRSSMainWindow::UpdateAllFeeds()
+{
+    SendMessage(m_feedItemListView.m_hWnd, LVM_DELETEALLITEMS, 0, 0);
+    long long cnt = 0;
+    m_rudiRSSClient.QueryFeedDataTableCount(cnt);
+    if (cnt > 0)
     {
-        m_rudiRSSClient.QueryAllFeedDataOrderByTimestamp([&](const FeedDatabase::FeedData& feedData) {
-            m_feedItemListView.InsertFeedItem(feedData);
-            });
+        ListView_SetItemCount(m_feedItemListView.m_hWnd, cnt);
     }
 }
 
@@ -326,6 +420,7 @@ void RudiRSSMainWindow::OpenImportOPMLDialog()
     ofn.nMaxFile = ARRAYSIZE(szPath);
     if (GetOpenFileName(&ofn))
     {
-        m_rudiRSSClient.ImportFromOPML(ofn.lpstrFile);
+        m_rudiRSSClient.ImportFromOPML(ofn.lpstrFile, [&](const std::vector<std::wstring>& feedUrls) {
+            });
     }
 }

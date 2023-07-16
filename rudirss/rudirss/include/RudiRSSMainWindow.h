@@ -8,13 +8,14 @@
 #include "FeedItemListView.h"
 
 #include <string>
-#include <set>
 #include <atlcore.h>
 #include <CommCtrl.h>
 
 class RudiRSSMainWindow : public MainWindow
 {
 protected:
+    static const int ALL_FEEDS_LIST_INDEX = 0;
+
     std::wstring m_title;
     std::wstring m_className;
     FeedListView m_feedListView;
@@ -22,6 +23,8 @@ protected:
     Viewer m_viewer;
     BOOL m_initViewer;
     RudiRSSClient m_rudiRSSClient;
+    long long m_lastSelectedFeedId;
+    int m_lastSelectedFeedIndex;
 
     HFONT m_font;
 
@@ -34,6 +37,7 @@ protected:
     void UpdateControl();
     void InitFont();
     void UpdateSelectedFeed(long long feedid);
+    void UpdateAllFeeds();
     void OpenImportOPMLDialog();
 
     LRESULT OnProcessListViewCommand(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);

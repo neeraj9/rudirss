@@ -23,6 +23,8 @@ public:
     bool QueryAllFeeds(FeedDatabase::FN_QUERY_FEED fnQueryFeed);
     bool QueryFeedDataByFeedId(long long feedid, FeedDatabase::FN_QUERY_FEED_DATA fnQueryFeedData);
     bool QueryFeedDataOrderByTimestamp(long long feedid, FeedDatabase::FN_QUERY_FEED_DATA fnQueryFeedData);
+    bool QueryFeedDataByOffsetOrderByTimestamp(long long offset, FeedDatabase::FN_QUERY_FEED_DATA fnQueryFeedData);
+    bool QueryFeedDataByFeedIdByOffsetOrderByTimestamp(long long feedid, long long offset, FeedDatabase::FN_QUERY_FEED_DATA fnQueryFeedData);
     bool QueryAllFeedDataOrderByTimestamp(FeedDatabase::FN_QUERY_FEED_DATA fnQueryFeedData);
     bool QueryFeedDataByFeedDataId(long long feeddataid, FeedDatabase::FN_QUERY_FEED_DATA fnQueryFeedData);
     bool DeleteOutdatedFeedData(unsigned reserveDays);
@@ -30,10 +32,16 @@ public:
     bool DeleteFeedDataByFeedId(long long feedid);
     bool UpdateFeedDataReadColumn(long long feeddataid, long long read);
     bool QueryFeedTableDataExist(long long& exitst);
+    bool QueryFeedDataTableCount(long long &count);
+    bool QueryFeedDataTableCountByFeedId(long long feedid, long long &count);
+    bool QueryFeedDataByOffset(long long offset, FeedDatabase::FN_QUERY_FEED_DATA fnQueryFeedData);
+    bool QueryFeedTableCount(long long &count);
+    bool QueryFeedByOffset(long long offset, FeedDatabase::FN_QUERY_FEED fnQueryFeed);
 
     using FN_ON_DB_NOTIFICATION = std::function<void(const FeedDatabase::FeedConsumptionUnit &)>;
     void StartRefreshFeedTimer(FN_ON_DB_NOTIFICATION fnOnDbNotification);
-    void ImportFromOPML(const std::wstring &opml);
+    using FN_ON_IMPORT_OPML = std::function<void(const std::vector<std::wstring>&)>;
+    void ImportFromOPML(const std::wstring &opml, FN_ON_IMPORT_OPML fnOnImportOPML);
 
 protected:
     static const size_t DEFAULT_MAX_CONSUMPTION_COUNT = 32768;

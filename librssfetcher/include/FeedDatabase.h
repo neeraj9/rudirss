@@ -20,6 +20,8 @@ protected:
     SQLite3StmtHandle m_queryFeedDataByFeedIdStmt;
     SQLite3StmtHandle m_queryFeedDataByFeedDataIdStmt;
     SQLite3StmtHandle m_queryFeedDataByFeedIdOrderByTimestampStmt;
+    SQLite3StmtHandle m_queryFeedDataByOffsetOrderByTimestampStmt;
+    SQLite3StmtHandle m_queryFeedDataByFeedIdByOffsetOrderByTimestampStmt;
     SQLite3StmtHandle m_queryAllFeedDataOrderByTimestampStmt;
     SQLite3StmtHandle m_deleteAllFeedStmt;
     SQLite3StmtHandle m_deleteAllFeedDataStmt;
@@ -27,7 +29,12 @@ protected:
     SQLite3StmtHandle m_deleteFeedByFeedIdStmt;
     SQLite3StmtHandle m_deleteFeedDataByFeedIdStmt;
     SQLite3StmtHandle m_updateFeedDataReadStmt;
-    SQLite3StmtHandle m_queryFeedTableDataExist;
+    SQLite3StmtHandle m_queryFeedTableDataExistStmt;
+    SQLite3StmtHandle m_queryFeedDataTableCountStmt;
+    SQLite3StmtHandle m_queryFeedDataTableCountByFeedIdStmt;
+    SQLite3StmtHandle m_queryFeedDataByOffsetStmt;
+    SQLite3StmtHandle m_queryFeedTableCountStmt;
+    SQLite3StmtHandle m_queryFeedByOffsetStmt;
     ATL::CComCriticalSection m_dbLock;
 
 public:
@@ -154,6 +161,8 @@ public:
     bool QueryAllFeeds(FN_QUERY_FEED fnQueryFeed);
     bool QueryFeedDataByFeedId(long long feedid, FN_QUERY_FEED_DATA fnQueryFeedData);
     bool QueryFeedDataOrderByTimestamp(long long feedid, FN_QUERY_FEED_DATA fnQueryFeedData);
+    bool QueryFeedDataByOffsetOrderByTimestamp(long long offset, FN_QUERY_FEED_DATA fnQueryFeedData);
+    bool QueryFeedDataByFeedIdByOffsetOrderByTimestamp(long long feedid, long long offset, FN_QUERY_FEED_DATA fnQueryFeedData);
     bool QueryAllFeedDataOrderByTimestamp(FN_QUERY_FEED_DATA fnQueryFeedData);
     bool QueryFeedDataByFeedDataId(long long feeddataid, FN_QUERY_FEED_DATA fnQueryFeedData);
     bool DeleteAllFeeds();
@@ -163,4 +172,9 @@ public:
     bool DeleteFeedDataByFeedId(long long feedid);
     bool UpdateFeedDataReadColumn(long long feeddataid, long long read);
     bool QueryFeedTableDataExist(long long &exist);
+    bool QueryFeedDataTableCount(long long &count);
+    bool QueryFeedDataTableCountByFeedId(long long feedid, long long &count);
+    bool QueryFeedTableCount(long long &count);
+    bool QueryFeedByOffset(long long offset, FN_QUERY_FEED fnQueryFeedData);
+    bool QueryFeedDataByOffset(long long offset, FN_QUERY_FEED_DATA fnQueryFeedData);
 };

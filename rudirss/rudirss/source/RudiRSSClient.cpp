@@ -254,6 +254,16 @@ bool RudiRSSClient::QueryFeedDataOrderByTimestamp(long long feedid, FeedDatabase
     return m_db.QueryFeedDataOrderByTimestamp(feedid, fnQueryFeedData);
 }
 
+bool RudiRSSClient::QueryFeedDataByOffsetOrderByTimestamp(long long offset, FeedDatabase::FN_QUERY_FEED_DATA fnQueryFeedData)
+{
+    return m_db.QueryFeedDataByOffsetOrderByTimestamp(offset, fnQueryFeedData);
+}
+
+bool RudiRSSClient::QueryFeedDataByFeedIdByOffsetOrderByTimestamp(long long feedid, long long offset, FeedDatabase::FN_QUERY_FEED_DATA fnQueryFeedData)
+{
+    return m_db.QueryFeedDataByFeedIdByOffsetOrderByTimestamp(feedid, offset, fnQueryFeedData);
+}
+
 bool RudiRSSClient::QueryAllFeedDataOrderByTimestamp(FeedDatabase::FN_QUERY_FEED_DATA fnQueryFeedData)
 {
     return m_db.QueryAllFeedDataOrderByTimestamp(fnQueryFeedData);
@@ -293,12 +303,38 @@ bool RudiRSSClient::QueryFeedTableDataExist(long long& exist)
     return m_db.QueryFeedTableDataExist(exist);
 }
 
+bool RudiRSSClient::QueryFeedDataTableCount(long long& count)
+{
+    return m_db.QueryFeedDataTableCount(count);
+}
+
+bool RudiRSSClient::QueryFeedDataTableCountByFeedId(long long feedid, long long& count)
+{
+    return m_db.QueryFeedDataTableCountByFeedId(feedid, count);
+}
+
+bool RudiRSSClient::QueryFeedDataByOffset(long long offset, FeedDatabase::FN_QUERY_FEED_DATA fnQueryFeedData)
+{
+    return m_db.QueryFeedDataByOffset(offset, fnQueryFeedData);
+}
+
+bool RudiRSSClient::QueryFeedTableCount(long long& count)
+{
+    return m_db.QueryFeedTableCount(count);
+}
+
+bool RudiRSSClient::QueryFeedByOffset(long long offset, FeedDatabase::FN_QUERY_FEED fnQueryFeed)
+{
+    return m_db.QueryFeedByOffset(offset, fnQueryFeed);
+}
+
 VOID CALLBACK RudiRSSClient::WaitOrTimerCallback(PVOID param, BOOLEAN TimerOrWaitFired)
 {
     auto refreshTimer = reinterpret_cast<RefreshTimer*>(param);
     auto pThis = reinterpret_cast<RudiRSSClient*>(refreshTimer->GetParam());
     // By design, guid is identical to url in Feed table
     pThis->ConsumeFeed(refreshTimer->GetFeedGuid());
+    OutputDebugString(L"***** trigger\n");
 }
 
 void RudiRSSClient::StartRefreshFeedTimer(FN_ON_DB_NOTIFICATION fnOnDbNotification)
@@ -321,20 +357,32 @@ void RudiRSSClient::StartRefreshFeedTimer(FN_ON_DB_NOTIFICATION fnOnDbNotificati
     }
 }
 
-void RudiRSSClient::ImportFromOPML(const std::wstring& opml)
+void RudiRSSClient::ImportFromOPML(const std::wstring& opml, FN_ON_IMPORT_OPML fnOnImportOPML)
 {
     std::vector<std::wstring> feedUrls;
     if (FeedCommon::LoadFeedUrlsFromOPML(opml, feedUrls))
     {
         for (const auto& feedUrl : feedUrls)
         {
-            auto pair = m_refreshTimer.insert(std::pair<std::wstring, RefreshTimer>(feedUrl, std::move(RefreshTimer(this, feedUrl))));
-            if (pair.second)
+            auto it = m_refreshTimer.find(feedUrl);
+            if (it == m_refreshTimer.end())
             {
-                pair.first->second.Create(WaitOrTimerCallback, &pair.first->second, FeedDatabase::Feed::DEFAULT_FEED_UPDATE_DUETIME,
+                auto pair = m_refreshTimer.insert(std::pair<std::wstring, RefreshTimer>(feedUrl, std::move(RefreshTimer(this, feedUrl))));
+                if (pair.second)
+                {
+                    pair.first->second.Create(WaitOrTimerCallback, &pair.first->second, FeedDatabase::Feed::DEFAULT_FEED_UPDATE_DUETIME,
+                        FeedDatabase::Feed::DEFAULT_FEED_UPDATE_INTERVAL, WT_EXECUTEDEFAULT);
+                }
+            }
+            else
+            {
+                it->second.Create(WaitOrTimerCallback, &it->second, FeedDatabase::Feed::DEFAULT_FEED_UPDATE_DUETIME,
                     FeedDatabase::Feed::DEFAULT_FEED_UPDATE_INTERVAL, WT_EXECUTEDEFAULT);
             }
         }
+
+        if (fnOnImportOPML)
+            fnOnImportOPML(feedUrls);
     }
 }
 
