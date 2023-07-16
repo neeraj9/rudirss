@@ -158,17 +158,21 @@ void FeedDatabase::Close()
     m_queryFeedDataByFeedDataIdStmt.Close();
     m_queryFeedDataByFeedIdOrderByTimestampStmt.Close();
     m_queryFeedDataByOffsetOrderByTimestampStmt.Close();
+    m_queryFeedDataByFeedIdByOffsetOrderByTimestampStmt.Close();
     m_queryAllFeedDataOrderByTimestampStmt.Close();
     m_deleteAllFeedStmt.Close();
     m_deleteAllFeedDataStmt.Close();
     m_deleteOutdatedFeedDataStmt.Close();
-    m_deleteFeedByFeedIdStmt.Close();;
+    m_deleteFeedByFeedIdStmt.Close();
     m_deleteFeedDataByFeedIdStmt.Close();
     m_updateFeedDataReadStmt.Close();
     m_queryFeedTableDataExistStmt.Close();
+    m_queryFeedDataTableCountStmt.Close();
+    m_queryFeedDataTableCountByFeedIdStmt.Close();
     m_queryFeedDataByOffsetStmt.Close();
     m_queryFeedTableCountStmt.Close();
     m_queryFeedByOffsetStmt.Close();
+
     m_sql.Close();
 }
 
