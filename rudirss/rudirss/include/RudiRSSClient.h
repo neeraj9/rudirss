@@ -43,6 +43,9 @@ public:
     using FN_ON_IMPORT_OPML = std::function<void(const std::vector<std::wstring>&)>;
     void ImportFromOPML(const std::wstring &opml, FN_ON_IMPORT_OPML fnOnImportOPML);
 
+    void LoadDisplayConfiguration(DisplayConfiguration& displayConfig);
+    void SaveDisplayConfiguration(const DisplayConfiguration& displayConfig);
+
 protected:
     static const size_t DEFAULT_MAX_CONSUMPTION_COUNT = 32768;
 
@@ -68,9 +71,7 @@ protected:
     FN_ON_DB_NOTIFICATION m_fnOnDbNotification;
 
     void LoadDatabaseConfiguration(DatabaseConfiguration& dbConfig);
-    void LoadConfiguration(Configuration &config);
-    void SaveDatabaseConfiguration(DatabaseConfiguration& dbConfig);
-    void SaveConfiguration(Configuration &config);
+    void SaveDatabaseConfiguration(const DatabaseConfiguration& dbConfig);
 
     virtual void OnFeedReady(const std::unique_ptr<Feed>& feed);
     void NotifyDbEvent(FeedDatabase::FeedConsumptionUnit &&consumptionUnit);

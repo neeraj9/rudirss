@@ -30,16 +30,6 @@ RudiRSSClient::~RudiRSSClient()
 
     CloseHandle(m_dbSemaphore);
     CloseHandle(m_notificationSemaphore);
-
-    {
-        Configuration config;
-        QueryAllFeeds([&](const FeedDatabase::Feed& feed) {
-            std::wstring url;
-            FeedCommon::ConvertStringToWideString(feed.url, url);
-            config.feedUrls.push_back(url);
-            });
-        SaveConfiguration(config);
-    }
 }
 
 bool RudiRSSClient::Initialize()
@@ -334,7 +324,6 @@ VOID CALLBACK RudiRSSClient::WaitOrTimerCallback(PVOID param, BOOLEAN TimerOrWai
     auto pThis = reinterpret_cast<RudiRSSClient*>(refreshTimer->GetParam());
     // By design, guid is identical to url in Feed table
     pThis->ConsumeFeed(refreshTimer->GetFeedGuid());
-    OutputDebugString(L"***** trigger\n");
 }
 
 void RudiRSSClient::StartRefreshFeedTimer(FN_ON_DB_NOTIFICATION fnOnDbNotification)
@@ -392,20 +381,26 @@ void RudiRSSClient::LoadDatabaseConfiguration(DatabaseConfiguration& dbConfig)
     dbConfig.reserveDays = GetPrivateProfileInt(L"Database", L"ReserveDays", DatabaseConfiguration::DEFAULT_RESERVE_DAYS, m_rudirssIni.c_str());
 }
 
-void RudiRSSClient::LoadConfiguration(Configuration& config)
-{
-    LoadDatabaseConfiguration(config.dbConfiguration);
-}
-
-void RudiRSSClient::SaveDatabaseConfiguration(DatabaseConfiguration& dbConfig)
+void RudiRSSClient::SaveDatabaseConfiguration(const DatabaseConfiguration& dbConfig)
 {
     WritePrivateProfileString(L"Database", L"AllowDeleteOutdatedFeedItems",
         std::to_wstring(static_cast<unsigned>(dbConfig.allowDeleteOutdatedFeedItems)).c_str(), m_rudirssIni.c_str());
     WritePrivateProfileString(L"Database", L"ReserveDays", std::to_wstring(dbConfig.reserveDays).c_str(), m_rudirssIni.c_str());
 }
 
-void RudiRSSClient::SaveConfiguration(Configuration& config)
+void RudiRSSClient::LoadDisplayConfiguration(DisplayConfiguration &displayConfig)
 {
-    SaveDatabaseConfiguration(config.dbConfiguration);
+    displayConfig.feedWidth = GetPrivateProfileInt(L"Display", L"FeedWidth", 300, m_rudirssIni.c_str());
+    displayConfig.feedItemTitleColumnWidth = GetPrivateProfileInt(L"Display", L"FeedItemTitleColumnWidth", 250, m_rudirssIni.c_str());
+    displayConfig.feedItemUpdatedColumnWidth = GetPrivateProfileInt(L"Display", L"FeedItemUpdatedColumnWidth", 150, m_rudirssIni.c_str());
 }
 
+void RudiRSSClient::SaveDisplayConfiguration(const DisplayConfiguration &displayConfig)
+{
+    WritePrivateProfileString(L"Display", L"FeedWidth",
+        std::to_wstring(static_cast<unsigned>(displayConfig.feedWidth)).c_str(), m_rudirssIni.c_str());
+    WritePrivateProfileString(L"Display", L"FeedItemTitleColumnWidth",
+        std::to_wstring(static_cast<unsigned>(displayConfig.feedItemTitleColumnWidth)).c_str(), m_rudirssIni.c_str());
+    WritePrivateProfileString(L"Display", L"FeedItemUpdatedColumnWidth",
+        std::to_wstring(static_cast<unsigned>(displayConfig.feedItemUpdatedColumnWidth)).c_str(), m_rudirssIni.c_str());
+}

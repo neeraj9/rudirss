@@ -154,7 +154,10 @@ void RudiRSSMainWindow::InittializeControl()
     LONG height = rc.bottom - rc.top;
     LONG viewerX = 0;
 
-    m_feedListView.Initialize(m_hWnd, m_hInstance, (HMENU)IDC_FEED_LIST_VIEW, 0, 0, 300, height,
+    DisplayConfiguration displayConfig;
+    m_rudiRSSClient.LoadDisplayConfiguration(displayConfig);
+
+    m_feedListView.Initialize(m_hWnd, m_hInstance, (HMENU)IDC_FEED_LIST_VIEW, 0, 0, displayConfig.feedWidth, height,
         [&](HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) -> LRESULT {
             LPNMITEMACTIVATE itemActivate = (LPNMITEMACTIVATE)lParam;
             switch (itemActivate->hdr.code)
@@ -209,8 +212,8 @@ void RudiRSSMainWindow::InittializeControl()
     GetClientRect(m_feedListView.m_hWnd, &rc);
     viewerX += rc.right - rc.left;
 
-    const int titleColWidth = 250;
-    const int updatedColWidth = 150;
+    const int titleColWidth = displayConfig.feedItemTitleColumnWidth;
+    const int updatedColWidth = displayConfig.feedItemUpdatedColumnWidth;
     m_feedItemListView.Initialize(m_hWnd, m_hInstance, (HMENU)IDC_FEED_ITEM_LIST_VIEW, rc.right + 1, 0,
         titleColWidth + updatedColWidth, height, titleColWidth, updatedColWidth,
         [&](HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) -> LRESULT {

@@ -23,41 +23,25 @@ struct DatabaseConfiguration
 
         return *this;
     }
-    DatabaseConfiguration& operator=(DatabaseConfiguration&& rhs) noexcept
-    {
-        if (this != &rhs)
-        {
-            allowDeleteOutdatedFeedItems = rhs.allowDeleteOutdatedFeedItems;
-            reserveDays = rhs.reserveDays;
-        }
-
-        return *this;
-    }
 };
 
-struct Configuration
+struct DisplayConfiguration
 {
-    std::vector<std::wstring> feedUrls;
-    DatabaseConfiguration dbConfiguration;
-    Configuration() {}
-    Configuration(const Configuration& rhs) : feedUrls{ rhs.feedUrls }, dbConfiguration{ rhs.dbConfiguration } {}
-    Configuration(Configuration&& rhs) noexcept : feedUrls{ std::move(rhs.feedUrls) }, dbConfiguration{ std::move(rhs.dbConfiguration) } {}
-    Configuration& operator=(const Configuration& rhs)
+    int feedWidth;
+    int feedItemTitleColumnWidth;
+    int feedItemUpdatedColumnWidth;
+    DisplayConfiguration() : feedWidth{ 0 }, feedItemTitleColumnWidth{ 0 }, feedItemUpdatedColumnWidth{ 0 } {}
+    DisplayConfiguration(const DisplayConfiguration& rhs) : feedWidth{ rhs.feedWidth },
+        feedItemTitleColumnWidth{ rhs.feedItemTitleColumnWidth }, feedItemUpdatedColumnWidth{ rhs.feedItemUpdatedColumnWidth } {}
+    DisplayConfiguration(DisplayConfiguration&& rhs) noexcept : feedWidth{ rhs.feedWidth },
+        feedItemTitleColumnWidth{ rhs.feedItemTitleColumnWidth }, feedItemUpdatedColumnWidth{ rhs.feedItemUpdatedColumnWidth } {}
+    DisplayConfiguration& operator=(const DisplayConfiguration& rhs)
     {
         if (this != &rhs)
         {
-            feedUrls = rhs.feedUrls;
-            dbConfiguration = rhs.dbConfiguration;
-        }
-
-        return *this;
-    }
-    Configuration& operator=(Configuration&& rhs) noexcept
-    {
-        if (this != &rhs)
-        {
-            feedUrls = std::move(rhs.feedUrls);
-            dbConfiguration = std::move(rhs.dbConfiguration);
+            feedWidth = rhs.feedWidth;
+            feedItemTitleColumnWidth = rhs.feedItemTitleColumnWidth;
+            feedItemUpdatedColumnWidth = rhs.feedItemUpdatedColumnWidth;
         }
 
         return *this;
