@@ -143,10 +143,6 @@ void RudiRSSMainWindow::OnDestroy()
 
 void RudiRSSMainWindow::InittializeControl()
 {
-    INITCOMMONCONTROLSEX icex{};
-    icex.dwICC = ICC_LISTVIEW_CLASSES;
-    InitCommonControlsEx(&icex);
-
     InitFont();
 
     RECT rc{};
