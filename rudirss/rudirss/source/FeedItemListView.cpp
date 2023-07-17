@@ -20,13 +20,12 @@ void FeedItemListView::Initialize(HWND hWnd, HINSTANCE hInstance, HMENU windowId
     m_fnProcessMessage = fnProcessMessage;
 
     constexpr DWORD dwStyle = WS_CHILD | WS_VISIBLE | LVS_REPORT | LVS_SHOWSELALWAYS | LVS_OWNERDATA | LVS_NOSORTHEADER;
-    Attach(CreateWindowEx(WS_EX_STATICEDGE, WC_LISTVIEW, nullptr, dwStyle, x, y,
+    Attach(CreateWindow(WC_LISTVIEW, nullptr, dwStyle, x, y,
         width, height, hWnd, windowId, hInstance, nullptr));
     SendMessage(m_hWnd, LVM_SETEXTENDEDLISTVIEWSTYLE, 0, LVS_EX_FULLROWSELECT | LVS_EX_DOUBLEBUFFER); // Set extended style
 
     LV_COLUMN lvColumn{};
     lvColumn.mask = LVCF_WIDTH | LVCF_TEXT | LVCF_SUBITEM;
-    //lvColumn.mask = LVCF_FMT | LVCF_WIDTH | LVCF_TEXT | LVCF_SUBITEM | LVIF_PARAM;
     lvColumn.fmt = LVCFMT_LEFT;
     lvColumn.cx = titleColWidth;
     lvColumn.pszText = const_cast<wchar_t*>(L"Title");
