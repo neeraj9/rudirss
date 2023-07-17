@@ -42,6 +42,8 @@ public:
     void StartRefreshFeedTimer(FN_ON_DB_NOTIFICATION fnOnDbNotification);
     using FN_ON_IMPORT_OPML = std::function<void(const std::vector<std::wstring>&)>;
     void ImportFromOPML(const std::wstring &opml, FN_ON_IMPORT_OPML fnOnImportOPML);
+    using FN_ON_IMPORT_LIST_FILE = std::function<void(const std::vector<std::wstring>&)>;
+    void ImportFromListFile(const std::wstring &listFile, FN_ON_IMPORT_LIST_FILE fnOnImportListFile);
 
     void LoadDisplayConfiguration(DisplayConfiguration& displayConfig);
     void SaveDisplayConfiguration(const DisplayConfiguration& displayConfig);

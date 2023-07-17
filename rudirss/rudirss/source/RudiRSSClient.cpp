@@ -375,6 +375,35 @@ void RudiRSSClient::ImportFromOPML(const std::wstring& opml, FN_ON_IMPORT_OPML f
     }
 }
 
+void RudiRSSClient::ImportFromListFile(const std::wstring& listFile, FN_ON_IMPORT_LIST_FILE fnOnImportListFile)
+{
+    std::vector<std::wstring> feedUrls;
+    if (FeedCommon::LoadFeedUrlsFromListFile(listFile, feedUrls))
+    {
+        for (const auto& feedUrl : feedUrls)
+        {
+            auto it = m_refreshTimer.find(feedUrl);
+            if (it == m_refreshTimer.end())
+            {
+                auto pair = m_refreshTimer.insert(std::pair<std::wstring, RefreshTimer>(feedUrl, std::move(RefreshTimer(this, feedUrl))));
+                if (pair.second)
+                {
+                    pair.first->second.Create(WaitOrTimerCallback, &pair.first->second, FeedDatabase::Feed::DEFAULT_FEED_UPDATE_DUETIME,
+                        FeedDatabase::Feed::DEFAULT_FEED_UPDATE_INTERVAL, WT_EXECUTEDEFAULT);
+                }
+            }
+            else
+            {
+                it->second.Create(WaitOrTimerCallback, &it->second, FeedDatabase::Feed::DEFAULT_FEED_UPDATE_DUETIME,
+                    FeedDatabase::Feed::DEFAULT_FEED_UPDATE_INTERVAL, WT_EXECUTEDEFAULT);
+            }
+        }
+
+        if (fnOnImportListFile)
+            fnOnImportListFile(feedUrls);
+    }
+}
+
 void RudiRSSClient::LoadDatabaseConfiguration(DatabaseConfiguration& dbConfig)
 {
     dbConfig.allowDeleteOutdatedFeedItems = !!GetPrivateProfileInt(L"Database", L"AllowDeleteOutdatedFeedItems", 1, m_rudirssIni.c_str());

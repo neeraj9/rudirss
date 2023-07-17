@@ -39,6 +39,7 @@ protected:
     void UpdateSelectedFeed(long long feedid);
     void UpdateAllFeeds();
     void OpenImportOPMLDialog();
+    void OpenImportListFileDialog();
 
     LRESULT OnProcessListViewCommand(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 

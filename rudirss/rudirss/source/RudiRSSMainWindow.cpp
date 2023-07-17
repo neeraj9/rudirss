@@ -100,6 +100,12 @@ LRESULT RudiRSSMainWindow::OnProcessMessage(HWND hWnd, UINT message, WPARAM wPar
         }
         break;
 
+        case ID_FILE_IMPORT_FROM_LIST_FILE:
+        {
+            OpenImportListFileDialog();
+        }
+        break;
+
         default:
             break;
         }
@@ -417,15 +423,31 @@ LRESULT RudiRSSMainWindow::OnProcessListViewCommand(HWND hWnd, UINT message, WPA
 
 void RudiRSSMainWindow::OpenImportOPMLDialog()
 {
-    WCHAR szPath[MAX_PATH] = {};
+    WCHAR path[MAX_PATH] = {};
     OPENFILENAME ofn = { sizeof(ofn) };
     ofn.hwndOwner = m_hWnd;
     ofn.lpstrFilter = L"OPML file\0*.opml\0";
-    ofn.lpstrFile = szPath;
-    ofn.nMaxFile = ARRAYSIZE(szPath);
+    ofn.lpstrFile = path;
+    ofn.nMaxFile = ARRAYSIZE(path);
     if (GetOpenFileName(&ofn))
     {
         m_rudiRSSClient.ImportFromOPML(ofn.lpstrFile, [&](const std::vector<std::wstring>& feedUrls) {
+            ListView_SetItemCount(m_feedListView.m_hWnd, feedUrls.size() + 1); // Plus one for 'All feeds'
+            });
+    }
+}
+
+void RudiRSSMainWindow::OpenImportListFileDialog()
+{
+    WCHAR path[MAX_PATH] = {};
+    OPENFILENAME ofn = { sizeof(ofn) };
+    ofn.hwndOwner = m_hWnd;
+    ofn.lpstrFilter = L"All files\0*.*\0";
+    ofn.lpstrFile = path;
+    ofn.nMaxFile = ARRAYSIZE(path);
+    if (GetOpenFileName(&ofn))
+    {
+        m_rudiRSSClient.ImportFromListFile(ofn.lpstrFile, [&](const std::vector<std::wstring>& feedUrls) {
             ListView_SetItemCount(m_feedListView.m_hWnd, feedUrls.size() + 1); // Plus one for 'All feeds'
             });
     }
