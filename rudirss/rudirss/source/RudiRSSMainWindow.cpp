@@ -426,6 +426,7 @@ void RudiRSSMainWindow::OpenImportOPMLDialog()
     if (GetOpenFileName(&ofn))
     {
         m_rudiRSSClient.ImportFromOPML(ofn.lpstrFile, [&](const std::vector<std::wstring>& feedUrls) {
+            ListView_SetItemCount(m_feedListView.m_hWnd, feedUrls.size() + 1); // Plus one for 'All feeds'
             });
     }
 }
