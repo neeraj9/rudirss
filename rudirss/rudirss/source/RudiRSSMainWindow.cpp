@@ -233,6 +233,7 @@ void RudiRSSMainWindow::InittializeControl()
                                 [&](const FeedDatabase::FeedData& feedData) {
                                     std::wstring title;
                                     FeedCommon::ConvertStringToWideString(feedData.title, title);
+                                    title.insert(0, feedData.read ? L"[X] ": L"[ ] ");
                                     _snwprintf_s(lpdi->item.pszText, lpdi->item.cchTextMax, _TRUNCATE, L"%s", title.c_str());
                                 });
                         }
@@ -255,6 +256,7 @@ void RudiRSSMainWindow::InittializeControl()
                                 [&](const FeedDatabase::FeedData& feedData) {
                                     std::wstring title;
                                     FeedCommon::ConvertStringToWideString(feedData.title, title);
+                                    title.insert(0, feedData.read ? L"[X] ": L"[ ] ");
                                     _snwprintf_s(lpdi->item.pszText, lpdi->item.cchTextMax, _TRUNCATE, L"%s", title.c_str());
                                 });
                         }
@@ -279,10 +281,12 @@ void RudiRSSMainWindow::InittializeControl()
                 {
                     std::wstring title;
                     std::wstring link;
+                    long long feeddataid = FeedDatabase::INVALID_FEEDDATA_ID;
                     if (ALL_FEEDS_LIST_INDEX == InterlockedOr64(reinterpret_cast<LONG64*>(&m_lastSelectedFeedIndex), 0))
                     {
                         m_rudiRSSClient.QueryFeedDataByOffsetOrderByTimestamp(itemActivate->iItem,
                             [&](const FeedDatabase::FeedData& feedData) {
+                                feeddataid = feedData.feeddataid;
                                 FeedCommon::ConvertStringToWideString(feedData.title, title);
                                 FeedCommon::ConvertStringToWideString(feedData.link, link);
                             });
@@ -292,10 +296,12 @@ void RudiRSSMainWindow::InittializeControl()
                         m_rudiRSSClient.QueryFeedDataByFeedIdByOffsetOrderByTimestamp(InterlockedOr64(reinterpret_cast<LONG64*>(&m_lastSelectedFeedId), 0),
                             itemActivate->iItem,
                             [&](const FeedDatabase::FeedData& feedData) {
+                                feeddataid = feedData.feeddataid;
                                 FeedCommon::ConvertStringToWideString(feedData.title, title);
                                 FeedCommon::ConvertStringToWideString(feedData.link, link);
                             });
                     }
+                    m_rudiRSSClient.UpdateFeedDataReadColumn(feeddataid, static_cast<long long>(true));
                     // To handle Protocol-Relative link
                     if (L"//" == link.substr(0, 2))
                         link.insert(0, L"https:");
