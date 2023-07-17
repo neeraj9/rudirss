@@ -37,6 +37,9 @@ public:
     bool QueryFeedDataByOffset(long long offset, FeedDatabase::FN_QUERY_FEED_DATA fnQueryFeedData);
     bool QueryFeedTableCount(long long &count);
     bool QueryFeedByOffset(long long offset, FeedDatabase::FN_QUERY_FEED fnQueryFeed);
+    bool QueryFeedByOffsetInRange(long long limit, long long offset, FeedDatabase::FN_QUERY_FEED fnQueryFeed);
+    bool QueryFeedDataOrderByTimestampInRange(long long limit, long long offset, FeedDatabase::FN_QUERY_FEED_DATA fnQueryFeedData);
+    bool QueryFeedDataByFeedIdOrderByTimestampInRange(long long feedid, long long limit, long long offset, FeedDatabase::FN_QUERY_FEED_DATA fnQueryFeedData);
 
     using FN_ON_DB_NOTIFICATION = std::function<void(const FeedDatabase::FeedConsumptionUnit &)>;
     void StartRefreshFeedTimer(FN_ON_DB_NOTIFICATION fnOnDbNotification);

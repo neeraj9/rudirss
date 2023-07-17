@@ -60,12 +60,7 @@ bool RudiRSSMainWindow::Initialize(HINSTANCE hInstance)
 
         if (result)
         {
-            long long cnt = 0;
-            m_rudiRSSClient.QueryFeedTableCount(cnt);
-            if (cnt > 0)
-            {
-                ListView_SetItemCount(m_feedListView.m_hWnd, cnt + 1); // Plus one for 'All feeds'
-            }
+            m_feedListView.UpdateFeedListFromDatabase();
 
             m_rudiRSSClient.StartRefreshFeedTimer([&](const FeedDatabase::FeedConsumptionUnit& consumptionUnit) {
                 if (FeedDatabase::FeedConsumptionUnit::OperationType::NOTIFY_INSERTION_COMPLETE == consumptionUnit.opType)
@@ -259,6 +254,7 @@ void RudiRSSMainWindow::OpenImportOPMLDialog()
     if (GetOpenFileName(&ofn))
     {
         m_rudiRSSClient.ImportFromOPML(ofn.lpstrFile, [&](const std::vector<std::wstring>& feedUrls) {
+            m_feedListView.ClearCache();
             ListView_SetItemCount(m_feedListView.m_hWnd, feedUrls.size() + 1); // Plus one for 'All feeds'
             });
     }
@@ -275,6 +271,7 @@ void RudiRSSMainWindow::OpenImportListFileDialog()
     if (GetOpenFileName(&ofn))
     {
         m_rudiRSSClient.ImportFromListFile(ofn.lpstrFile, [&](const std::vector<std::wstring>& feedUrls) {
+            m_feedListView.ClearCache();
             ListView_SetItemCount(m_feedListView.m_hWnd, feedUrls.size() + 1); // Plus one for 'All feeds'
             });
     }

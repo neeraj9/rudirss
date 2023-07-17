@@ -318,6 +318,21 @@ bool RudiRSSClient::QueryFeedByOffset(long long offset, FeedDatabase::FN_QUERY_F
     return m_db.QueryFeedByOffset(offset, fnQueryFeed);
 }
 
+bool RudiRSSClient::QueryFeedByOffsetInRange(long long limit, long long offset, FeedDatabase::FN_QUERY_FEED fnQueryFeed)
+{
+    return m_db.QueryFeedByOffsetInRange(limit, offset, fnQueryFeed);
+}
+
+bool RudiRSSClient::QueryFeedDataOrderByTimestampInRange(long long limit, long long offset, FeedDatabase::FN_QUERY_FEED_DATA fnQueryFeedData)
+{
+    return m_db.QueryFeedDataOrderByTimestampInRange(limit, offset, fnQueryFeedData);
+}
+
+bool RudiRSSClient::QueryFeedDataByFeedIdOrderByTimestampInRange(long long feedid, long long limit, long long offset, FeedDatabase::FN_QUERY_FEED_DATA fnQueryFeedData)
+{
+    return m_db.QueryFeedDataByFeedIdOrderByTimestampInRange(feedid, limit, offset, fnQueryFeedData);
+}
+
 VOID CALLBACK RudiRSSClient::WaitOrTimerCallback(PVOID param, BOOLEAN TimerOrWaitFired)
 {
     auto refreshTimer = reinterpret_cast<RefreshTimer*>(param);

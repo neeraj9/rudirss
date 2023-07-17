@@ -35,6 +35,10 @@ protected:
     SQLite3StmtHandle m_queryFeedDataByOffsetStmt;
     SQLite3StmtHandle m_queryFeedTableCountStmt;
     SQLite3StmtHandle m_queryFeedByOffsetStmt;
+    SQLite3StmtHandle m_queryFeedByOffsetInRangeStmt;
+    SQLite3StmtHandle m_queryFeedDataOrderByTimestampInRangeStmt;
+    SQLite3StmtHandle m_queryFeedDataByFeedIdOrderByTimestampInRangeStmt;
+
     ATL::CComCriticalSection m_dbLock;
 
 public:
@@ -175,6 +179,9 @@ public:
     bool QueryFeedDataTableCount(long long &count);
     bool QueryFeedDataTableCountByFeedId(long long feedid, long long &count);
     bool QueryFeedTableCount(long long &count);
-    bool QueryFeedByOffset(long long offset, FN_QUERY_FEED fnQueryFeedData);
+    bool QueryFeedByOffset(long long offset, FN_QUERY_FEED fnQueryFeed);
+    bool QueryFeedByOffsetInRange(long long limit, long long offset, FN_QUERY_FEED fnQueryFeed);
     bool QueryFeedDataByOffset(long long offset, FN_QUERY_FEED_DATA fnQueryFeedData);
+    bool QueryFeedDataOrderByTimestampInRange(long long limit, long long offset, FN_QUERY_FEED_DATA fnQueryFeedData);
+    bool QueryFeedDataByFeedIdOrderByTimestampInRange(long long feedid, long long limit, long long offset, FN_QUERY_FEED_DATA fnQueryFeedData);
 };

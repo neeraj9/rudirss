@@ -9,6 +9,7 @@ public:
     virtual ~ListView() {}
 
     virtual LRESULT OnProcessMessage(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) = 0;
+    virtual void ClearCache() = 0;
 
     const int GetWidth() const { return m_width; }
     const int GetHeight() const { return m_height; }

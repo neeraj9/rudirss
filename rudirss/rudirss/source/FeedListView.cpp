@@ -57,13 +57,28 @@ LRESULT FeedListView::OnProcessMessage(HWND hWnd, UINT message, WPARAM wParam, L
             }
             else
             {
-                m_mainWindow->GetRudiRSSClient().QueryFeedByOffset(lpdi->item.iItem - 1, [&](const FeedDatabase::Feed& feed) {
+                auto it = m_cache.find(static_cast<long long>(lpdi->item.iItem - 1));
+                if (it != m_cache.end())
+                {
                     std::wstring title;
-                    FeedCommon::ConvertStringToWideString(feed.title, title);
+                    FeedCommon::ConvertStringToWideString(it->second.title, title);
                     _snwprintf_s(lpdi->item.pszText, lpdi->item.cchTextMax, _TRUNCATE, L"%s", title.c_str());
-                    });
+                }
             }
         }
+    }
+    break;
+
+
+    case LVN_ODCACHEHINT:
+    {
+        LPNMLVCACHEHINT pCachehint = (NMLVCACHEHINT*)lParam;
+        long long idx = pCachehint->iFrom;
+        m_mainWindow->GetRudiRSSClient().QueryFeedByOffsetInRange(static_cast<long long>(pCachehint->iTo - pCachehint->iFrom + 1),
+            static_cast<long long>(pCachehint->iFrom),
+            [&](const FeedDatabase::Feed& feed) {
+                m_cache.insert(std::pair<long long, FeedDatabase::Feed>(idx++, feed));
+            });
     }
     break;
 
@@ -100,4 +115,21 @@ long long FeedListView::GetLastSelectedFeedId()
 int FeedListView::GetLastSelectedFeedIndex()
 {
     return InterlockedOr(reinterpret_cast<long*>(&m_lastSelectedFeedIndex), 0);
+}
+
+void FeedListView::UpdateFeedListFromDatabase()
+{
+    ClearCache();
+    SendMessage(m_hWnd, LVM_DELETEALLITEMS, 0, 0);
+    long long cnt = 0;
+    m_mainWindow->GetRudiRSSClient().QueryFeedTableCount(cnt);
+    if (cnt > 0)
+    {
+        ListView_SetItemCount(m_hWnd, cnt + 1); // Plus one for 'All feeds'
+    }
+}
+
+void FeedListView::ClearCache()
+{
+    m_cache.clear();
 }

@@ -3,6 +3,8 @@
 #include "ListView.h"
 #include "FeedDatabase.h"
 
+#include <map>
+
 class RudiRSSMainWindow;
 
 class FeedItemListView : public ListView
@@ -20,9 +22,11 @@ public:
     void UpdateSelectedFeed(long long feedid);
     void UpdateAllFeeds();
 
+    virtual void ClearCache();
+
 protected:
     int m_titleColumnWidth;
     int m_updatedColumnWidth;
-
+    std::map<long long, FeedDatabase::FeedData> m_cache;
     RudiRSSMainWindow* m_mainWindow;
 };
