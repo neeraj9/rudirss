@@ -6,6 +6,8 @@
 #include <stdexcept>
 #include <rpcdce.h>
 #include <atltime.h>
+#include <fstream>
+#include <winhttp.h>
 
 using namespace FeedCommon;
 
@@ -280,4 +282,27 @@ bool FeedCommon::LoadFeedUrlsFromOPML(const std::wstring& opml, std::vector<std:
     }
 
     return result;
+}
+
+bool FeedCommon::LoadFeedUrlsFromListFile(const std::wstring& listFile, std::vector<std::wstring>& feedUrls)
+{
+    std::wfstream f(listFile, std::iostream::in);
+    if (f)
+    {
+        for (std::wstring feedUrl; std::getline(f, feedUrl);)
+        {
+            WCHAR host[BUFSIZ]{};
+            URL_COMPONENTS urlComponents{};
+            urlComponents.dwStructSize = sizeof(urlComponents);
+            urlComponents.lpszHostName = host;
+            urlComponents.dwHostNameLength = _countof(host);
+            urlComponents.dwUrlPathLength = -1;
+            if (WinHttpCrackUrl(feedUrl.c_str(), 0, 0, &urlComponents))
+            {
+                feedUrls.push_back(feedUrl);
+            }
+        }
+    }
+
+    return !feedUrls.empty();
 }

@@ -1,0 +1,4 @@
+https://www.majorgeeks.com/files/rss
+https://www.geeksforgeeks.org//feed
+https://news.ycombinator.com/rss
+https://planet.emacslife.com/atom.xml

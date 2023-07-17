@@ -6,6 +6,7 @@
 #include <format>
 #include <fstream>
 #include <atltime.h>
+#include <winhttp.h>
 
 using namespace FeedCommon;
 
@@ -254,4 +255,13 @@ TEST(TestFeedCommon, TestLoadOPML)
     }
 
     CoUninitialize();
+}
+
+TEST(TestFeedCommon, TestLoadFeedListFile)
+{
+    WCHAR dir[256]{};
+    GetCurrentDirectory(_countof(dir), dir);
+    std::vector<std::wstring> feedUrls;
+    bool result = LoadFeedUrlsFromListFile(std::format(L"{}\\..\\..\\testdata\\test_feed_list.txt", dir), feedUrls);
+    ASSERT_TRUE(result);
 }
