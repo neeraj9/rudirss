@@ -132,6 +132,15 @@ LRESULT FeedItemListView::OnProcessMessage(HWND hWnd, UINT message, WPARAM wPara
                     });
             }
             m_mainWindow->GetRudiRSSClient().UpdateFeedDataReadColumn(feeddataid, static_cast<long long>(true));
+
+            // Update the cache as well
+            auto it = m_cache.find(itemActivate->iItem);
+            if (it != m_cache.end())
+            {
+                it->second.read = static_cast<long long>(true);
+            }
+            ListView_Update(m_hWnd, itemActivate->iItem);
+
             // To handle Protocol-Relative link
             if (L"//" == link.substr(0, 2))
                 link.insert(0, L"https:");
