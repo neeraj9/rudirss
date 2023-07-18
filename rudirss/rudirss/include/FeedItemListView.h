@@ -23,10 +23,14 @@ public:
     void UpdateAllFeeds();
 
     virtual void ClearCache();
+    void UpdateReadStateInCache(int item, long long read);
+
+    const int GetLastRightClickedItem() const { return m_lastRighClickedItem; }
 
 protected:
     int m_titleColumnWidth;
     int m_updatedColumnWidth;
+    int m_lastRighClickedItem;
     std::map<long long, FeedDatabase::FeedData> m_cache;
     RudiRSSMainWindow* m_mainWindow;
 };

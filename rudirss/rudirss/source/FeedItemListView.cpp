@@ -2,15 +2,16 @@
 #include "FeedCommon.h"
 #include "FeedListView.h"
 #include "RudiRSSMainWindow.h"
+#include "resource.h"
 
 #include <CommCtrl.h>
 
-FeedItemListView::FeedItemListView() : m_titleColumnWidth{ 0 }, m_updatedColumnWidth{ 0 }, m_mainWindow{ nullptr }
+FeedItemListView::FeedItemListView() : m_titleColumnWidth{ 0 }, m_updatedColumnWidth{ 0 }, m_mainWindow{ nullptr }, m_lastRighClickedItem{ -1 }
 {
 }
 
 FeedItemListView::FeedItemListView(RudiRSSMainWindow* mainWindow): m_titleColumnWidth{ 0 }, m_updatedColumnWidth{ 0 },
-m_mainWindow{ mainWindow }
+m_mainWindow{ mainWindow }, m_lastRighClickedItem{ -1 }
 {
 
 }
@@ -109,7 +110,6 @@ LRESULT FeedItemListView::OnProcessMessage(HWND hWnd, UINT message, WPARAM wPara
         LPNMITEMACTIVATE itemActivate = (LPNMITEMACTIVATE)lParam;
         if (m_mainWindow->IsViewerInitialized())
         {
-            std::wstring title;
             std::wstring link;
             long long feeddataid = FeedDatabase::INVALID_FEEDDATA_ID;
             if (FeedListView::ALL_FEEDS_LIST_INDEX == m_mainWindow->GetFeedListView().GetLastSelectedFeedIndex())
@@ -117,7 +117,6 @@ LRESULT FeedItemListView::OnProcessMessage(HWND hWnd, UINT message, WPARAM wPara
                 m_mainWindow->GetRudiRSSClient().QueryFeedDataByOffsetOrderByTimestamp(itemActivate->iItem,
                     [&](const FeedDatabase::FeedData& feedData) {
                         feeddataid = feedData.feeddataid;
-                        FeedCommon::ConvertStringToWideString(feedData.title, title);
                         FeedCommon::ConvertStringToWideString(feedData.link, link);
                     });
             }
@@ -127,24 +126,36 @@ LRESULT FeedItemListView::OnProcessMessage(HWND hWnd, UINT message, WPARAM wPara
                     itemActivate->iItem,
                     [&](const FeedDatabase::FeedData& feedData) {
                         feeddataid = feedData.feeddataid;
-                        FeedCommon::ConvertStringToWideString(feedData.title, title);
                         FeedCommon::ConvertStringToWideString(feedData.link, link);
                     });
             }
             m_mainWindow->GetRudiRSSClient().UpdateFeedDataReadColumn(feeddataid, static_cast<long long>(true));
 
             // Update the cache as well
-            auto it = m_cache.find(itemActivate->iItem);
-            if (it != m_cache.end())
-            {
-                it->second.read = static_cast<long long>(true);
-            }
-            ListView_Update(m_hWnd, itemActivate->iItem);
+            UpdateReadStateInCache(itemActivate->iItem, static_cast<long long>(true));
 
             // To handle Protocol-Relative link
             if (L"//" == link.substr(0, 2))
                 link.insert(0, L"https:");
             m_mainWindow->GetViewer().Navigate(link);
+        }
+    }
+    break;
+
+    case NM_RCLICK:
+    {
+        LPNMITEMACTIVATE itemActivate = (LPNMITEMACTIVATE)lParam;
+        m_lastRighClickedItem = itemActivate->iItem;
+        HMENU hPopupMenu = LoadMenu(m_mainWindow->GetHInstance(), MAKEINTRESOURCE(IDR_FEED_ITEM_MENU));
+        if (hPopupMenu)
+        {
+            HMENU hMenu = GetSubMenu(hPopupMenu, 0);
+            POINT pt{};
+            if (GetCursorPos(&pt))
+            {
+                TrackPopupMenu(hMenu, TPM_TOPALIGN | TPM_LEFTALIGN, pt.x, pt.y, 0, hWnd, NULL);
+            }
+            DestroyMenu(hPopupMenu);
         }
     }
     break;
@@ -183,4 +194,14 @@ void FeedItemListView::UpdateAllFeeds()
 void FeedItemListView::ClearCache()
 {
     m_cache.clear();
+}
+
+void FeedItemListView::UpdateReadStateInCache(int item, long long read)
+{
+    auto it = m_cache.find(item);
+    if (it != m_cache.end())
+    {
+        it->second.read = read;
+    }
+    ListView_Update(m_hWnd, item);
 }

@@ -122,6 +122,26 @@ public:
 
             return *this;
         }
+
+        FeedData& operator=(const FeedData& rhs)
+        {
+            if (this != &rhs)
+            {
+                feeddataid = rhs.feeddataid;
+                guid = rhs.guid;
+                feedid = rhs.feedid;
+                link = rhs.link;
+                title = rhs.title;
+                datetime = rhs.datetime;
+                timestamp = rhs.timestamp;
+                createdtime = rhs.createdtime;
+                read = rhs.read;
+                tag = rhs.tag;
+                misc = rhs.misc;
+            }
+
+            return *this;
+        }
     };
 
     struct FeedConsumptionUnit

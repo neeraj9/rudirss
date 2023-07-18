@@ -25,6 +25,7 @@ protected:
     virtual void OnRegister(WNDCLASSEXW& wcex);
     virtual HWND Create();
     LRESULT OnProcessMessage(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
+    LRESULT OnCommand(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
     void OnDestroy();
 
     void InittializeControl();
@@ -34,6 +35,9 @@ protected:
     void OpenImportListFileDialog();
 
     LRESULT OnProcessListViewCommand(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
+
+    long long GetLastSelectedFeedDataId();
+    bool GetLastSelectedFeedData(FeedDatabase::FeedData &feedData);
 
 public:
     RudiRSSMainWindow();
@@ -46,4 +50,6 @@ public:
     Viewer& GetViewer() { return m_viewer; }
     RudiRSSClient& GetRudiRSSClient() { return m_rudiRSSClient; }
     BOOL IsViewerInitialized();
+
+    const HINSTANCE GetHInstance() const { return m_hInstance; }
 };

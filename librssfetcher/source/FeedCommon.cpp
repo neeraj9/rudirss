@@ -3,6 +3,7 @@
 #include "RSSFeed.h"
 #include "AtomFeed.h"
 
+#include <Windows.h>
 #include <stdexcept>
 #include <rpcdce.h>
 #include <atltime.h>
@@ -305,4 +306,40 @@ bool FeedCommon::LoadFeedUrlsFromListFile(const std::wstring& listFile, std::vec
     }
 
     return !feedUrls.empty();
+}
+
+bool FeedCommon::CopyToClipboard(const std::wstring& data)
+{
+    if (data.empty())
+        return false;
+
+    bool result = false;
+    HGLOBAL hMem = GlobalAlloc(GMEM_MOVEABLE, (data.length() + 1) * sizeof(wchar_t));
+    if (hMem)
+    {
+        wchar_t* buffer = reinterpret_cast<wchar_t*>(GlobalLock(hMem));
+        if (buffer)
+        {
+            wcscpy_s(buffer, data.length() + 1, data.c_str());
+            GlobalUnlock(hMem);
+
+            OpenClipboard(NULL);
+            EmptyClipboard();
+            if (SetClipboardData(CF_UNICODETEXT, hMem))
+            {
+                CloseClipboard();
+                result = true;
+            }
+            else
+            {
+                GlobalFree(hMem);
+            }
+        }
+        else
+        {
+            GlobalFree(hMem);
+        }
+    }
+
+    return result;
 }

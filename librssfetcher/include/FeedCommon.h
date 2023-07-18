@@ -53,4 +53,6 @@ namespace FeedCommon
 
     bool LoadFeedUrlsFromOPML(const std::wstring &opml, std::vector<std::wstring> &feedUrls);
     bool LoadFeedUrlsFromListFile(const std::wstring &listFile, std::vector<std::wstring> &feedUrls);
+
+    bool CopyToClipboard(const std::wstring& data);
 };
