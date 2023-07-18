@@ -52,6 +52,8 @@ public:
     void LoadDisplayConfiguration(DisplayConfiguration& displayConfig);
     void SaveDisplayConfiguration(const DisplayConfiguration& displayConfig);
 
+    bool DeleteFeedByOffset(long long offset);
+
 protected:
     static const size_t DEFAULT_MAX_CONSUMPTION_COUNT = 32768;
 

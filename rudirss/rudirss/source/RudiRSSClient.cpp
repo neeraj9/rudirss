@@ -453,3 +453,28 @@ void RudiRSSClient::SaveDisplayConfiguration(const DisplayConfiguration &display
     WritePrivateProfileString(L"Display", L"FeedItemUpdatedColumnWidth",
         std::to_wstring(static_cast<unsigned>(displayConfig.feedItemUpdatedColumnWidth)).c_str(), m_rudirssIni.c_str());
 }
+
+bool RudiRSSClient::DeleteFeedByOffset(long long offset)
+{
+    bool result = false;
+    long long feedid = FeedDatabase::INVALID_FEED_ID;
+    do
+    {
+        std::wstring guid;
+        QueryFeedByOffset(offset, [&](const FeedDatabase::Feed& feed) {
+            feedid = feed.feedid;
+            FeedCommon::ConvertStringToWideString(feed.guid, guid);
+            });
+
+        if (FeedDatabase::INVALID_FEED_ID == feedid)
+            break;
+
+        // Stop and remove its refresh timer
+        m_refreshTimer.erase(guid);
+
+        DeleteFeedDataByFeedId(feedid);
+        DeleteFeedByFeedId(feedid);
+    } while (0);
+
+    return result;
+}

@@ -23,15 +23,19 @@ public:
 
     long long GetLastSelectedFeedId();
     int GetLastSelectedFeedIndex();
+    void ResetLastSelectedFeedIndex();
 
     void UpdateFeedListFromDatabase();
     void UpdateFeedList(const std::vector<std::wstring> &feedUrls);
 
     virtual void ClearCache();
 
+    const int GetLastRightClickedItem() const { return m_lastRighClickedItem; }
+
 protected:
     long long m_lastSelectedFeedId;
     int m_lastSelectedFeedIndex;
+    int m_lastRighClickedItem;
     RudiRSSMainWindow* m_mainWindow;
     std::map<long long, FeedDatabase::Feed> m_cache;
 };

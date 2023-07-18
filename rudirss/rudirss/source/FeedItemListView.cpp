@@ -172,8 +172,7 @@ LRESULT FeedItemListView::OnProcessMessage(HWND hWnd, UINT message, WPARAM wPara
 
 void FeedItemListView::UpdateSelectedFeed(long long feedid)
 {
-    ClearCache();
-    SendMessage(m_hWnd, LVM_DELETEALLITEMS, 0, 0);
+    DeleteAllItems();
     long long cnt = 0;
     m_mainWindow->GetRudiRSSClient().QueryFeedDataTableCountByFeedId(feedid, cnt);
     if (cnt > 0)
@@ -184,14 +183,19 @@ void FeedItemListView::UpdateSelectedFeed(long long feedid)
 
 void FeedItemListView::UpdateAllFeeds()
 {
-    ClearCache();
-    SendMessage(m_hWnd, LVM_DELETEALLITEMS, 0, 0);
+    DeleteAllItems();
     long long cnt = 0;
     m_mainWindow->GetRudiRSSClient().QueryFeedDataTableCount(cnt);
     if (cnt > 0)
     {
         ListView_SetItemCount(m_hWnd, cnt);
     }
+}
+
+void FeedItemListView::DeleteAllItems()
+{
+    ClearCache();
+    SendMessage(m_hWnd, LVM_DELETEALLITEMS, 0, 0);
 }
 
 void FeedItemListView::ClearCache()

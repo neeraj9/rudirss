@@ -7,12 +7,13 @@
 #include <atlbase.h>
 #include <CommCtrl.h>
 
-FeedListView::FeedListView() : m_mainWindow{ nullptr }, m_lastSelectedFeedId{ FeedDatabase::INVALID_FEED_ID }, m_lastSelectedFeedIndex{ -1 }
+FeedListView::FeedListView() : m_mainWindow{ nullptr }, m_lastSelectedFeedId{ FeedDatabase::INVALID_FEED_ID }, m_lastSelectedFeedIndex{ -1 },
+m_lastRighClickedItem{ -1 }
 {
 }
 
 FeedListView::FeedListView(RudiRSSMainWindow* mainWindow) : m_mainWindow{ mainWindow }, 
-m_lastSelectedFeedId{ FeedDatabase::INVALID_FEED_ID }, m_lastSelectedFeedIndex{ -1 }
+m_lastSelectedFeedId{ FeedDatabase::INVALID_FEED_ID }, m_lastSelectedFeedIndex{ -1 }, m_lastRighClickedItem{ -1 }
 {
 
 }
@@ -100,6 +101,28 @@ LRESULT FeedListView::OnProcessMessage(HWND hWnd, UINT message, WPARAM wParam, L
     }
     break;
 
+    case NM_RCLICK:
+    {
+        LPNMITEMACTIVATE itemActivate = (LPNMITEMACTIVATE)lParam;
+        if (FeedListView::ALL_FEEDS_LIST_INDEX != itemActivate->iItem
+            && -1 != itemActivate->iItem)
+        {
+            m_lastRighClickedItem = itemActivate->iItem;
+            HMENU hPopupMenu = LoadMenu(m_mainWindow->GetHInstance(), MAKEINTRESOURCE(IDR_FEED_MENU));
+            if (hPopupMenu)
+            {
+                POINT pt{};
+                if (GetCursorPos(&pt))
+                {
+                    HMENU hMenu = GetSubMenu(hPopupMenu, 1);
+                    TrackPopupMenu(hMenu, TPM_TOPALIGN | TPM_LEFTALIGN, pt.x, pt.y, 0, hWnd, NULL);
+                }
+                DestroyMenu(hPopupMenu);
+            }
+        }
+    }
+    break;
+
     default:
         break;
     }
@@ -115,6 +138,11 @@ long long FeedListView::GetLastSelectedFeedId()
 int FeedListView::GetLastSelectedFeedIndex()
 {
     return InterlockedOr(reinterpret_cast<long*>(&m_lastSelectedFeedIndex), 0);
+}
+
+void FeedListView::ResetLastSelectedFeedIndex()
+{
+    InterlockedExchange(reinterpret_cast<long*>(&m_lastSelectedFeedIndex), -1);
 }
 
 void FeedListView::UpdateFeedListFromDatabase()

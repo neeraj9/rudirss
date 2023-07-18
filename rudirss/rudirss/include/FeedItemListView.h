@@ -21,6 +21,7 @@ public:
 
     void UpdateSelectedFeed(long long feedid);
     void UpdateAllFeeds();
+    void DeleteAllItems();
 
     virtual void ClearCache();
     void UpdateReadStateInCache(int item, long long read);
