@@ -148,7 +148,7 @@ LRESULT FeedItemListView::OnProcessMessage(HWND hWnd, UINT message, WPARAM wPara
         if (-1 != itemActivate->iItem)
         {
             m_lastRighClickedItem = itemActivate->iItem;
-            HMENU hPopupMenu = LoadMenu(m_mainWindow->GetHInstance(), MAKEINTRESOURCE(IDR_FEED_ITEM_MENU));
+            HMENU hPopupMenu = LoadMenu(m_mainWindow->GetHInstance(), MAKEINTRESOURCE(IDR_FEED_MENU));
             if (hPopupMenu)
             {
                 POINT pt{};

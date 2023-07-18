@@ -147,8 +147,6 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="checked_feed_item.ico" />
-    <Image Include="icon1.ico" />
-    <Image Include="icon2.ico" />
     <Image Include="new_feed_item.ico" />
     <Image Include="rudirss.ico" />
     <Image Include="small.ico" />
