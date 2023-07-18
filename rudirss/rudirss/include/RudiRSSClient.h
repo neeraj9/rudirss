@@ -52,6 +52,7 @@ public:
     void LoadDisplayConfiguration(DisplayConfiguration& displayConfig);
     void SaveDisplayConfiguration(const DisplayConfiguration& displayConfig);
 
+    bool RefreshFeedByOffset(long long offset);
     bool DeleteFeedByOffset(long long offset);
 
 protected:

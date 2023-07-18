@@ -4,7 +4,6 @@
 
 #include <userenv.h>
 #include <shlobj_core.h>
-#include <format>
 #include <atltime.h>
 
 RudiRSSClient::RudiRSSClient() : m_dbSemaphore{ nullptr }, m_dbConsumptionThread{ nullptr },
@@ -371,6 +370,9 @@ void RudiRSSClient::ImportFromOPML(const std::wstring& opml, FN_ON_IMPORT_OPML f
     std::vector<std::wstring> feedUrls;
     if (FeedCommon::LoadFeedUrlsFromOPML(opml, feedUrls))
     {
+        if (fnOnImportOPML)
+            fnOnImportOPML(feedUrls);
+
         for (const auto& feedUrl : feedUrls)
         {
             auto it = m_refreshTimer.find(feedUrl);
@@ -389,9 +391,6 @@ void RudiRSSClient::ImportFromOPML(const std::wstring& opml, FN_ON_IMPORT_OPML f
                     FeedDatabase::Feed::DEFAULT_FEED_UPDATE_INTERVAL, WT_EXECUTEDEFAULT);
             }
         }
-
-        if (fnOnImportOPML)
-            fnOnImportOPML(feedUrls);
     }
 }
 
@@ -452,6 +451,34 @@ void RudiRSSClient::SaveDisplayConfiguration(const DisplayConfiguration &display
         std::to_wstring(static_cast<unsigned>(displayConfig.feedItemTitleColumnWidth)).c_str(), m_rudirssIni.c_str());
     WritePrivateProfileString(L"Display", L"FeedItemUpdatedColumnWidth",
         std::to_wstring(static_cast<unsigned>(displayConfig.feedItemUpdatedColumnWidth)).c_str(), m_rudirssIni.c_str());
+}
+
+bool RudiRSSClient::RefreshFeedByOffset(long long offset)
+{
+    bool result = false;
+    long long feedid = FeedDatabase::INVALID_FEED_ID;
+    do
+    {
+        std::wstring guid;
+        unsigned duetime = FeedDatabase::Feed::DEFAULT_FEED_UPDATE_DUETIME;
+        unsigned updateinterval = FeedDatabase::Feed::DEFAULT_FEED_UPDATE_INTERVAL;
+        QueryFeedByOffset(offset, [&](const FeedDatabase::Feed& feed) {
+            FeedCommon::ConvertStringToWideString(feed.guid, guid);
+            duetime = feed.duetime;
+            updateinterval = feed.updateinterval;
+            });
+
+        if (guid.empty())
+            break;
+
+        auto it = m_refreshTimer.find(guid);
+        if (it != m_refreshTimer.end())
+        {
+            it->second.Create(WaitOrTimerCallback, &it->second, duetime, updateinterval, WT_EXECUTEDEFAULT);
+        }
+    } while (0);
+
+    return result;
 }
 
 bool RudiRSSClient::DeleteFeedByOffset(long long offset)

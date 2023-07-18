@@ -191,6 +191,16 @@ LRESULT RudiRSSMainWindow::OnCommand(HWND hWnd, UINT message, WPARAM wParam, LPA
     }
     break;
 
+    case ID_FEED_MENU_REFRESH:
+    {
+        int lastRightClickedItem = m_feedListView.GetLastRightClickedItem();
+        if (FeedListView::ALL_FEEDS_LIST_INDEX != lastRightClickedItem)
+        {
+            m_rudiRSSClient.RefreshFeedByOffset(lastRightClickedItem - 1);
+        }
+    }
+    break;
+
     case ID_FEED_MENU_DELETE_THIS_FEED:
     {
         int lastRightClickedItem = m_feedListView.GetLastRightClickedItem();
