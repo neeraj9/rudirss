@@ -129,6 +129,29 @@ void FeedListView::UpdateFeedListFromDatabase()
     }
 }
 
+void FeedListView::UpdateFeedList(const std::vector<std::wstring>& feedUrls)
+{
+    long long differentCount = 0;
+    for (const auto& url : feedUrls)
+    {
+        std::string guid;
+        FeedCommon::ConvertWideStringToString(url, guid);
+        long long exist = 0;
+        m_mainWindow->GetRudiRSSClient().QueryFeedExistByGuid(guid, exist);
+        if (0 == exist)
+        {
+            differentCount++;
+        }
+    }
+
+    long long feedCount = 0;
+    if (m_mainWindow->GetRudiRSSClient().QueryFeedTableCount(feedCount))
+    {
+        ClearCache();
+        ListView_SetItemCount(m_hWnd, feedCount + differentCount + 1); // Plus one for 'All feeds'
+    }
+}
+
 void FeedListView::ClearCache()
 {
     m_cache.clear();

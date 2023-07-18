@@ -40,6 +40,7 @@ public:
     bool QueryFeedByOffsetInRange(long long limit, long long offset, FeedDatabase::FN_QUERY_FEED fnQueryFeed);
     bool QueryFeedDataOrderByTimestampInRange(long long limit, long long offset, FeedDatabase::FN_QUERY_FEED_DATA fnQueryFeedData);
     bool QueryFeedDataByFeedIdOrderByTimestampInRange(long long feedid, long long limit, long long offset, FeedDatabase::FN_QUERY_FEED_DATA fnQueryFeedData);
+    bool QueryFeedExistByGuid(const std::string& guid, long long& exist);
 
     using FN_ON_DB_NOTIFICATION = std::function<void(const FeedDatabase::FeedConsumptionUnit &)>;
     void StartRefreshFeedTimer(FN_ON_DB_NOTIFICATION fnOnDbNotification);

@@ -4,6 +4,7 @@
 #include "FeedDatabase.h"
 
 #include <map>
+#include <vector>
 
 class RudiRSSMainWindow;
 
@@ -24,6 +25,7 @@ public:
     int GetLastSelectedFeedIndex();
 
     void UpdateFeedListFromDatabase();
+    void UpdateFeedList(const std::vector<std::wstring> &feedUrls);
 
     virtual void ClearCache();
 

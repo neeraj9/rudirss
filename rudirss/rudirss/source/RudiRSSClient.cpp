@@ -333,6 +333,11 @@ bool RudiRSSClient::QueryFeedDataByFeedIdOrderByTimestampInRange(long long feedi
     return m_db.QueryFeedDataByFeedIdOrderByTimestampInRange(feedid, limit, offset, fnQueryFeedData);
 }
 
+bool RudiRSSClient::QueryFeedExistByGuid(const std::string& guid, long long& exist)
+{
+    return m_db.QueryFeedExistByGuid(guid, exist);
+}
+
 VOID CALLBACK RudiRSSClient::WaitOrTimerCallback(PVOID param, BOOLEAN TimerOrWaitFired)
 {
     auto refreshTimer = reinterpret_cast<RefreshTimer*>(param);
@@ -395,6 +400,9 @@ void RudiRSSClient::ImportFromListFile(const std::wstring& listFile, FN_ON_IMPOR
     std::vector<std::wstring> feedUrls;
     if (FeedCommon::LoadFeedUrlsFromListFile(listFile, feedUrls))
     {
+        if (fnOnImportListFile)
+            fnOnImportListFile(feedUrls);
+
         for (const auto& feedUrl : feedUrls)
         {
             auto it = m_refreshTimer.find(feedUrl);
@@ -413,9 +421,6 @@ void RudiRSSClient::ImportFromListFile(const std::wstring& listFile, FN_ON_IMPOR
                     FeedDatabase::Feed::DEFAULT_FEED_UPDATE_INTERVAL, WT_EXECUTEDEFAULT);
             }
         }
-
-        if (fnOnImportListFile)
-            fnOnImportListFile(feedUrls);
     }
 }
 

@@ -38,6 +38,7 @@ protected:
     SQLite3StmtHandle m_queryFeedByOffsetInRangeStmt;
     SQLite3StmtHandle m_queryFeedDataOrderByTimestampInRangeStmt;
     SQLite3StmtHandle m_queryFeedDataByFeedIdOrderByTimestampInRangeStmt;
+    SQLite3StmtHandle m_queryFeedExistByGuid;
 
     ATL::CComCriticalSection m_dbLock;
 
@@ -184,4 +185,5 @@ public:
     bool QueryFeedDataByOffset(long long offset, FN_QUERY_FEED_DATA fnQueryFeedData);
     bool QueryFeedDataOrderByTimestampInRange(long long limit, long long offset, FN_QUERY_FEED_DATA fnQueryFeedData);
     bool QueryFeedDataByFeedIdOrderByTimestampInRange(long long feedid, long long limit, long long offset, FN_QUERY_FEED_DATA fnQueryFeedData);
+    bool QueryFeedExistByGuid(const std::string& guid, long long& exist);
 };

@@ -160,6 +160,11 @@ void FeedDatabase::Initialize()
     ret = sqlite3_prepare_v2(m_sql.m_handle, stmt.c_str(), stmt.length(), &m_queryFeedDataByFeedIdOrderByTimestampInRangeStmt.m_handle, nullptr);
     if (0 != ret)
         throw std::runtime_error("Error: cannot prepare query statement by feedid, limit and offset for feed data order by timestamp.");
+
+    stmt = "SELECT EXISTS (SELECT 1 FROM Feed WHERE guid = ?)";
+    ret = sqlite3_prepare_v2(m_sql.m_handle, stmt.c_str(), stmt.length(), &m_queryFeedExistByGuid.m_handle, nullptr);
+    if (0 != ret)
+        throw std::runtime_error("Error: cannot prepare query statement of checking whether the feed exists.");
 }
 
 void FeedDatabase::Close()
@@ -190,6 +195,7 @@ void FeedDatabase::Close()
     m_queryFeedByOffsetInRangeStmt.Close();
     m_queryFeedDataOrderByTimestampInRangeStmt.Close();
     m_queryFeedDataByFeedIdOrderByTimestampInRangeStmt.Close();
+    m_queryFeedExistByGuid.Close();
 
     m_sql.Close();
 }
@@ -836,6 +842,25 @@ bool FeedDatabase::QueryFeedDataByFeedIdOrderByTimestampInRange(long long feedid
             fnQueryFeedData(feedData);
         }
         sqlite3_reset(m_queryFeedDataByFeedIdOrderByTimestampInRangeStmt.m_handle);
+    }
+
+    return SQLITE_DONE == ret;
+}
+
+bool FeedDatabase::QueryFeedExistByGuid(const std::string& guid, long long& exist)
+{
+    ATL::CComCritSecLock lock(m_dbLock);
+    if (!m_queryFeedExistByGuid.m_handle)
+        return false;
+
+    int ret = SQLITE_OK;
+    if (SQLITE_OK == (ret = sqlite3_bind_text(m_queryFeedExistByGuid.m_handle, 1, guid.c_str(), guid.length(), nullptr)))
+    {
+        while (SQLITE_ROW == (ret = sqlite3_step(m_queryFeedExistByGuid.m_handle)))
+        {
+            exist = sqlite3_column_int64(m_queryFeedExistByGuid.m_handle, 0);
+        }
+        sqlite3_reset(m_queryFeedExistByGuid.m_handle);
     }
 
     return SQLITE_DONE == ret;

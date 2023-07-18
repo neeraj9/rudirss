@@ -254,8 +254,7 @@ void RudiRSSMainWindow::OpenImportOPMLDialog()
     if (GetOpenFileName(&ofn))
     {
         m_rudiRSSClient.ImportFromOPML(ofn.lpstrFile, [&](const std::vector<std::wstring>& feedUrls) {
-            m_feedListView.ClearCache();
-            ListView_SetItemCount(m_feedListView.m_hWnd, feedUrls.size() + 1); // Plus one for 'All feeds'
+            m_feedListView.UpdateFeedList(feedUrls);
             });
     }
 }
@@ -271,8 +270,7 @@ void RudiRSSMainWindow::OpenImportListFileDialog()
     if (GetOpenFileName(&ofn))
     {
         m_rudiRSSClient.ImportFromListFile(ofn.lpstrFile, [&](const std::vector<std::wstring>& feedUrls) {
-            m_feedListView.ClearCache();
-            ListView_SetItemCount(m_feedListView.m_hWnd, feedUrls.size() + 1); // Plus one for 'All feeds'
+            m_feedListView.UpdateFeedList(feedUrls);
             });
     }
 }
