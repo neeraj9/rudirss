@@ -5,6 +5,7 @@
 
 #include <commdlg.h>
 #include <CommCtrl.h>
+#include <format>
 
 RudiRSSMainWindow::RudiRSSMainWindow() : m_initViewer{ FALSE }, m_font{ nullptr },
 m_feedListView{ this }, m_feedItemListView{ this }
@@ -212,12 +213,20 @@ LRESULT RudiRSSMainWindow::OnCommand(HWND hWnd, UINT message, WPARAM wParam, LPA
         int lastRightClickedItem = m_feedListView.GetLastRightClickedItem();
         if (FeedListView::ALL_FEEDS_LIST_INDEX != lastRightClickedItem)
         {
-            m_rudiRSSClient.DeleteFeedByOffset(lastRightClickedItem - 1);
-            m_feedListView.UpdateFeedListFromDatabase();
-            if (lastRightClickedItem == m_feedListView.GetLastSelectedFeedIndex())
+            std::wstring title;
+            m_rudiRSSClient.QueryFeedByOffset(static_cast<long long>(lastRightClickedItem - 1), [&](const FeedDatabase::Feed &feed) {
+                FeedCommon::ConvertStringToWideString(feed.title, title);
+                });
+
+            if (IDYES == MessageBox(hWnd, std::format(L"Delete the feed '{}'?", title).c_str(), L"Delete the feed", MB_ICONWARNING | MB_YESNO))
             {
-                m_feedListView.ResetLastSelectedFeedIndex();
-                m_feedItemListView.DeleteAllItems();
+                m_rudiRSSClient.DeleteFeedByOffset(lastRightClickedItem - 1);
+                m_feedListView.UpdateFeedListFromDatabase();
+                if (lastRightClickedItem == m_feedListView.GetLastSelectedFeedIndex())
+                {
+                    m_feedListView.ResetLastSelectedFeedIndex();
+                    m_feedItemListView.DeleteAllItems();
+                }
             }
         }
     }
@@ -225,11 +234,14 @@ LRESULT RudiRSSMainWindow::OnCommand(HWND hWnd, UINT message, WPARAM wParam, LPA
 
     case ID_FEED_MENU_DELETE_ALL:
     {
-        m_rudiRSSClient.DeleteAllFeedsAndAllFeedData();
-        m_feedListView.DeleteAllItems();
-        m_feedListView.ResetLastSelectedFeedId();
-        m_feedListView.ResetLastSelectedFeedIndex();
-        m_feedItemListView.DeleteAllItems();
+        if (IDYES == MessageBox(hWnd, L"Delete all feeds?", L"Delete all feeds", MB_ICONWARNING | MB_YESNO))
+        {
+            m_rudiRSSClient.DeleteAllFeedsAndAllFeedData();
+            m_feedListView.DeleteAllItems();
+            m_feedListView.ResetLastSelectedFeedId();
+            m_feedListView.ResetLastSelectedFeedIndex();
+            m_feedItemListView.DeleteAllItems();
+        }
     }
     break;
 
