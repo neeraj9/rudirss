@@ -453,9 +453,8 @@ void RudiRSSClient::SaveDisplayConfiguration(const DisplayConfiguration &display
         std::to_wstring(static_cast<unsigned>(displayConfig.feedItemUpdatedColumnWidth)).c_str(), m_rudirssIni.c_str());
 }
 
-bool RudiRSSClient::RefreshFeedByOffset(long long offset)
+void RudiRSSClient::RefreshFeedByOffset(long long offset)
 {
-    bool result = false;
     long long feedid = FeedDatabase::INVALID_FEED_ID;
     do
     {
@@ -477,13 +476,32 @@ bool RudiRSSClient::RefreshFeedByOffset(long long offset)
             it->second.Create(WaitOrTimerCallback, &it->second, duetime, updateinterval, WT_EXECUTEDEFAULT);
         }
     } while (0);
-
-    return result;
 }
 
-bool RudiRSSClient::DeleteFeedByOffset(long long offset)
+void RudiRSSClient::RefreshAllFeeds()
 {
-    bool result = false;
+    do
+    {
+        std::vector<FeedDatabase::Feed> feeds;
+        QueryAllFeeds([&](const FeedDatabase::Feed& feed) {
+            feeds.push_back(feed);
+            });
+
+        std::wstring guid;
+        for (const auto& feed : feeds)
+        {
+            FeedCommon::ConvertStringToWideString(feed.guid, guid);
+            auto it = m_refreshTimer.find(guid);
+            if (it != m_refreshTimer.end())
+            {
+                it->second.Create(WaitOrTimerCallback, &it->second, feed.duetime, feed.updateinterval, WT_EXECUTEDEFAULT);
+            }
+        }
+    } while (0);
+}
+
+void RudiRSSClient::DeleteFeedByOffset(long long offset)
+{
     long long feedid = FeedDatabase::INVALID_FEED_ID;
     do
     {
@@ -502,6 +520,4 @@ bool RudiRSSClient::DeleteFeedByOffset(long long offset)
         DeleteFeedDataByFeedId(feedid);
         DeleteFeedByFeedId(feedid);
     } while (0);
-
-    return result;
 }
