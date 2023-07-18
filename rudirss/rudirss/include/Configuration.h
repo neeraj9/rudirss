@@ -5,7 +5,7 @@
 
 struct DatabaseConfiguration
 {
-    static const unsigned DEFAULT_RESERVE_DAYS = 365;
+    static const unsigned DEFAULT_RESERVE_DAYS = 3650;
     bool allowDeleteOutdatedFeedItems;
     unsigned reserveDays;
     DatabaseConfiguration() : allowDeleteOutdatedFeedItems{ true }, reserveDays{ DEFAULT_RESERVE_DAYS } {}
