@@ -135,6 +135,11 @@ long long FeedListView::GetLastSelectedFeedId()
     return InterlockedOr64(reinterpret_cast<LONG64*>(&m_lastSelectedFeedId), 0);
 }
 
+void FeedListView::ResetLastSelectedFeedId()
+{
+    InterlockedExchange64(reinterpret_cast<LONG64*>(&m_lastSelectedFeedId), FeedDatabase::INVALID_FEED_ID);
+}
+
 int FeedListView::GetLastSelectedFeedIndex()
 {
     return InterlockedOr(reinterpret_cast<long*>(&m_lastSelectedFeedIndex), 0);
@@ -147,8 +152,7 @@ void FeedListView::ResetLastSelectedFeedIndex()
 
 void FeedListView::UpdateFeedListFromDatabase()
 {
-    ClearCache();
-    SendMessage(m_hWnd, LVM_DELETEALLITEMS, 0, 0);
+    DeleteAllItems();
     long long cnt = 0;
     m_mainWindow->GetRudiRSSClient().QueryFeedTableCount(cnt);
     if (cnt > 0)
@@ -178,6 +182,12 @@ void FeedListView::UpdateFeedList(const std::vector<std::wstring>& feedUrls)
         ClearCache();
         ListView_SetItemCount(m_hWnd, feedCount + differentCount + 1); // Plus one for 'All feeds'
     }
+}
+
+void FeedListView::DeleteAllItems()
+{
+    ClearCache();
+    SendMessage(m_hWnd, LVM_DELETEALLITEMS, 0, 0);
 }
 
 void FeedListView::ClearCache()

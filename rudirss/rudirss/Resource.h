@@ -22,11 +22,11 @@
 #define ID_FEED_ITEM_MENU_COPY_TITLE    32781
 #define ID_FEED_ITEM_MENU_COPY_LINK     32782
 #define ID_FEED_ITEM_MENU_OPEN_WITH_DEFAULT_BROWSER 32783
-#define ID_FEEDITEMMENU_MARKASUNREAD    32784
 #define ID_FEED_ITEM_MENU_MARK_AS_UNREAD 32785
 #define ID_FEED_MENU_REFRESH            32788
 #define ID_FEED_MENU_DELETE_THIS_FEED   32789
 #define ID_FEED_MENU_REFRESH_ALL        32791
+#define ID_FEED_MENU_DELETE_ALL         32793
 #define IDC_STATIC                      -1
 
 // Next default values for new objects
@@ -35,7 +35,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        133
-#define _APS_NEXT_COMMAND_VALUE         32792
+#define _APS_NEXT_COMMAND_VALUE         32794
 #define _APS_NEXT_CONTROL_VALUE         1000
 #define _APS_NEXT_SYMED_VALUE           110
 #endif

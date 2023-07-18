@@ -22,12 +22,14 @@ public:
     static const int ALL_FEEDS_LIST_INDEX = 0;
 
     long long GetLastSelectedFeedId();
+    void ResetLastSelectedFeedId();
     int GetLastSelectedFeedIndex();
     void ResetLastSelectedFeedIndex();
 
     void UpdateFeedListFromDatabase();
     void UpdateFeedList(const std::vector<std::wstring> &feedUrls);
 
+    void DeleteAllItems();
     virtual void ClearCache();
 
     const int GetLastRightClickedItem() const { return m_lastRighClickedItem; }

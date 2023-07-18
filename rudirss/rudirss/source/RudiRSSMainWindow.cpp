@@ -223,6 +223,16 @@ LRESULT RudiRSSMainWindow::OnCommand(HWND hWnd, UINT message, WPARAM wParam, LPA
     }
     break;
 
+    case ID_FEED_MENU_DELETE_ALL:
+    {
+        m_rudiRSSClient.DeleteAllFeedsAndAllFeedData();
+        m_feedListView.DeleteAllItems();
+        m_feedListView.ResetLastSelectedFeedId();
+        m_feedListView.ResetLastSelectedFeedIndex();
+        m_feedItemListView.DeleteAllItems();
+    }
+    break;
+
     default:
         break;
     }

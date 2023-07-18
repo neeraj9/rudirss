@@ -337,6 +337,16 @@ bool RudiRSSClient::QueryFeedExistByGuid(const std::string& guid, long long& exi
     return m_db.QueryFeedExistByGuid(guid, exist);
 }
 
+bool RudiRSSClient::DeleteAllFeeds()
+{
+    return m_db.DeleteAllFeeds();
+}
+
+bool RudiRSSClient::DeleteAllFeedData()
+{
+    return m_db.DeleteAllFeedData();
+}
+
 VOID CALLBACK RudiRSSClient::WaitOrTimerCallback(PVOID param, BOOLEAN TimerOrWaitFired)
 {
     auto refreshTimer = reinterpret_cast<RefreshTimer*>(param);
@@ -520,4 +530,12 @@ void RudiRSSClient::DeleteFeedByOffset(long long offset)
         DeleteFeedDataByFeedId(feedid);
         DeleteFeedByFeedId(feedid);
     } while (0);
+}
+
+void RudiRSSClient::DeleteAllFeedsAndAllFeedData()
+{
+    // Stop and clear all timers first
+    m_refreshTimer.clear();
+    m_db.DeleteAllFeedData();
+    m_db.DeleteAllFeeds();
 }
