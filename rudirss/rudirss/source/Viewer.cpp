@@ -12,12 +12,12 @@ Viewer::~Viewer()
     Destroy();
 }
 
-HRESULT Viewer::Initialize(HWND hWnd, const RECT &rc, FN_ON_WEBVIEW_READY fnOnWebViewReady)
+HRESULT Viewer::Initialize(HWND hWnd, const RECT &rc, const std::wstring userDataFolder, FN_ON_WEBVIEW_READY fnOnWebViewReady)
 {
     m_hWndParent = hWnd;
     m_fnOnWebViewReady = fnOnWebViewReady;
     memcpy(&m_rc, &rc, sizeof(rc));
-    HRESULT result = CreateCoreWebView2EnvironmentWithOptions(nullptr, nullptr, nullptr,
+    HRESULT result = CreateCoreWebView2EnvironmentWithOptions(nullptr, userDataFolder.c_str(), nullptr,
         Callback<ICoreWebView2CreateCoreWebView2EnvironmentCompletedHandler>(
             [&](HRESULT result, ICoreWebView2Environment* env) -> HRESULT {
 

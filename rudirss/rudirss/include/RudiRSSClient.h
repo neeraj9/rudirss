@@ -59,6 +59,8 @@ public:
     void DeleteFeedByOffset(long long offset);
     void DeleteAllFeedsAndAllFeedData();
 
+    const std::wstring GetRudiRSSFolder() const { return m_rudirssDirectory; }
+
 protected:
     static const size_t DEFAULT_MAX_CONSUMPTION_COUNT = 32768;
 
