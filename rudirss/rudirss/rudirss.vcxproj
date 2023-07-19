@@ -162,6 +162,7 @@
     <ClInclude Include="include\FeedItemListView.h" />
     <ClInclude Include="include\FeedListView.h" />
     <ClInclude Include="include\ListView.h" />
+    <ClInclude Include="include\ListViewCache.h" />
     <ClInclude Include="include\MainWindow.h" />
     <ClInclude Include="include\RefreshTimer.h" />
     <ClInclude Include="include\RudiRSSClient.h" />

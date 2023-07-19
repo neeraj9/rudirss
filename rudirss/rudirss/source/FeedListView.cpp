@@ -70,16 +70,43 @@ LRESULT FeedListView::OnProcessMessage(HWND hWnd, UINT message, WPARAM wParam, L
     }
     break;
 
-
     case LVN_ODCACHEHINT:
     {
         LPNMLVCACHEHINT pCachehint = (NMLVCACHEHINT*)lParam;
-        long long idx = pCachehint->iFrom;
-        m_mainWindow->GetRudiRSSClient().QueryFeedByOffsetInRange(static_cast<long long>(pCachehint->iTo - pCachehint->iFrom + 1),
-            static_cast<long long>(pCachehint->iFrom),
-            [&](const FeedDatabase::Feed& feed) {
-                m_cache.insert(std::pair<long long, FeedDatabase::Feed>(idx++, feed));
-            });
+        long long from = static_cast<long long>(pCachehint->iFrom);
+        long long to = static_cast<long long>(pCachehint->iTo);
+        // Feed index starts from 1 (after 'All feeds') in FeedListView, however, the actual index to display will be index minus an offset, that is 1.
+        // Therefore, setting the index minus 1 here is to fill its buffer in the cache and diaply it later.
+        if (from > 0)
+            from--;
+        if (to > 0)
+            to--;
+        if (m_cache.empty())
+        {
+            long long idx = from;
+            m_mainWindow->GetRudiRSSClient().QueryFeedByOffsetInRange(to - from + 1,
+                from, [&](const FeedDatabase::Feed& feed) {
+                    m_cache.insert(std::pair<long long, FeedDatabase::Feed>(idx++, feed));
+                });
+        }
+        else
+        {
+            auto insertionDirection = m_cache.GetInsertionDirection(from, to);
+            if (ListViewCache<FeedDatabase::Feed>::InsertionDirection::NONE != insertionDirection)
+            {
+                size_t cnt = static_cast<size_t>(to) - static_cast<size_t>(from) + 1;
+                if (ListViewCache<FeedDatabase::Feed>::InsertionDirection::FRONT == insertionDirection)
+                    m_cache.DeleteBackElements(cnt);
+                else
+                    m_cache.DeleteFrontElements(cnt);
+
+                long long idx = from;
+                m_mainWindow->GetRudiRSSClient().QueryFeedByOffsetInRange(to - from + 1,
+                    from, [&](const FeedDatabase::Feed& feed) {
+                        m_cache.insert(std::pair<long long, FeedDatabase::Feed>(idx++, feed));
+                    });
+            }
+        }
     }
     break;
 

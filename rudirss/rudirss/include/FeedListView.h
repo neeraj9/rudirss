@@ -2,8 +2,8 @@
 
 #include "ListView.h"
 #include "FeedDatabase.h"
+#include "ListViewCache.h"
 
-#include <map>
 #include <vector>
 
 class RudiRSSMainWindow;
@@ -39,5 +39,5 @@ protected:
     int m_lastSelectedFeedIndex;
     int m_lastRighClickedItem;
     RudiRSSMainWindow* m_mainWindow;
-    std::map<long long, FeedDatabase::Feed> m_cache;
+    ListViewCache<FeedDatabase::Feed> m_cache;
 };

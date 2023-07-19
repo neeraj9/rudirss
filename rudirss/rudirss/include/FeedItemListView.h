@@ -2,8 +2,7 @@
 
 #include "ListView.h"
 #include "FeedDatabase.h"
-
-#include <map>
+#include "ListViewCache.h"
 
 class RudiRSSMainWindow;
 
@@ -32,6 +31,6 @@ protected:
     int m_titleColumnWidth;
     int m_updatedColumnWidth;
     int m_lastRighClickedItem;
-    std::map<long long, FeedDatabase::FeedData> m_cache;
+    ListViewCache<FeedDatabase::FeedData> m_cache;
     RudiRSSMainWindow* m_mainWindow;
 };

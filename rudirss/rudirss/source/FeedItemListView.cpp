@@ -86,21 +86,65 @@ LRESULT FeedItemListView::OnProcessMessage(HWND hWnd, UINT message, WPARAM wPara
         LPNMLVCACHEHINT pCachehint = (NMLVCACHEHINT*)lParam;
         if (FeedListView::ALL_FEEDS_LIST_INDEX == m_mainWindow->GetFeedListView().GetLastSelectedFeedIndex())
         {
-            long long idx = pCachehint->iFrom;
-            m_mainWindow->GetRudiRSSClient().QueryFeedDataOrderByTimestampInRange(static_cast<long long>(pCachehint->iTo - pCachehint->iFrom + 1),
-                static_cast<long long>(pCachehint->iFrom), [&](const FeedDatabase::FeedData& feedData) {
-                    m_cache.insert(std::pair<long long, FeedDatabase::FeedData>(idx++, feedData));
-                });
+            if (m_cache.empty())
+            {
+                long long idx = pCachehint->iFrom;
+                m_mainWindow->GetRudiRSSClient().QueryFeedDataOrderByTimestampInRange(static_cast<long long>(pCachehint->iTo - pCachehint->iFrom + 1),
+                    static_cast<long long>(pCachehint->iFrom), [&](const FeedDatabase::FeedData& feedData) {
+                        m_cache.insert(std::pair<long long, FeedDatabase::FeedData>(idx++, feedData));
+                    });
+            }
+            else
+            {
+                auto insertionDirection = m_cache.GetInsertionDirection(static_cast<long long>(pCachehint->iFrom), static_cast<long long>(pCachehint->iTo));
+                if (ListViewCache<FeedDatabase::FeedData>::InsertionDirection::NONE != insertionDirection)
+                {
+                    size_t cnt = static_cast<size_t>(pCachehint->iTo - pCachehint->iFrom + 1);
+                    if (ListViewCache<FeedDatabase::FeedData>::InsertionDirection::FRONT == insertionDirection)
+                        m_cache.DeleteBackElements(cnt);
+                    else
+                        m_cache.DeleteFrontElements(cnt);
+
+                    long long idx = pCachehint->iFrom;
+                    m_mainWindow->GetRudiRSSClient().QueryFeedDataOrderByTimestampInRange(static_cast<long long>(pCachehint->iTo - pCachehint->iFrom + 1),
+                        static_cast<long long>(pCachehint->iFrom), [&](const FeedDatabase::FeedData& feedData) {
+                            m_cache.insert(std::pair<long long, FeedDatabase::FeedData>(idx++, feedData));
+                        });
+                }
+            }
         }
         else
         {
-            long long idx = pCachehint->iFrom;
-            long long lastSelectedFeedId = m_mainWindow->GetFeedListView().GetLastSelectedFeedId();
-            m_mainWindow->GetRudiRSSClient().QueryFeedDataByFeedIdOrderByTimestampInRange(lastSelectedFeedId,
-                static_cast<long long>(pCachehint->iTo - pCachehint->iFrom + 1),
-                static_cast<long long>(pCachehint->iFrom), [&](const FeedDatabase::FeedData& feedData) {
-                    m_cache.insert(std::pair<long long, FeedDatabase::FeedData>(idx++, feedData));
-                });
+            if (m_cache.empty())
+            {
+                long long idx = pCachehint->iFrom;
+                long long lastSelectedFeedId = m_mainWindow->GetFeedListView().GetLastSelectedFeedId();
+                m_mainWindow->GetRudiRSSClient().QueryFeedDataByFeedIdOrderByTimestampInRange(lastSelectedFeedId,
+                    static_cast<long long>(pCachehint->iTo - pCachehint->iFrom + 1),
+                    static_cast<long long>(pCachehint->iFrom), [&](const FeedDatabase::FeedData& feedData) {
+                        m_cache.insert(std::pair<long long, FeedDatabase::FeedData>(idx++, feedData));
+                    });
+            }
+            else
+            {
+                auto insertionDirection = m_cache.GetInsertionDirection(static_cast<long long>(pCachehint->iFrom), static_cast<long long>(pCachehint->iTo));
+                if (ListViewCache<FeedDatabase::FeedData>::InsertionDirection::NONE != insertionDirection)
+                {
+                    size_t cnt = static_cast<size_t>(pCachehint->iTo - pCachehint->iFrom + 1);
+                    if (ListViewCache<FeedDatabase::FeedData>::InsertionDirection::FRONT == insertionDirection)
+                        m_cache.DeleteBackElements(cnt);
+                    else
+                        m_cache.DeleteFrontElements(cnt);
+
+                    long long idx = pCachehint->iFrom;
+                    long long lastSelectedFeedId = m_mainWindow->GetFeedListView().GetLastSelectedFeedId();
+                    m_mainWindow->GetRudiRSSClient().QueryFeedDataByFeedIdOrderByTimestampInRange(lastSelectedFeedId,
+                        static_cast<long long>(pCachehint->iTo - pCachehint->iFrom + 1),
+                        static_cast<long long>(pCachehint->iFrom), [&](const FeedDatabase::FeedData& feedData) {
+                            m_cache.insert(std::pair<long long, FeedDatabase::FeedData>(idx++, feedData));
+                        });
+                }
+            }
         }
     }
     break;
