@@ -1,4 +1,4 @@
 
 # Overview
 
-RudiRSS is a rumimentary RSS reader.
+RudiRSS is a rudimentary RSS reader.
