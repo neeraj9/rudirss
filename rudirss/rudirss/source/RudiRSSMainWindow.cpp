@@ -285,7 +285,7 @@ void RudiRSSMainWindow::InittializeControl()
     RECT viewerRect{};
     GetClientRect(m_hWnd, &viewerRect);
     viewerRect.left = viewerX + 1;
-    m_viewer.Initialize(m_hWnd, viewerRect, [&]() {
+    m_viewer.Initialize(m_hWnd, viewerRect, m_rudiRSSClient.GetRudiRSSFolder(), [&]() {
         InterlockedExchange(reinterpret_cast<LONG*>(&m_initViewer), TRUE);
         });
 }

@@ -9,6 +9,8 @@
 #include <wil/com.h>
 #include "WebView2.h"
 
+#include <string>
+
 using namespace Microsoft::WRL;
 
 class Viewer : public WindowHandle
@@ -26,7 +28,7 @@ public:
     Viewer();
     virtual ~Viewer();
 
-    HRESULT Initialize(HWND hWnd, const RECT &rc, FN_ON_WEBVIEW_READY fnOnWebViewReady);
+    HRESULT Initialize(HWND hWnd, const RECT &rc, const std::wstring userDataFolder, FN_ON_WEBVIEW_READY fnOnWebViewReady);
     void Destroy();
 
     HRESULT Navigate(const std::wstring &uri);
