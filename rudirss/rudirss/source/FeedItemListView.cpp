@@ -63,7 +63,6 @@ LRESULT FeedItemListView::OnProcessMessage(HWND hWnd, UINT message, WPARAM wPara
                 {
                     std::wstring title;
                     FeedCommon::ConvertStringToWideString(it->second.title, title);
-                    title.insert(0, it->second.read ? L"[X] " : L"[ ] ");
                     _snwprintf_s(lpdi->item.pszText, lpdi->item.cchTextMax, _TRUNCATE, L"%s", title.c_str());
                 }
             }
@@ -146,6 +145,34 @@ LRESULT FeedItemListView::OnProcessMessage(HWND hWnd, UINT message, WPARAM wPara
                 }
             }
         }
+    }
+    break;
+
+    case NM_CUSTOMDRAW:
+    {
+        LPNMLVCUSTOMDRAW lpCD = (LPNMLVCUSTOMDRAW)lParam;
+        if (CDDS_PREPAINT == lpCD->nmcd.dwDrawStage)
+        {
+            return CDRF_NOTIFYITEMDRAW;
+        }
+        else if (CDDS_ITEMPREPAINT == lpCD->nmcd.dwDrawStage)
+        {
+            return CDRF_NOTIFYSUBITEMDRAW;
+        }
+        // Flag combined with CDDS_ITEMPREPAINT or CDDS_ITEMPOSTPAINT if a subitem is being drawn.
+        else if ((CDDS_ITEMPREPAINT | CDDS_SUBITEM) == lpCD->nmcd.dwDrawStage)
+        {
+            if (0 == lpCD->iSubItem)
+            {
+                auto it = m_cache.find(lpCD->nmcd.dwItemSpec);
+                if (it != m_cache.end())
+                    SelectObject(lpCD->nmcd.hdc, 1 == it->second.read ? m_mainWindow->GetDefaultFont(): m_mainWindow->GetBoldFont());
+            }
+
+            return CDRF_NEWFONT;
+        }
+
+        return CDRF_SKIPDEFAULT;
     }
     break;
 
