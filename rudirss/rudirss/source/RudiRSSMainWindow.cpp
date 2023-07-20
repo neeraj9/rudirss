@@ -7,7 +7,7 @@
 #include <CommCtrl.h>
 #include <format>
 
-RudiRSSMainWindow::RudiRSSMainWindow() : m_initViewer{ FALSE }, m_font{ nullptr },
+RudiRSSMainWindow::RudiRSSMainWindow() : m_initViewer{ FALSE }, m_font{ nullptr }, m_boldFont{ nullptr },
 m_feedListView{ this }, m_feedItemListView{ this }
 {
 }
@@ -255,6 +255,7 @@ LRESULT RudiRSSMainWindow::OnCommand(HWND hWnd, UINT message, WPARAM wParam, LPA
 void RudiRSSMainWindow::OnDestroy()
 {
     DeleteObject(m_font);
+    DeleteObject(m_boldFont);
 }
 
 void RudiRSSMainWindow::InittializeControl()
@@ -295,6 +296,10 @@ void RudiRSSMainWindow::InitFont()
     LOGFONT font{};
     SystemParametersInfo(SPI_GETICONTITLELOGFONT, sizeof(font), &font, 0);
     m_font = CreateFont(font.lfHeight, font.lfWidth, font.lfEscapement, font.lfOrientation, font.lfWeight, font.lfItalic, font.lfUnderline, font.lfStrikeOut,
+        font.lfCharSet, font.lfOutPrecision, font.lfClipPrecision, font.lfQuality, font.lfPitchAndFamily, font.lfFaceName);
+
+    font.lfWeight = FW_BOLD;
+    m_boldFont = CreateFont(font.lfHeight, font.lfWidth, font.lfEscapement, font.lfOrientation, font.lfWeight, font.lfItalic, font.lfUnderline, font.lfStrikeOut,
         font.lfCharSet, font.lfOutPrecision, font.lfClipPrecision, font.lfQuality, font.lfPitchAndFamily, font.lfFaceName);
 }
 

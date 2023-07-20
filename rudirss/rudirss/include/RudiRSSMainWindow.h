@@ -21,6 +21,7 @@ protected:
     RudiRSSClient m_rudiRSSClient;
 
     HFONT m_font;
+    HFONT m_boldFont;
 
     virtual void OnRegister(WNDCLASSEXW& wcex);
     virtual HWND Create();
@@ -52,4 +53,7 @@ public:
     BOOL IsViewerInitialized();
 
     const HINSTANCE GetHInstance() const { return m_hInstance; }
+
+    const HFONT GetDefaultFont() const { return m_font; }
+    const HFONT GetBoldFont() const { return m_boldFont; }
 };
