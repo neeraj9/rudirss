@@ -53,9 +53,9 @@ jobs:
       shell: powershell
       run: |
         Get-ChildItem -Path ./rudirss/x64/Release/rudirss.exe, ./rudirss/x64/Release/WebView2Loader.dll |
-        Compress-Archive -DestinationPath ./rudirss/x64/Release/RudiRSS_x64.zip
+        Compress-Archive -DestinationPath ./rudirss/x64/Release/RudiRSS_x64_${{ github.sha }}.zip
 
-    - name: Release
+    - name: Release assets
       uses: softprops/action-gh-release@v1
       if: startsWith(github.ref, 'refs/tags/')
       with:
@@ -63,4 +63,4 @@ jobs:
         name: Release ${{ github.ref }}
         prerelease: true
         files: |
-          ./rudirss/x64/Release/RudiRSS_x64.zip
+          ./rudirss/x64/Release/RudiRSS_x64_${{ github.sha }}.zip
