@@ -3,11 +3,14 @@
 # separate terms of service, privacy policy, and support
 # documentation.
 
+
 name: Build
 
 on:
   push:
     branches: [ "master" ]
+    tags:
+      - "v*"
   pull_request:
     branches: [ "master" ]
 
@@ -21,7 +24,7 @@ env:
   BUILD_CONFIGURATION: Release
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   build:
@@ -45,3 +48,19 @@ jobs:
       # Add additional options to the MSBuild command line here (like platform or verbosity level).
       # See https://docs.microsoft.com/visualstudio/msbuild/msbuild-command-line-reference
       run: msbuild /m /p:Configuration=${{env.BUILD_CONFIGURATION}} ${{env.SOLUTION_FILE_PATH}}
+
+    - name: Pack artifact
+      shell: powershell
+      run: |
+        Get-ChildItem -Path ./rudirss/x64/Release/rudirss.exe, ./rudirss/x64/Release/WebView2Loader.dll |
+        Compress-Archive -DestinationPath ./rudirss/x64/Release/RudiRSS_x64.zip
+
+    - name: Release
+      uses: softprops/action-gh-release@v1
+      if: startsWith(github.ref, 'refs/tags/')
+      with:
+        tag_name: ${{ github.ref }}
+        name: Release ${{ github.ref }}
+        prerelease: true
+        files: |
+          ./rudirss/x64/Release/RudiRSS_x64.zip
