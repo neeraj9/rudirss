@@ -58,9 +58,14 @@ jobs:
       shell: powershell
       run: |
         Get-ChildItem -Path ${{ env.RELEASE_X64_FOLDER }}/rudirss.exe, ${{ env.RELEASE_X64_FOLDER }}/WebView2Loader.dll |
-        Compress-Archive -DestinationPath ${{ env.RELEASE_X64_FOLDER }}/RudiRSS_x64_${{ github.sha }}.zip
+        Compress-Archive -DestinationPath ${{ env.RELEASE_X64_FOLDER }}/RudiRSS_x64.zip
         Get-ChildItem -Path ${{ env.RELEASE_X86_FOLDER }}/rudirss.exe, ${{ env.RELEASE_X86_FOLDER }}/WebView2Loader.dll |
-        Compress-Archive -DestinationPath ${{ env.RELEASE_X86_FOLDER }}/RudiRSS_x86_${{ github.sha }}.zip
+        Compress-Archive -DestinationPath ${{ env.RELEASE_X86_FOLDER }}/RudiRSS_x86.zip
+
+    - if: startsWith(github.ref, 'refs/tags/')
+      run: |
+        mv ${{ env.RELEASE_X64_FOLDER }}/RudiRSS_x64.zip ${{ env.RELEASE_X64_FOLDER }}/RudiRSS_x64_${{ github.ref_name }}_${{ github.sha }}.zip
+        mv ${{ env.RELEASE_X86_FOLDER }}/RudiRSS_x86.zip ${{ env.RELEASE_X86_FOLDER }}/RudiRSS_x86_${{ github.ref_name }}_${{ github.sha }}.zip
 
     - name: Release assets
       uses: softprops/action-gh-release@v1
@@ -69,5 +74,5 @@ jobs:
         name: Pre-release ${{ github.ref_name }}
         prerelease: true
         files: |
-          ${{ env.RELEASE_X64_FOLDER }}/RudiRSS_x64_${{ github.sha }}.zip
-          ${{ env.RELEASE_X86_FOLDER }}/RudiRSS_x86_${{ github.sha }}.zip
+          ${{ env.RELEASE_X64_FOLDER }}/RudiRSS_x64_${{ github.ref_name }}_${{ github.sha }}.zip
+          ${{ env.RELEASE_X86_FOLDER }}/RudiRSS_x86_${{ github.ref_name }}_${{ github.sha }}.zip
