@@ -10,42 +10,6 @@
 
 class FeedDatabase
 {
-protected:
-    SQLite3Handle m_sql;
-    SQLite3StmtHandle m_insertFeedStmt;
-    SQLite3StmtHandle m_insertFeedDataStmt;
-    SQLite3StmtHandle m_queryFeedStmt;
-    SQLite3StmtHandle m_queryFeedByGuidStmt;
-    SQLite3StmtHandle m_queryAllFeedsStmt;
-    SQLite3StmtHandle m_queryFeedDataByFeedIdStmt;
-    SQLite3StmtHandle m_queryFeedDataByFeedDataIdStmt;
-    SQLite3StmtHandle m_queryFeedDataByFeedIdOrderByTimestampStmt;
-    SQLite3StmtHandle m_queryFeedDataByOffsetOrderByTimestampStmt;
-    SQLite3StmtHandle m_queryFeedDataByFeedIdByOffsetOrderByTimestampStmt;
-    SQLite3StmtHandle m_queryAllFeedDataOrderByTimestampStmt;
-    SQLite3StmtHandle m_deleteAllFeedStmt;
-    SQLite3StmtHandle m_deleteAllFeedDataStmt;
-    SQLite3StmtHandle m_deleteOutdatedFeedDataStmt;
-    SQLite3StmtHandle m_deleteFeedByFeedIdStmt;
-    SQLite3StmtHandle m_deleteFeedDataByFeedIdStmt;
-    SQLite3StmtHandle m_updateFeedDataReadStmt;
-    SQLite3StmtHandle m_queryFeedTableDataExistStmt;
-    SQLite3StmtHandle m_queryFeedDataTableCountStmt;
-    SQLite3StmtHandle m_queryFeedDataTableCountByFeedIdStmt;
-    SQLite3StmtHandle m_queryFeedDataByOffsetStmt;
-    SQLite3StmtHandle m_queryFeedTableCountStmt;
-    SQLite3StmtHandle m_queryFeedByOffsetStmt;
-    SQLite3StmtHandle m_queryFeedByOffsetInRangeStmt;
-    SQLite3StmtHandle m_queryFeedDataOrderByTimestampInRangeStmt;
-    SQLite3StmtHandle m_queryFeedDataByFeedIdOrderByTimestampInRangeStmt;
-    SQLite3StmtHandle m_queryFeedExistByGuid;
-    SQLite3StmtHandle m_queryFeedDataCountByTitle;
-    SQLite3StmtHandle m_queryFeedDataByTitleOrderByTimestampInRangeStmt;
-    SQLite3StmtHandle m_queryFeedDataCountByFeedIdByTitle;
-    SQLite3StmtHandle m_queryFeedDataByFeedIdByTitleOrderByTimestampInRangeStmt;
-
-    ATL::CComCriticalSection m_dbLock;
-
 public:
     FeedDatabase();
     virtual ~FeedDatabase();
@@ -215,4 +179,42 @@ public:
     bool QueryFeedDataCountByFeedIdByTitle(long long feedid, const std::string& title, long long &count);
     bool QueryFeedDataByFeedIdByTitleOrderByTimestampInRange(long long feedid, const std::string &title, long long limit, long long offset,
         FN_QUERY_FEED_DATA fnQueryFeedData);
+
+protected:
+    SQLite3Handle m_sql;
+    SQLite3StmtHandle m_insertFeedStmt;
+    SQLite3StmtHandle m_insertFeedDataStmt;
+    SQLite3StmtHandle m_queryFeedStmt;
+    SQLite3StmtHandle m_queryFeedByGuidStmt;
+    SQLite3StmtHandle m_queryAllFeedsStmt;
+    SQLite3StmtHandle m_queryFeedDataByFeedIdStmt;
+    SQLite3StmtHandle m_queryFeedDataByFeedDataIdStmt;
+    SQLite3StmtHandle m_queryFeedDataByFeedIdOrderByTimestampStmt;
+    SQLite3StmtHandle m_queryFeedDataByOffsetOrderByTimestampStmt;
+    SQLite3StmtHandle m_queryFeedDataByFeedIdByOffsetOrderByTimestampStmt;
+    SQLite3StmtHandle m_queryAllFeedDataOrderByTimestampStmt;
+    SQLite3StmtHandle m_deleteAllFeedStmt;
+    SQLite3StmtHandle m_deleteAllFeedDataStmt;
+    SQLite3StmtHandle m_deleteOutdatedFeedDataStmt;
+    SQLite3StmtHandle m_deleteFeedByFeedIdStmt;
+    SQLite3StmtHandle m_deleteFeedDataByFeedIdStmt;
+    SQLite3StmtHandle m_updateFeedDataReadStmt;
+    SQLite3StmtHandle m_queryFeedTableDataExistStmt;
+    SQLite3StmtHandle m_queryFeedDataTableCountStmt;
+    SQLite3StmtHandle m_queryFeedDataTableCountByFeedIdStmt;
+    SQLite3StmtHandle m_queryFeedDataByOffsetStmt;
+    SQLite3StmtHandle m_queryFeedTableCountStmt;
+    SQLite3StmtHandle m_queryFeedByOffsetStmt;
+    SQLite3StmtHandle m_queryFeedByOffsetInRangeStmt;
+    SQLite3StmtHandle m_queryFeedDataOrderByTimestampInRangeStmt;
+    SQLite3StmtHandle m_queryFeedDataByFeedIdOrderByTimestampInRangeStmt;
+    SQLite3StmtHandle m_queryFeedExistByGuid;
+    SQLite3StmtHandle m_queryFeedDataCountByTitle;
+    SQLite3StmtHandle m_queryFeedDataByTitleOrderByTimestampInRangeStmt;
+    SQLite3StmtHandle m_queryFeedDataCountByFeedIdByTitle;
+    SQLite3StmtHandle m_queryFeedDataByFeedIdByTitleOrderByTimestampInRangeStmt;
+
+    ATL::CComCriticalSection m_dbLock;
+
+    void QueryFeedData(FeedData& feedData, sqlite3_stmt *stmt);
 };
