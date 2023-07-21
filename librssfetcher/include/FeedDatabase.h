@@ -208,7 +208,7 @@ protected:
     SQLite3StmtHandle m_queryFeedByOffsetInRangeStmt;
     SQLite3StmtHandle m_queryFeedDataOrderByTimestampInRangeStmt;
     SQLite3StmtHandle m_queryFeedDataByFeedIdOrderByTimestampInRangeStmt;
-    SQLite3StmtHandle m_queryFeedExistByGuid;
+    SQLite3StmtHandle m_queryFeedExistByGuidStmt;
     SQLite3StmtHandle m_queryFeedDataCountByTitle;
     SQLite3StmtHandle m_queryFeedDataByTitleOrderByTimestampInRangeStmt;
     SQLite3StmtHandle m_queryFeedDataCountByFeedIdByTitle;
@@ -217,4 +217,5 @@ protected:
     ATL::CComCriticalSection m_dbLock;
 
     void QueryFeedData(FeedData& feedData, sqlite3_stmt *stmt);
+    void QueryFeed(Feed& feed, sqlite3_stmt *stmt);
 };
