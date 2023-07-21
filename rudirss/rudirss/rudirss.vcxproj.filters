@@ -85,6 +85,9 @@
     <ClInclude Include="include\ListViewCache.h">
       <Filter>Header Files\include</Filter>
     </ClInclude>
+    <ClInclude Include="include\SearchBox.h">
+      <Filter>Header Files\include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="rudirss.cpp">
@@ -109,6 +112,9 @@
       <Filter>Source Files\source</Filter>
     </ClCompile>
     <ClCompile Include="source\FeedItemListView.cpp">
+      <Filter>Source Files\source</Filter>
+    </ClCompile>
+    <ClCompile Include="source\SearchBox.cpp">
       <Filter>Source Files\source</Filter>
     </ClCompile>
   </ItemGroup>

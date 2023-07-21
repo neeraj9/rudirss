@@ -160,6 +160,7 @@
     <ClInclude Include="framework.h" />
     <ClInclude Include="include\Configuration.h" />
     <ClInclude Include="include\FeedItemListView.h" />
+    <ClInclude Include="include\SearchBox.h" />
     <ClInclude Include="include\FeedListView.h" />
     <ClInclude Include="include\ListView.h" />
     <ClInclude Include="include\ListViewCache.h" />
@@ -180,6 +181,7 @@
     <ClCompile Include="source\MainWindow.cpp" />
     <ClCompile Include="source\RudiRSSClient.cpp" />
     <ClCompile Include="source\RudiRSSMainWindow.cpp" />
+    <ClCompile Include="source\SearchBox.cpp" />
     <ClCompile Include="source\Viewer.cpp" />
     <ClCompile Include="source\WindowHandle.cpp" />
   </ItemGroup>

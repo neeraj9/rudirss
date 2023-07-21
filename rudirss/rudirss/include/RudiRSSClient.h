@@ -43,6 +43,11 @@ public:
     bool QueryFeedExistByGuid(const std::string& guid, long long& exist);
     bool DeleteAllFeeds();
     bool DeleteAllFeedData();
+    bool QueryFeedDataCountByTitle(const std::string& title, long long &count);
+    bool QueryFeedDataByTitleOrderByTimestampInRange(const std::string &title, long long limit, long long offset, FeedDatabase::FN_QUERY_FEED_DATA fnQueryFeedData);
+    bool QueryFeedDataCountByFeedIdByTitle(long long feedid, const std::string& title, long long &count);
+    bool QueryFeedDataByFeedIdByTitleOrderByTimestampInRange(long long feedid, const std::string &title, long long limit, long long offset,
+        FeedDatabase::FN_QUERY_FEED_DATA fnQueryFeedData);
 
     using FN_ON_DB_NOTIFICATION = std::function<void(const FeedDatabase::FeedConsumptionUnit &)>;
     void StartRefreshFeedTimer(FN_ON_DB_NOTIFICATION fnOnDbNotification);

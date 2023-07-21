@@ -347,6 +347,28 @@ bool RudiRSSClient::DeleteAllFeedData()
     return m_db.DeleteAllFeedData();
 }
 
+bool RudiRSSClient::QueryFeedDataCountByTitle(const std::string& title, long long& count)
+{
+    return m_db.QueryFeedDataCountByTitle(title, count);
+}
+
+bool RudiRSSClient::QueryFeedDataByTitleOrderByTimestampInRange(const std::string& title, long long limit, long long offset,
+    FeedDatabase::FN_QUERY_FEED_DATA fnQueryFeedData)
+{
+    return m_db.QueryFeedDataByTitleOrderByTimestampInRange(title, limit, offset, fnQueryFeedData);
+}
+
+bool RudiRSSClient::QueryFeedDataCountByFeedIdByTitle(long long feedid, const std::string& title, long long& count)
+{
+    return m_db.QueryFeedDataCountByFeedIdByTitle(feedid, title, count);
+}
+
+bool RudiRSSClient::QueryFeedDataByFeedIdByTitleOrderByTimestampInRange(long long feedid, const std::string& title, long long limit, long long offset,
+    FeedDatabase::FN_QUERY_FEED_DATA fnQueryFeedData)
+{
+    return m_db.QueryFeedDataByFeedIdByTitleOrderByTimestampInRange(feedid, title, limit, offset, fnQueryFeedData);
+}
+
 VOID CALLBACK RudiRSSClient::WaitOrTimerCallback(PVOID param, BOOLEAN TimerOrWaitFired)
 {
     auto refreshTimer = reinterpret_cast<RefreshTimer*>(param);
@@ -446,14 +468,14 @@ void RudiRSSClient::SaveDatabaseConfiguration(const DatabaseConfiguration& dbCon
     WritePrivateProfileString(L"Database", L"ReserveDays", std::to_wstring(dbConfig.reserveDays).c_str(), m_rudirssIni.c_str());
 }
 
-void RudiRSSClient::LoadDisplayConfiguration(DisplayConfiguration &displayConfig)
+void RudiRSSClient::LoadDisplayConfiguration(DisplayConfiguration& displayConfig)
 {
     displayConfig.feedWidth = GetPrivateProfileInt(L"Display", L"FeedWidth", 300, m_rudirssIni.c_str());
     displayConfig.feedItemTitleColumnWidth = GetPrivateProfileInt(L"Display", L"FeedItemTitleColumnWidth", 250, m_rudirssIni.c_str());
     displayConfig.feedItemUpdatedColumnWidth = GetPrivateProfileInt(L"Display", L"FeedItemUpdatedColumnWidth", 150, m_rudirssIni.c_str());
 }
 
-void RudiRSSClient::SaveDisplayConfiguration(const DisplayConfiguration &displayConfig)
+void RudiRSSClient::SaveDisplayConfiguration(const DisplayConfiguration& displayConfig)
 {
     WritePrivateProfileString(L"Display", L"FeedWidth",
         std::to_wstring(static_cast<unsigned>(displayConfig.feedWidth)).c_str(), m_rudirssIni.c_str());

@@ -112,14 +112,17 @@ LRESULT FeedListView::OnProcessMessage(HWND hWnd, UINT message, WPARAM wParam, L
 
     case NM_CLICK:
     {
+        m_mainWindow->ClearLastSearchResult();
+        m_mainWindow->ClearSearchBox();
         InterlockedExchange(reinterpret_cast<long*>(&m_lastSelectedFeedIndex), itemActivate->iItem);
         if (ALL_FEEDS_LIST_INDEX != itemActivate->iItem)
         {
-            m_mainWindow->GetRudiRSSClient().QueryFeedByOffset(itemActivate->iItem - 1, [&](const FeedDatabase::Feed& feed) {
-                InterlockedExchange64(reinterpret_cast<LONG64*>(&m_lastSelectedFeedId), feed.feedid);
-                });
-
-            m_mainWindow->GetFeedItemListView().UpdateSelectedFeed(InterlockedOr64(reinterpret_cast<LONG64*>(&m_lastSelectedFeedId), 0));
+            auto it = m_cache.find(itemActivate->iItem - 1);
+            if (it != m_cache.end())
+            {
+                InterlockedExchange64(reinterpret_cast<LONG64*>(&m_lastSelectedFeedId), it->second.feedid);
+                m_mainWindow->GetFeedItemListView().UpdateSelectedFeed(InterlockedOr64(reinterpret_cast<LONG64*>(&m_lastSelectedFeedId), 0));
+            }
         }
         else
         {
