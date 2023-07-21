@@ -39,6 +39,10 @@ protected:
     SQLite3StmtHandle m_queryFeedDataOrderByTimestampInRangeStmt;
     SQLite3StmtHandle m_queryFeedDataByFeedIdOrderByTimestampInRangeStmt;
     SQLite3StmtHandle m_queryFeedExistByGuid;
+    SQLite3StmtHandle m_queryFeedDataCountByTitle;
+    SQLite3StmtHandle m_queryFeedDataByTitleOrderByTimestampInRangeStmt;
+    SQLite3StmtHandle m_queryFeedDataCountByFeedIdByTitle;
+    SQLite3StmtHandle m_queryFeedDataByFeedIdByTitleOrderByTimestampInRangeStmt;
 
     ATL::CComCriticalSection m_dbLock;
 
@@ -206,4 +210,9 @@ public:
     bool QueryFeedDataOrderByTimestampInRange(long long limit, long long offset, FN_QUERY_FEED_DATA fnQueryFeedData);
     bool QueryFeedDataByFeedIdOrderByTimestampInRange(long long feedid, long long limit, long long offset, FN_QUERY_FEED_DATA fnQueryFeedData);
     bool QueryFeedExistByGuid(const std::string& guid, long long& exist);
+    bool QueryFeedDataCountByTitle(const std::string& title, long long &count);
+    bool QueryFeedDataByTitleOrderByTimestampInRange(const std::string &title, long long limit, long long offset, FN_QUERY_FEED_DATA fnQueryFeedData);
+    bool QueryFeedDataCountByFeedIdByTitle(long long feedid, const std::string& title, long long &count);
+    bool QueryFeedDataByFeedIdByTitleOrderByTimestampInRange(long long feedid, const std::string &title, long long limit, long long offset,
+        FN_QUERY_FEED_DATA fnQueryFeedData);
 };
