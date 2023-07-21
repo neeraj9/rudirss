@@ -90,22 +90,11 @@ LRESULT FeedItemListView::OnProcessMessage(HWND hWnd, UINT message, WPARAM wPara
             {
                 if (m_mainWindow->GetLastSearchText().empty())
                 {
-                    long long idx = pCachehint->iFrom;
-                    m_mainWindow->GetRudiRSSClient().QueryFeedDataOrderByTimestampInRange(static_cast<long long>(pCachehint->iTo - pCachehint->iFrom + 1),
-                        static_cast<long long>(pCachehint->iFrom), [&](const FeedDatabase::FeedData& feedData) {
-                            m_cache.insert(std::pair<long long, FeedDatabase::FeedData>(idx++, feedData));
-                        });
+                    QueryFeedDataOrderByTimestampInRange(static_cast<long long>(pCachehint->iFrom), static_cast<long long>(pCachehint->iTo));
                 }
                 else if(m_mainWindow->GetLastSearchResultCount() > 0)
                 {
-                    std::string query = std::format("%{}%", m_mainWindow->GetLastSearchText());
-                    long long idx = pCachehint->iFrom;
-                    m_mainWindow->GetRudiRSSClient().QueryFeedDataByTitleOrderByTimestampInRange(query,
-                        static_cast<long long>(pCachehint->iTo - pCachehint->iFrom + 1),
-                        static_cast<long long>(pCachehint->iFrom),
-                        [&](const FeedDatabase::FeedData& feedData) {
-                            m_cache.insert(std::pair<long long, FeedDatabase::FeedData>(idx++, feedData));
-                        });
+                    QueryFeedDataByTitleOrderByTimestampInRange(static_cast<long long>(pCachehint->iFrom), static_cast<long long>(pCachehint->iTo));
                 }
             }
             else
@@ -121,22 +110,11 @@ LRESULT FeedItemListView::OnProcessMessage(HWND hWnd, UINT message, WPARAM wPara
 
                     if (m_mainWindow->GetLastSearchText().empty())
                     {
-                        long long idx = pCachehint->iFrom;
-                        m_mainWindow->GetRudiRSSClient().QueryFeedDataOrderByTimestampInRange(static_cast<long long>(pCachehint->iTo - pCachehint->iFrom + 1),
-                            static_cast<long long>(pCachehint->iFrom), [&](const FeedDatabase::FeedData& feedData) {
-                                m_cache.insert(std::pair<long long, FeedDatabase::FeedData>(idx++, feedData));
-                            });
+                        QueryFeedDataOrderByTimestampInRange(static_cast<long long>(pCachehint->iFrom), static_cast<long long>(pCachehint->iTo));
                     }
                     else if (m_mainWindow->GetLastSearchResultCount() > 0)
                     {
-                        std::string query = std::format("%{}%", m_mainWindow->GetLastSearchText());
-                        long long idx = pCachehint->iFrom;
-                        m_mainWindow->GetRudiRSSClient().QueryFeedDataByTitleOrderByTimestampInRange(query,
-                            static_cast<long long>(pCachehint->iTo - pCachehint->iFrom + 1),
-                            static_cast<long long>(pCachehint->iFrom),
-                            [&](const FeedDatabase::FeedData& feedData) {
-                                m_cache.insert(std::pair<long long, FeedDatabase::FeedData>(idx++, feedData));
-                            });
+                        QueryFeedDataByTitleOrderByTimestampInRange(static_cast<long long>(pCachehint->iFrom), static_cast<long long>(pCachehint->iTo));
                     }
                 }
             }
@@ -147,24 +125,11 @@ LRESULT FeedItemListView::OnProcessMessage(HWND hWnd, UINT message, WPARAM wPara
             {
                 if (m_mainWindow->GetLastSearchText().empty())
                 {
-                    long long idx = pCachehint->iFrom;
-                    long long lastSelectedFeedId = m_mainWindow->GetFeedListView().GetLastSelectedFeedId();
-                    m_mainWindow->GetRudiRSSClient().QueryFeedDataByFeedIdOrderByTimestampInRange(lastSelectedFeedId,
-                        static_cast<long long>(pCachehint->iTo - pCachehint->iFrom + 1),
-                        static_cast<long long>(pCachehint->iFrom), [&](const FeedDatabase::FeedData& feedData) {
-                            m_cache.insert(std::pair<long long, FeedDatabase::FeedData>(idx++, feedData));
-                        });
+                    QueryFeedDataByFeedIdOrderByTimestampInRange(static_cast<long long>(pCachehint->iFrom), static_cast<long long>(pCachehint->iTo));
                 }
                 else if (m_mainWindow->GetLastSearchResultCount() > 0)
                 {
-                    long long idx = pCachehint->iFrom;
-                    long long lastSelectedFeedId = m_mainWindow->GetFeedListView().GetLastSelectedFeedId();
-                    std::string query = std::format("%{}%", m_mainWindow->GetLastSearchText());
-                    m_mainWindow->GetRudiRSSClient().QueryFeedDataByFeedIdByTitleOrderByTimestampInRange(lastSelectedFeedId, query,
-                        static_cast<long long>(pCachehint->iTo - pCachehint->iFrom + 1),
-                        static_cast<long long>(pCachehint->iFrom), [&](const FeedDatabase::FeedData& feedData) {
-                            m_cache.insert(std::pair<long long, FeedDatabase::FeedData>(idx++, feedData));
-                        });
+                    QueryFeedDataByFeedIdByTitleOrderByTimestampInRange(static_cast<long long>(pCachehint->iFrom), static_cast<long long>(pCachehint->iTo));
                 }
             }
             else
@@ -180,24 +145,11 @@ LRESULT FeedItemListView::OnProcessMessage(HWND hWnd, UINT message, WPARAM wPara
 
                     if (m_mainWindow->GetLastSearchText().empty())
                     {
-                        long long idx = pCachehint->iFrom;
-                        long long lastSelectedFeedId = m_mainWindow->GetFeedListView().GetLastSelectedFeedId();
-                        m_mainWindow->GetRudiRSSClient().QueryFeedDataByFeedIdOrderByTimestampInRange(lastSelectedFeedId,
-                            static_cast<long long>(pCachehint->iTo - pCachehint->iFrom + 1),
-                            static_cast<long long>(pCachehint->iFrom), [&](const FeedDatabase::FeedData& feedData) {
-                                m_cache.insert(std::pair<long long, FeedDatabase::FeedData>(idx++, feedData));
-                            });
+                        QueryFeedDataByFeedIdOrderByTimestampInRange(static_cast<long long>(pCachehint->iFrom), static_cast<long long>(pCachehint->iTo));
                     }
                     else if (m_mainWindow->GetLastSearchResultCount() > 0)
                     {
-                        long long idx = pCachehint->iFrom;
-                        long long lastSelectedFeedId = m_mainWindow->GetFeedListView().GetLastSelectedFeedId();
-                        std::string query = std::format("%{}%", m_mainWindow->GetLastSearchText());
-                        m_mainWindow->GetRudiRSSClient().QueryFeedDataByFeedIdByTitleOrderByTimestampInRange(lastSelectedFeedId, query,
-                            static_cast<long long>(pCachehint->iTo - pCachehint->iFrom + 1),
-                            static_cast<long long>(pCachehint->iFrom), [&](const FeedDatabase::FeedData& feedData) {
-                                m_cache.insert(std::pair<long long, FeedDatabase::FeedData>(idx++, feedData));
-                            });
+                        QueryFeedDataByFeedIdByTitleOrderByTimestampInRange(static_cast<long long>(pCachehint->iFrom), static_cast<long long>(pCachehint->iTo));
                     }
                 }
             }
@@ -336,12 +288,66 @@ void FeedItemListView::ClearCache()
     m_cache.clear();
 }
 
-void FeedItemListView::UpdateReadStateInCache(int item, long long read)
+bool FeedItemListView::GetRightClickedFeedDataFromCache(FeedDatabase::FeedData& feedData)
 {
-    auto it = m_cache.find(item);
+    bool result = false;
+    auto it = m_cache.find(static_cast<long long>(m_lastRighClickedItem));
     if (it != m_cache.end())
     {
-        it->second.read = read;
+        feedData = it->second;
+        result = true;
     }
-    ListView_Update(m_hWnd, item);
+    return result;
 }
+
+ ListViewCache<FeedDatabase::FeedData>::iterator FeedItemListView::GetRightClickedFeedDataIteratorFromCache(FeedDatabase::FeedData& feedData, bool& result)
+{
+    auto it = m_cache.find(static_cast<long long>(m_lastRighClickedItem));
+    if (it != m_cache.end())
+    {
+        feedData = it->second;
+        result = true;
+    }
+    return it;
+}
+
+ void FeedItemListView::QueryFeedDataOrderByTimestampInRange(long long from, long long to)
+ {
+     long long idx = from;
+     m_mainWindow->GetRudiRSSClient().QueryFeedDataOrderByTimestampInRange(to - from + 1,
+         from, [&](const FeedDatabase::FeedData& feedData) {
+             m_cache.insert(std::pair<long long, FeedDatabase::FeedData>(idx++, feedData));
+         });
+ }
+
+ void FeedItemListView::QueryFeedDataByTitleOrderByTimestampInRange(long long from, long long to)
+ {
+     std::string query = std::format("%{}%", m_mainWindow->GetLastSearchText());
+     long long idx = from;
+     m_mainWindow->GetRudiRSSClient().QueryFeedDataByTitleOrderByTimestampInRange(query,
+         to - from + 1, from,
+         [&](const FeedDatabase::FeedData& feedData) {
+             m_cache.insert(std::pair<long long, FeedDatabase::FeedData>(idx++, feedData));
+         });
+ }
+
+ void FeedItemListView::QueryFeedDataByFeedIdOrderByTimestampInRange(long long from, long long to)
+ {
+     long long idx = from;
+     long long lastSelectedFeedId = m_mainWindow->GetFeedListView().GetLastSelectedFeedId();
+     m_mainWindow->GetRudiRSSClient().QueryFeedDataByFeedIdOrderByTimestampInRange(lastSelectedFeedId,
+         to - from + 1, from, [&](const FeedDatabase::FeedData& feedData) {
+             m_cache.insert(std::pair<long long, FeedDatabase::FeedData>(idx++, feedData));
+         });
+ }
+
+ void FeedItemListView::QueryFeedDataByFeedIdByTitleOrderByTimestampInRange(long long from, long long to)
+ {
+     long long idx = from;
+     long long lastSelectedFeedId = m_mainWindow->GetFeedListView().GetLastSelectedFeedId();
+     std::string query = std::format("%{}%", m_mainWindow->GetLastSearchText());
+     m_mainWindow->GetRudiRSSClient().QueryFeedDataByFeedIdByTitleOrderByTimestampInRange(lastSelectedFeedId, query,
+         to - from + 1, from, [&](const FeedDatabase::FeedData& feedData) {
+             m_cache.insert(std::pair<long long, FeedDatabase::FeedData>(idx++, feedData));
+         });
+ }

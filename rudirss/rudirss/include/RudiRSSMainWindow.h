@@ -41,9 +41,6 @@ protected:
 
     LRESULT OnProcessListViewCommand(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
-    long long GetLastSelectedFeedDataId();
-    bool GetLastSelectedFeedData(FeedDatabase::FeedData &feedData);
-
 public:
     RudiRSSMainWindow();
     virtual ~RudiRSSMainWindow();

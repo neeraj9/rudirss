@@ -488,70 +488,55 @@ void RudiRSSClient::SaveDisplayConfiguration(const DisplayConfiguration& display
 void RudiRSSClient::RefreshFeedByOffset(long long offset)
 {
     long long feedid = FeedDatabase::INVALID_FEED_ID;
-    do
+    std::wstring guid;
+    unsigned duetime = FeedDatabase::Feed::DEFAULT_FEED_UPDATE_DUETIME;
+    unsigned updateinterval = FeedDatabase::Feed::DEFAULT_FEED_UPDATE_INTERVAL;
+    QueryFeedByOffset(offset, [&](const FeedDatabase::Feed& feed) {
+        FeedCommon::ConvertStringToWideString(feed.guid, guid);
+        duetime = feed.duetime;
+        updateinterval = feed.updateinterval;
+        });
+
+    if (!guid.empty())
     {
-        std::wstring guid;
-        unsigned duetime = FeedDatabase::Feed::DEFAULT_FEED_UPDATE_DUETIME;
-        unsigned updateinterval = FeedDatabase::Feed::DEFAULT_FEED_UPDATE_INTERVAL;
-        QueryFeedByOffset(offset, [&](const FeedDatabase::Feed& feed) {
-            FeedCommon::ConvertStringToWideString(feed.guid, guid);
-            duetime = feed.duetime;
-            updateinterval = feed.updateinterval;
-            });
-
-        if (guid.empty())
-            break;
-
         auto it = m_refreshTimer.find(guid);
         if (it != m_refreshTimer.end())
         {
             it->second.Create(WaitOrTimerCallback, &it->second, duetime, updateinterval, WT_EXECUTEDEFAULT);
         }
-    } while (0);
+    }
 }
 
 void RudiRSSClient::RefreshAllFeeds()
 {
-    do
-    {
-        std::vector<FeedDatabase::Feed> feeds;
-        QueryAllFeeds([&](const FeedDatabase::Feed& feed) {
-            feeds.push_back(feed);
-            });
-
+    QueryAllFeeds([&](const FeedDatabase::Feed& feed) {
         std::wstring guid;
-        for (const auto& feed : feeds)
+        FeedCommon::ConvertStringToWideString(feed.guid, guid);
+        auto it = m_refreshTimer.find(guid);
+        if (it != m_refreshTimer.end())
         {
-            FeedCommon::ConvertStringToWideString(feed.guid, guid);
-            auto it = m_refreshTimer.find(guid);
-            if (it != m_refreshTimer.end())
-            {
-                it->second.Create(WaitOrTimerCallback, &it->second, feed.duetime, feed.updateinterval, WT_EXECUTEDEFAULT);
-            }
+            it->second.Create(WaitOrTimerCallback, &it->second, feed.duetime, feed.updateinterval, WT_EXECUTEDEFAULT);
         }
-    } while (0);
+        });
 }
 
 void RudiRSSClient::DeleteFeedByOffset(long long offset)
 {
     long long feedid = FeedDatabase::INVALID_FEED_ID;
-    do
+    std::wstring guid;
+    QueryFeedByOffset(offset, [&](const FeedDatabase::Feed& feed) {
+        feedid = feed.feedid;
+        FeedCommon::ConvertStringToWideString(feed.guid, guid);
+        });
+
+    if (FeedDatabase::INVALID_FEED_ID != feedid)
     {
-        std::wstring guid;
-        QueryFeedByOffset(offset, [&](const FeedDatabase::Feed& feed) {
-            feedid = feed.feedid;
-            FeedCommon::ConvertStringToWideString(feed.guid, guid);
-            });
-
-        if (FeedDatabase::INVALID_FEED_ID == feedid)
-            break;
-
         // Stop and remove its refresh timer
         m_refreshTimer.erase(guid);
 
         DeleteFeedDataByFeedId(feedid);
         DeleteFeedByFeedId(feedid);
-    } while (0);
+    }
 }
 
 void RudiRSSClient::DeleteAllFeedsAndAllFeedData()

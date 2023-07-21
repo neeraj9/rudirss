@@ -23,9 +23,10 @@ public:
     void DeleteAllItems();
 
     virtual void ClearCache();
-    void UpdateReadStateInCache(int item, long long read);
 
     const int GetLastRightClickedItem() const { return m_lastRighClickedItem; }
+    bool GetRightClickedFeedDataFromCache(FeedDatabase::FeedData& feedData);
+    ListViewCache<FeedDatabase::FeedData>::iterator GetRightClickedFeedDataIteratorFromCache(FeedDatabase::FeedData& feedData, bool &result);
 
 protected:
     int m_titleColumnWidth;
@@ -33,4 +34,9 @@ protected:
     int m_lastRighClickedItem;
     ListViewCache<FeedDatabase::FeedData> m_cache;
     RudiRSSMainWindow* m_mainWindow;
+
+    void QueryFeedDataOrderByTimestampInRange(long long from, long long to);
+    void QueryFeedDataByTitleOrderByTimestampInRange(long long from, long long to);
+    void QueryFeedDataByFeedIdOrderByTimestampInRange(long long from, long long to);
+    void QueryFeedDataByFeedIdByTitleOrderByTimestampInRange(long long from, long long to);
 };

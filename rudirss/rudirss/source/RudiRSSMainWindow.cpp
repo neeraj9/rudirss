@@ -130,13 +130,15 @@ LRESULT RudiRSSMainWindow::OnCommand(HWND hWnd, UINT message, WPARAM wParam, LPA
     case ID_FEED_ITEM_MENU_MARK_AS_READ:
     case ID_FEED_ITEM_MENU_MARK_AS_UNREAD:
     {
-        int lastRightClickedItem = m_feedItemListView.GetLastRightClickedItem();
-        long long feeddataid = GetLastSelectedFeedDataId();
-        if (FeedDatabase::INVALID_FEEDDATA_ID != feeddataid)
+        FeedDatabase::FeedData feedData;
+        bool result = false;
+        auto it = m_feedItemListView.GetRightClickedFeedDataIteratorFromCache(feedData, result);
+        if (result)
         {
             long long read = static_cast<long long>(ID_FEED_ITEM_MENU_MARK_AS_READ == id);
-            m_rudiRSSClient.UpdateFeedDataReadColumn(feeddataid, read);
-            m_feedItemListView.UpdateReadStateInCache(lastRightClickedItem, read);
+            m_rudiRSSClient.UpdateFeedDataReadColumn(feedData.feeddataid, read);
+            it->second.read = read;
+            ListView_Update(m_feedItemListView.m_hWnd, it->first);
         }
     }
     break;
@@ -144,8 +146,7 @@ LRESULT RudiRSSMainWindow::OnCommand(HWND hWnd, UINT message, WPARAM wParam, LPA
     case ID_FEED_ITEM_MENU_COPY_TITLE:
     {
         FeedDatabase::FeedData feedData;
-        auto result = GetLastSelectedFeedData(feedData);
-        if (result)
+        if (m_feedItemListView.GetRightClickedFeedDataFromCache(feedData))
         {
             std::wstring title;
             FeedCommon::ConvertStringToWideString(feedData.title, title);
@@ -157,8 +158,7 @@ LRESULT RudiRSSMainWindow::OnCommand(HWND hWnd, UINT message, WPARAM wParam, LPA
     case ID_FEED_ITEM_MENU_COPY_LINK:
     {
         FeedDatabase::FeedData feedData;
-        auto result = GetLastSelectedFeedData(feedData);
-        if (result)
+        if (m_feedItemListView.GetRightClickedFeedDataFromCache(feedData))
         {
             std::wstring link;
             FeedCommon::ConvertStringToWideString(feedData.link, link);
@@ -170,8 +170,7 @@ LRESULT RudiRSSMainWindow::OnCommand(HWND hWnd, UINT message, WPARAM wParam, LPA
     case ID_FEED_ITEM_MENU_OPEN_WITH_DEFAULT_BROWSER:
     {
         FeedDatabase::FeedData feedData;
-        auto result = GetLastSelectedFeedData(feedData);
-        if (result)
+        if (m_feedItemListView.GetRightClickedFeedDataFromCache(feedData))
         {
             std::wstring link;
             FeedCommon::ConvertStringToWideString(feedData.link, link);
@@ -458,40 +457,6 @@ void RudiRSSMainWindow::OpenImportListFileDialog()
 BOOL RudiRSSMainWindow::IsViewerInitialized()
 {
     return InterlockedOr(reinterpret_cast<LONG*>(&m_initViewer), 0);
-}
-
-long long RudiRSSMainWindow::GetLastSelectedFeedDataId()
-{
-    int lastRightClickedItem = m_feedItemListView.GetLastRightClickedItem();
-    long long feeddataid = FeedDatabase::INVALID_FEEDDATA_ID;
-    if (FeedListView::ALL_FEEDS_LIST_INDEX == m_feedListView.GetLastSelectedFeedIndex())
-    {
-        m_rudiRSSClient.QueryFeedDataByOffsetOrderByTimestamp(lastRightClickedItem, [&](const FeedDatabase::FeedData& feedData) {
-            feeddataid = feedData.feeddataid;
-            });
-    }
-    else
-    {
-        m_rudiRSSClient.QueryFeedDataByFeedIdByOffsetOrderByTimestamp(m_feedListView.GetLastSelectedFeedId(),
-            lastRightClickedItem,
-            [&](const FeedDatabase::FeedData& feedData) {
-                feeddataid = feedData.feeddataid;
-            });
-    }
-
-    return feeddataid;
-}
-
-bool RudiRSSMainWindow::GetLastSelectedFeedData(FeedDatabase::FeedData& feedData)
-{
-    bool result = false;
-    m_rudiRSSClient.QueryFeedDataByFeedDataId(GetLastSelectedFeedDataId(),
-        [&](const FeedDatabase::FeedData& feedDataResult) {
-            feedData = feedDataResult;
-            result = true;
-        });
-
-    return result;
 }
 
 void RudiRSSMainWindow::ClearLastSearchResult()
