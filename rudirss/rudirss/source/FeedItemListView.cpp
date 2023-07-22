@@ -300,12 +300,11 @@ bool FeedItemListView::GetRightClickedFeedDataFromCache(FeedDatabase::FeedData& 
     return result;
 }
 
- ListViewCache<FeedDatabase::FeedData>::iterator FeedItemListView::GetRightClickedFeedDataIteratorFromCache(FeedDatabase::FeedData& feedData, bool& result)
+ ListViewCache<FeedDatabase::FeedData>::iterator FeedItemListView::GetRightClickedFeedDataIteratorFromCache(bool& result)
 {
     auto it = m_cache.find(static_cast<long long>(m_lastRighClickedItem));
     if (it != m_cache.end())
     {
-        feedData = it->second;
         result = true;
     }
     return it;

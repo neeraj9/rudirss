@@ -130,13 +130,12 @@ LRESULT RudiRSSMainWindow::OnCommand(HWND hWnd, UINT message, WPARAM wParam, LPA
     case ID_FEED_ITEM_MENU_MARK_AS_READ:
     case ID_FEED_ITEM_MENU_MARK_AS_UNREAD:
     {
-        FeedDatabase::FeedData feedData;
         bool result = false;
-        auto it = m_feedItemListView.GetRightClickedFeedDataIteratorFromCache(feedData, result);
+        auto it = m_feedItemListView.GetRightClickedFeedDataIteratorFromCache(result);
         if (result)
         {
             long long read = static_cast<long long>(ID_FEED_ITEM_MENU_MARK_AS_READ == id);
-            m_rudiRSSClient.UpdateFeedDataReadColumn(feedData.feeddataid, read);
+            m_rudiRSSClient.UpdateFeedDataReadColumn(it->second.feeddataid, read);
             it->second.read = read;
             ListView_Update(m_feedItemListView.m_hWnd, it->first);
         }
@@ -209,19 +208,19 @@ LRESULT RudiRSSMainWindow::OnCommand(HWND hWnd, UINT message, WPARAM wParam, LPA
 
     case ID_FEED_MENU_DELETE_THIS_FEED:
     {
-        int lastRightClickedItem = m_feedListView.GetLastRightClickedItem();
-        if (FeedListView::ALL_FEEDS_LIST_INDEX != lastRightClickedItem)
+        bool result = false;
+        auto it = m_feedListView.GetRightClickedFeedIteratorFromCache(result);
+        if (result)
         {
             std::wstring title;
-            m_rudiRSSClient.QueryFeedByOffset(static_cast<long long>(lastRightClickedItem - 1), [&](const FeedDatabase::Feed &feed) {
-                FeedCommon::ConvertStringToWideString(feed.title, title);
-                });
+            FeedCommon::ConvertStringToWideString(it->second.title, title);
 
             if (IDYES == MessageBox(hWnd, std::format(L"Delete the feed '{}'?", title).c_str(), L"Delete the feed", MB_ICONWARNING | MB_YESNO))
             {
-                m_rudiRSSClient.DeleteFeedByOffset(lastRightClickedItem - 1);
+                int lastRightClickedItem = it->first;
+                m_rudiRSSClient.DeleteFeedByFeedId(it->second.feedid);
                 m_feedListView.UpdateFeedListFromDatabase();
-                if (lastRightClickedItem == m_feedListView.GetLastSelectedFeedIndex())
+                if (lastRightClickedItem == m_feedListView.GetLastSelectedFeedIndex() - 1)
                 {
                     m_feedListView.ResetLastSelectedFeedIndex();
                     m_feedItemListView.DeleteAllItems();

@@ -33,6 +33,7 @@ public:
     virtual void ClearCache();
 
     const int GetLastRightClickedItem() const { return m_lastRighClickedItem; }
+    ListViewCache<FeedDatabase::Feed>::iterator GetRightClickedFeedIteratorFromCache(bool &result);
 
 protected:
     long long m_lastSelectedFeedId;

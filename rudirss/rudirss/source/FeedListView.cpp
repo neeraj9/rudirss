@@ -224,3 +224,13 @@ void FeedListView::ClearCache()
 {
     m_cache.clear();
 }
+
+ListViewCache<FeedDatabase::Feed>::iterator FeedListView::GetRightClickedFeedIteratorFromCache(bool& result)
+{
+    auto it = m_cache.find(static_cast<long long>(m_lastRighClickedItem - 1)); // Minus 1 (the offset start after 'All feeds')
+    if (it != m_cache.end())
+    {
+        result = true;
+    }
+    return it;
+}

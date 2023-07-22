@@ -26,7 +26,7 @@ public:
 
     const int GetLastRightClickedItem() const { return m_lastRighClickedItem; }
     bool GetRightClickedFeedDataFromCache(FeedDatabase::FeedData& feedData);
-    ListViewCache<FeedDatabase::FeedData>::iterator GetRightClickedFeedDataIteratorFromCache(FeedDatabase::FeedData& feedData, bool &result);
+    ListViewCache<FeedDatabase::FeedData>::iterator GetRightClickedFeedDataIteratorFromCache(bool &result);
 
 protected:
     int m_titleColumnWidth;

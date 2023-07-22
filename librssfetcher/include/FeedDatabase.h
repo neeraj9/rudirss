@@ -47,6 +47,20 @@ public:
 
             return *this;
         }
+        Feed& operator=(const Feed& rhs)
+        {
+            if (this != &rhs)
+            {
+                feedid = rhs.feedid;
+                guid = rhs.guid;
+                url = rhs.url;
+                title = rhs.title;
+                duetime = rhs.duetime;
+                updateinterval = rhs.updateinterval;
+            }
+
+            return *this;
+        }
     };
 
     static const long long INVALID_FEED_ID = -1;
