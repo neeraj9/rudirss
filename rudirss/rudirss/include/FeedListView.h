@@ -41,4 +41,6 @@ protected:
     int m_lastRighClickedItem;
     RudiRSSMainWindow* m_mainWindow;
     ListViewCache<FeedDatabase::Feed> m_cache;
+
+    void QueryFeedByOffsetInRange(long long from, long long to);
 };

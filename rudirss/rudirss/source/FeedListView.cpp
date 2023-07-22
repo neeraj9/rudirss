@@ -83,11 +83,7 @@ LRESULT FeedListView::OnProcessMessage(HWND hWnd, UINT message, WPARAM wParam, L
             to--;
         if (m_cache.empty())
         {
-            long long idx = from;
-            m_mainWindow->GetRudiRSSClient().QueryFeedByOffsetInRange(to - from + 1,
-                from, [&](const FeedDatabase::Feed& feed) {
-                    m_cache.insert(std::pair<long long, FeedDatabase::Feed>(idx++, feed));
-                });
+            QueryFeedByOffsetInRange(from, to);
         }
         else
         {
@@ -100,11 +96,7 @@ LRESULT FeedListView::OnProcessMessage(HWND hWnd, UINT message, WPARAM wParam, L
                 else
                     m_cache.DeleteFrontElements(cnt);
 
-                long long idx = from;
-                m_mainWindow->GetRudiRSSClient().QueryFeedByOffsetInRange(to - from + 1,
-                    from, [&](const FeedDatabase::Feed& feed) {
-                        m_cache.insert(std::pair<long long, FeedDatabase::Feed>(idx++, feed));
-                    });
+                QueryFeedByOffsetInRange(from, to);
             }
         }
     }
@@ -233,4 +225,13 @@ ListViewCache<FeedDatabase::Feed>::iterator FeedListView::GetRightClickedFeedIte
         result = true;
     }
     return it;
+}
+
+void FeedListView::QueryFeedByOffsetInRange(long long from, long long to)
+{
+    long long idx = from;
+    m_mainWindow->GetRudiRSSClient().QueryFeedByOffsetInRange(to - from + 1,
+        from, [&](const FeedDatabase::Feed& feed) {
+            m_cache.insert(std::pair<long long, FeedDatabase::Feed>(idx++, feed));
+        });
 }
