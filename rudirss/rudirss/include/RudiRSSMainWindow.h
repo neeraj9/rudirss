@@ -20,10 +20,11 @@ protected:
     Viewer m_viewer;
     BOOL m_initViewer;
     RudiRSSClient m_rudiRSSClient;
-    SearchBox m_feedItemSearchBox;
-    std::string m_lastFeedItemSearchText;
-    SearchBox m_feedSourceSearchBox;
-    std::string m_lastFeedSourceSearchText;
+    SearchBox m_searchBox;
+    std::string m_lastSearchText;
+    WindowHandle m_comboSearchType;
+    static const int DEFAULT_SEARCH_TPYE_COMBOBOX_WIDTH = 100;
+    static const int DEFAULT_SEARCH_TPYE_COMBOBOX_HEIGHT = 16;
 
     HFONT m_font;
     HFONT m_boldFont;
@@ -59,9 +60,9 @@ public:
     const HFONT GetDefaultFont() const { return m_font; }
     const HFONT GetBoldFont() const { return m_boldFont; }
 
-    const std::string &GetLastFeedItemSearchText() const { return m_lastFeedItemSearchText; }
+    const std::string &GetLastSearchText() const { return m_lastSearchText; }
     void ClearLastSearchResult();
     void ClearSearchBox();
 
-    const std::string &GetLastFeedSourceSearchText() const { return m_lastFeedSourceSearchText; }
+    SearchBox::SearchType GetSearchType();
 };

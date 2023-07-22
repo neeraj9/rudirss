@@ -8,7 +8,13 @@ class SearchBox : public WindowHandle
 {
 public:
     static const int DEFAULT_WIDTH = 300;
-    static const int DEFAULT_HEIGHT = 20;
+    static const int DEFAULT_HEIGHT = 24;
+
+    enum class SearchType
+    {
+        SOURCE_FEEDS,
+        FEED_ITEMS,
+    };
 
     SearchBox();
     virtual ~SearchBox();

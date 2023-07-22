@@ -106,8 +106,6 @@ LRESULT FeedListView::OnProcessMessage(HWND hWnd, UINT message, WPARAM wParam, L
 
     case NM_CLICK:
     {
-        m_mainWindow->ClearLastSearchResult();
-        m_mainWindow->ClearSearchBox();
         InterlockedExchange(reinterpret_cast<long*>(&m_lastSelectedFeedIndex), itemActivate->iItem);
         if (ALL_FEEDS_LIST_INDEX != itemActivate->iItem)
         {
@@ -236,7 +234,8 @@ void FeedListView::QueryFeedByOffsetInRange(long long from, long long to)
     {
     case DisplayConfiguration::FeedSortMethod::ASC:
     {
-        if (m_mainWindow->GetLastFeedSourceSearchText().empty())
+        if (SearchBox::SearchType::FEED_ITEMS == m_mainWindow->GetSearchType()
+            || m_mainWindow->GetLastSearchText().empty())
         {
             m_mainWindow->GetRudiRSSClient().QueryFeedByOffsetOrderByTitleASCInRange(to - from + 1,
                 from, [&](const FeedDatabase::Feed& feed) {
@@ -245,7 +244,7 @@ void FeedListView::QueryFeedByOffsetInRange(long long from, long long to)
         }
         else
         {
-            std::string query = std::format("%{}%", m_mainWindow->GetLastFeedSourceSearchText());
+            std::string query = std::format("%{}%", m_mainWindow->GetLastSearchText());
             m_mainWindow->GetRudiRSSClient().QueryFeedByTitleByOffsetOrderByTitleASCInRange(query, to - from + 1,
                 from, [&](const FeedDatabase::Feed& feed) {
                     m_cache.insert(std::pair<long long, FeedDatabase::Feed>(idx++, feed));
@@ -256,7 +255,8 @@ void FeedListView::QueryFeedByOffsetInRange(long long from, long long to)
 
     case DisplayConfiguration::FeedSortMethod::DESC:
     {
-        if (m_mainWindow->GetLastFeedSourceSearchText().empty())
+        if (SearchBox::SearchType::FEED_ITEMS == m_mainWindow->GetSearchType()
+            || m_mainWindow->GetLastSearchText().empty())
         {
             m_mainWindow->GetRudiRSSClient().QueryFeedByOffsetOrderByTitleDESCInRange(to - from + 1,
                 from, [&](const FeedDatabase::Feed& feed) {
@@ -265,7 +265,7 @@ void FeedListView::QueryFeedByOffsetInRange(long long from, long long to)
         }
         else
         {
-            std::string query = std::format("%{}%", m_mainWindow->GetLastFeedSourceSearchText());
+            std::string query = std::format("%{}%", m_mainWindow->GetLastSearchText());
             m_mainWindow->GetRudiRSSClient().QueryFeedByTitleByOffsetOrderByTitleDESCInRange(query, to - from + 1,
                 from, [&](const FeedDatabase::Feed& feed) {
                     m_cache.insert(std::pair<long long, FeedDatabase::Feed>(idx++, feed));
@@ -276,7 +276,8 @@ void FeedListView::QueryFeedByOffsetInRange(long long from, long long to)
 
     default:
     {
-        if (m_mainWindow->GetLastFeedSourceSearchText().empty())
+        if (SearchBox::SearchType::FEED_ITEMS == m_mainWindow->GetSearchType()
+            || m_mainWindow->GetLastSearchText().empty())
         {
             m_mainWindow->GetRudiRSSClient().QueryFeedByOffsetInRange(to - from + 1,
                 from, [&](const FeedDatabase::Feed& feed) {
@@ -285,7 +286,7 @@ void FeedListView::QueryFeedByOffsetInRange(long long from, long long to)
         }
         else
         {
-            std::string query = std::format("%{}%", m_mainWindow->GetLastFeedSourceSearchText());
+            std::string query = std::format("%{}%", m_mainWindow->GetLastSearchText());
             m_mainWindow->GetRudiRSSClient().QueryFeedByTitleByOffsetInRange(query, to - from + 1,
                 from, [&](const FeedDatabase::Feed& feed) {
                     m_cache.insert(std::pair<long long, FeedDatabase::Feed>(idx++, feed));
