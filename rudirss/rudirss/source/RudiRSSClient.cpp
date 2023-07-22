@@ -42,6 +42,14 @@ bool RudiRSSClient::Initialize()
         LoadDatabaseConfiguration(dbConfig);
         if (dbConfig.allowDeleteOutdatedFeedItems)
             DeleteOutdatedFeedData(dbConfig.reserveDays);
+
+#if 0
+        int n = 0;
+        m_db.QueryFeedByTitleByOffsetInRange("%emacs%", 4, 0, [&](const FeedDatabase::Feed& feed) {
+            n++;
+            });
+        n = 0;
+#endif
     }
     catch (const std::exception& e)
     {
@@ -387,6 +395,26 @@ bool RudiRSSClient::QueryFeedDataByFeedIdByTitleOrderByTimestampInRange(long lon
     FeedDatabase::FN_QUERY_FEED_DATA fnQueryFeedData)
 {
     return m_db.QueryFeedDataByFeedIdByTitleOrderByTimestampInRange(feedid, title, limit, offset, fnQueryFeedData);
+}
+
+bool RudiRSSClient::QueryFeedCountByTitle(const std::string& title, long long& count)
+{
+    return m_db.QueryFeedCountByTitle(title, count);
+}
+
+bool RudiRSSClient::QueryFeedByTitleByOffsetInRange(const std::string& title, long long limit, long long offset, FeedDatabase::FN_QUERY_FEED fnQueryFeed)
+{
+    return m_db.QueryFeedByTitleByOffsetInRange(title, limit, offset, fnQueryFeed);
+}
+
+bool RudiRSSClient::QueryFeedByTitleByOffsetOrderByTitleASCInRange(const std::string& title, long long limit, long long offset, FeedDatabase::FN_QUERY_FEED fnQueryFeed)
+{
+    return m_db.QueryFeedByTitleByOffsetOrderByTitleASCInRange(title, limit, offset, fnQueryFeed);
+}
+
+bool RudiRSSClient::QueryFeedByTitleByOffsetOrderByTitleDESCInRange(const std::string& title, long long limit, long long offset, FeedDatabase::FN_QUERY_FEED fnQueryFeed)
+{
+    return m_db.QueryFeedByTitleByOffsetOrderByTitleDESCInRange(title, limit, offset, fnQueryFeed);
 }
 
 VOID CALLBACK RudiRSSClient::WaitOrTimerCallback(PVOID param, BOOLEAN TimerOrWaitFired)

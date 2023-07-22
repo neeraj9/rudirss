@@ -13,7 +13,7 @@ SearchBox::~SearchBox()
 
 }
 
-void SearchBox::Initialize(int x, int y, int width, int height, HWND hWnd, HINSTANCE hInstance, HMENU searchBoxId)
+void SearchBox::Initialize(int x, int y, int width, int height, HWND hWnd, HINSTANCE hInstance, HMENU searchBoxId, const std::wstring &cueText)
 {
     if (Attach(CreateWindowEx(WS_EX_CLIENTEDGE, WC_EDIT, nullptr, WS_CHILD | WS_VISIBLE, x, y, width, height,
         hWnd, searchBoxId, hInstance, nullptr)))
@@ -21,7 +21,7 @@ void SearchBox::Initialize(int x, int y, int width, int height, HWND hWnd, HINST
         m_width = width;
         m_height = height;
 
-        SendMessage(m_hWnd, EM_SETCUEBANNER, FALSE, (LPARAM)L"Search Title");
+        SendMessage(m_hWnd, EM_SETCUEBANNER, FALSE, (LPARAM)cueText.c_str());
     }
 }
 

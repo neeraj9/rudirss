@@ -52,6 +52,10 @@ public:
     bool QueryFeedDataCountByFeedIdByTitle(long long feedid, const std::string& title, long long &count);
     bool QueryFeedDataByFeedIdByTitleOrderByTimestampInRange(long long feedid, const std::string &title, long long limit, long long offset,
         FeedDatabase::FN_QUERY_FEED_DATA fnQueryFeedData);
+    bool QueryFeedCountByTitle(const std::string& title, long long &count);
+    bool QueryFeedByTitleByOffsetInRange(const std::string &title, long long limit, long long offset, FeedDatabase::FN_QUERY_FEED fnQueryFeed);
+    bool QueryFeedByTitleByOffsetOrderByTitleASCInRange(const std::string &title, long long limit, long long offset, FeedDatabase::FN_QUERY_FEED fnQueryFeed);
+    bool QueryFeedByTitleByOffsetOrderByTitleDESCInRange(const std::string &title, long long limit, long long offset, FeedDatabase::FN_QUERY_FEED fnQueryFeed);
 
     using FN_ON_DB_NOTIFICATION = std::function<void(const FeedDatabase::FeedConsumptionUnit &)>;
     void StartRefreshFeedTimer(FN_ON_DB_NOTIFICATION fnOnDbNotification);

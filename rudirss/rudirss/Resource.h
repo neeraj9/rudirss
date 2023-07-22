@@ -13,6 +13,7 @@
 #define IDI_RUDIRSS                     107
 #define IDC_RUDIRSS                     109
 #define IDC_FEED_ITEM_SEARCH_BOX        110
+#define IDC_FEED_SOURCE_SEARCH_EDIT_CONTROL 110
 #define IDC_FEED_ITEM_SEARCH_EDIT_CONTROL 111
 #define IDR_MAINFRAME                   128
 #define IDR_FEED_ITEM_MENU              132

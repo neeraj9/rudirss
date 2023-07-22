@@ -20,9 +20,10 @@ protected:
     Viewer m_viewer;
     BOOL m_initViewer;
     RudiRSSClient m_rudiRSSClient;
-    SearchBox m_searchBox;
-    std::string m_lastSearchText;
-    long long m_lastSearchResultCount;
+    SearchBox m_feedItemSearchBox;
+    std::string m_lastFeedItemSearchText;
+    SearchBox m_feedSourceSearchBox;
+    std::string m_lastFeedSourceSearchText;
 
     HFONT m_font;
     HFONT m_boldFont;
@@ -58,8 +59,9 @@ public:
     const HFONT GetDefaultFont() const { return m_font; }
     const HFONT GetBoldFont() const { return m_boldFont; }
 
-    const std::string &GetLastSearchText() const { return m_lastSearchText; }
-    long long GetLastSearchResultCount() { return m_lastSearchResultCount; }
+    const std::string &GetLastFeedItemSearchText() const { return m_lastFeedItemSearchText; }
     void ClearLastSearchResult();
     void ClearSearchBox();
+
+    const std::string &GetLastFeedSourceSearchText() const { return m_lastFeedSourceSearchText; }
 };

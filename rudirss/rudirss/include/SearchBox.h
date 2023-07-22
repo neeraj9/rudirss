@@ -2,6 +2,8 @@
 
 #include "WindowHandle.h"
 
+#include <string>
+
 class SearchBox : public WindowHandle
 {
 public:
@@ -11,7 +13,7 @@ public:
     SearchBox();
     virtual ~SearchBox();
 
-    void Initialize(int x, int y, int width, int height, HWND hWnd, HINSTANCE hInstance, HMENU searchBoxId);
+    void Initialize(int x, int y, int width, int height, HWND hWnd, HINSTANCE hInstance, HMENU searchBoxId, const std::wstring &cueText);
     void SetFont(HFONT font);
 
     int GetWidth() const { return m_width; }
