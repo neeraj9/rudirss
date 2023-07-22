@@ -1,4 +1,5 @@
 #include "SearchBox.h"
+#include "FeedCommon.h"
 #include "resource.h"
 
 #include <CommCtrl.h>
@@ -29,4 +30,13 @@ void SearchBox::SetFont(HFONT font)
 {
     if (m_hWnd)
         SendMessage(m_hWnd, WM_SETFONT, (WPARAM)font, TRUE);
+}
+
+std::string SearchBox::GetSearchText()
+{
+    WCHAR text[MAX_PATH]{};
+    GetWindowText(m_hWnd, text, _countof(text));
+    std::string result;
+    FeedCommon::ConvertWideStringToString(text, result);
+    return std::move(result);
 }

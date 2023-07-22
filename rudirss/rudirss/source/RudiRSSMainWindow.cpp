@@ -249,14 +249,10 @@ LRESULT RudiRSSMainWindow::OnCommand(HWND hWnd, UINT message, WPARAM wParam, LPA
         {
         case EN_CHANGE:
         {
-            WCHAR text[MAX_PATH]{};
-            GetWindowText(m_feedItemSearchBox.m_hWnd, text, _countof(text));
-            std::string title;
-            FeedCommon::ConvertWideStringToString(text, title);
-            m_lastFeedItemSearchText = title;
-            if (!title.empty())
+            m_lastFeedItemSearchText = std::move(m_feedItemSearchBox.GetSearchText());
+            if (!m_lastFeedItemSearchText.empty())
             {
-                std::string query = std::format("%{}%", title);
+                std::string query = std::format("%{}%", m_lastFeedItemSearchText);
                 long long cnt = 0;
 
                 if (FeedListView::ALL_FEEDS_LIST_INDEX == m_feedListView.GetLastSelectedFeedIndex())
@@ -297,14 +293,10 @@ LRESULT RudiRSSMainWindow::OnCommand(HWND hWnd, UINT message, WPARAM wParam, LPA
         {
         case EN_CHANGE:
         {
-            WCHAR text[MAX_PATH]{};
-            GetWindowText(m_feedSourceSearchBox.m_hWnd, text, _countof(text));
-            std::string title;
-            FeedCommon::ConvertWideStringToString(text, title);
-            m_lastFeedSourceSearchText = title;
-            if (!title.empty())
+            m_lastFeedSourceSearchText = std::move(m_feedSourceSearchBox.GetSearchText());
+            if (!m_lastFeedSourceSearchText.empty())
             {
-                std::string query = std::format("%{}%", title);
+                std::string query = std::format("%{}%", m_lastFeedSourceSearchText);
                 long long cnt = 0;
 
                 m_rudiRSSClient.QueryFeedCountByTitle(query, cnt);
