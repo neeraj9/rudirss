@@ -341,7 +341,6 @@ void RudiRSSMainWindow::InittializeControl()
     RECT rc{};
     GetClientRect(m_hWnd, &rc);
     LONG height = rc.bottom - rc.top;
-    LONG viewerX = 0;
 
     m_feedItemSearchBox.Initialize(rc.right - SearchBox::DEFAULT_WIDTH, 0, SearchBox::DEFAULT_WIDTH, SearchBox::DEFAULT_HEIGHT, 
         m_hWnd, m_hInstance, (HMENU)IDC_FEED_ITEM_SEARCH_EDIT_CONTROL, L"Search feed items");
@@ -359,7 +358,7 @@ void RudiRSSMainWindow::InittializeControl()
     m_feedListView.SetFeedSortMethod(displayConfig.feedSortMethod);
     SendMessage(m_feedListView.m_hWnd, WM_SETFONT, (WPARAM)m_font, TRUE);
     GetClientRect(m_feedListView.m_hWnd, &rc);
-    viewerX += rc.right - rc.left;
+    LONG viewerX = m_feedListView.GetWidth();
 
     const int titleColWidth = displayConfig.feedItemTitleColumnWidth;
     const int updatedColWidth = displayConfig.feedItemUpdatedColumnWidth;
@@ -367,8 +366,8 @@ void RudiRSSMainWindow::InittializeControl()
         titleColWidth + updatedColWidth, height, titleColWidth, updatedColWidth);
     SendMessage(m_feedItemListView.m_hWnd, WM_SETFONT, (WPARAM)m_font, TRUE);
     GetClientRect(m_feedItemListView.m_hWnd, &rc);
+    viewerX += m_feedItemListView.GetWidth();
 
-    viewerX += rc.right - rc.left;
     RECT viewerRect{};
     GetClientRect(m_hWnd, &viewerRect);
     viewerRect.left = viewerX + 1;
@@ -398,7 +397,6 @@ void RudiRSSMainWindow::UpdateControl()
     RECT rc{};
     GetClientRect(m_hWnd, &rc);
     LONG height = rc.bottom - rc.top - SearchBox::DEFAULT_HEIGHT;
-    LONG viewerX = 0;
 
     MoveWindow(m_feedSourceSearchBox.m_hWnd, rc.right - SearchBox::DEFAULT_WIDTH * 2, 0, m_feedSourceSearchBox.GetWidth(), SearchBox::DEFAULT_HEIGHT, FALSE);
     MoveWindow(m_feedItemSearchBox.m_hWnd, rc.right - SearchBox::DEFAULT_WIDTH, 0, m_feedItemSearchBox.GetWidth(), SearchBox::DEFAULT_HEIGHT, FALSE);
@@ -406,11 +404,11 @@ void RudiRSSMainWindow::UpdateControl()
     int y = SearchBox::DEFAULT_HEIGHT + 1;
     MoveWindow(m_feedListView.m_hWnd, 0, y, m_feedListView.GetWidth(), height, FALSE);
     GetClientRect(m_feedListView.m_hWnd, &rc);
-    viewerX += rc.right - rc.left;
+    LONG viewerX = m_feedListView.GetWidth();
 
     MoveWindow(m_feedItemListView.m_hWnd, rc.right + 1, y, m_feedItemListView.GetWidth(), height, FALSE);
     GetClientRect(m_feedItemListView.m_hWnd, &rc);
-    viewerX += rc.right - rc.left;
+    viewerX += m_feedItemListView.GetWidth();
 
     if (InterlockedOr(reinterpret_cast<LONG*>(&m_initViewer), 0))
     {
