@@ -83,6 +83,16 @@ void FeedDatabase::Initialize()
     if (0 != ret)
         throw std::runtime_error("Error: cannot prepare query statement for all feeds.");
 
+    stmt = "SELECT * FROM Feed ORDER BY title ASC";
+    ret = sqlite3_prepare_v2(m_sql.m_handle, stmt.c_str(), stmt.length(), &m_queryAllFeedsOrderByTitleASCStmt.m_handle, nullptr);
+    if (0 != ret)
+        throw std::runtime_error("Error: cannot prepare query statement for all feeds order by title ASC.");
+
+    stmt = "SELECT * FROM Feed ORDER BY title DESC";
+    ret = sqlite3_prepare_v2(m_sql.m_handle, stmt.c_str(), stmt.length(), &m_queryAllFeedsOrderByTitleDESCStmt.m_handle, nullptr);
+    if (0 != ret)
+        throw std::runtime_error("Error: cannot prepare query statement for all feeds order by title DESC.");
+
     stmt = "SELECT * FROM FeedData WHERE feedid = ?";
     ret = sqlite3_prepare_v2(m_sql.m_handle, stmt.c_str(), stmt.length(), &m_queryFeedDataByFeedIdStmt.m_handle, nullptr);
     if (0 != ret)
@@ -178,6 +188,16 @@ void FeedDatabase::Initialize()
     if (0 != ret)
         throw std::runtime_error("Error: cannot prepare query statement by limit and offset for feed.");
 
+    stmt = "SELECT * FROM Feed ORDER BY title ASC LIMIT ? OFFSET ?";
+    ret = sqlite3_prepare_v2(m_sql.m_handle, stmt.c_str(), stmt.length(), &m_queryFeedsOrderByTitleASCInRangeStmt.m_handle, nullptr);
+    if (0 != ret)
+        throw std::runtime_error("Error: cannot prepare query statement by limit and offset for feeds order by title ASC.");
+
+    stmt = "SELECT * FROM Feed ORDER BY title DESC LIMIT ? OFFSET ?";
+    ret = sqlite3_prepare_v2(m_sql.m_handle, stmt.c_str(), stmt.length(), &m_queryFeedsOrderByTitleDESCInRangeStmt.m_handle, nullptr);
+    if (0 != ret)
+        throw std::runtime_error("Error: cannot prepare query statement by limit and offset for feeds order by title DESC.");
+
     stmt = "SELECT * FROM FeedData ORDER BY timestamp DESC LIMIT ? OFFSET ?";
     ret = sqlite3_prepare_v2(m_sql.m_handle, stmt.c_str(), stmt.length(), &m_queryFeedDataOrderByTimestampInRangeStmt.m_handle, nullptr);
     if (0 != ret)
@@ -247,6 +267,10 @@ void FeedDatabase::Close()
     m_queryFeedDataByTitleOrderByTimestampInRangeStmt.Close();
     m_queryFeedDataCountByFeedIdByTitle.Close();
     m_queryFeedDataByFeedIdByTitleOrderByTimestampInRangeStmt.Close();
+    m_queryAllFeedsOrderByTitleASCStmt.Close();
+    m_queryAllFeedsOrderByTitleDESCStmt.Close();
+    m_queryFeedsOrderByTitleASCInRangeStmt.Close();
+    m_queryFeedsOrderByTitleDESCInRangeStmt.Close();
 
     m_sql.Close();
 }
@@ -359,6 +383,44 @@ bool FeedDatabase::QueryAllFeeds(FN_QUERY_FEED fnQueryFeed)
         fnQueryFeed(feed);
     }
     sqlite3_reset(m_queryAllFeedsStmt.m_handle);
+
+    return SQLITE_DONE == ret;
+}
+
+bool FeedDatabase::QueryAllFeedsOrderByTitleASC(FN_QUERY_FEED fnQueryFeed)
+{
+    ATL::CComCritSecLock lock(m_dbLock);
+    if (!m_queryAllFeedsOrderByTitleASCStmt.m_handle
+        || !fnQueryFeed)
+        return false;
+
+    Feed feed;
+    int ret = SQLITE_OK;
+    while (SQLITE_ROW == (ret = sqlite3_step(m_queryAllFeedsOrderByTitleASCStmt.m_handle)))
+    {
+        QueryFeed(feed, m_queryAllFeedsOrderByTitleASCStmt.m_handle);
+        fnQueryFeed(feed);
+    }
+    sqlite3_reset(m_queryAllFeedsOrderByTitleASCStmt.m_handle);
+
+    return SQLITE_DONE == ret;
+}
+
+bool FeedDatabase::QueryAllFeedsOrderByTitleDESC(FN_QUERY_FEED fnQueryFeed)
+{
+    ATL::CComCritSecLock lock(m_dbLock);
+    if (!m_queryAllFeedsOrderByTitleDESCStmt.m_handle
+        || !fnQueryFeed)
+        return false;
+
+    Feed feed;
+    int ret = SQLITE_OK;
+    while (SQLITE_ROW == (ret = sqlite3_step(m_queryAllFeedsOrderByTitleDESCStmt.m_handle)))
+    {
+        QueryFeed(feed, m_queryAllFeedsOrderByTitleDESCStmt.m_handle);
+        fnQueryFeed(feed);
+    }
+    sqlite3_reset(m_queryAllFeedsOrderByTitleDESCStmt.m_handle);
 
     return SQLITE_DONE == ret;
 }
@@ -695,6 +757,52 @@ bool FeedDatabase::QueryFeedByOffsetInRange(long long limit, long long offset, F
             fnQueryFeed(feed);
         }
         sqlite3_reset(m_queryFeedByOffsetInRangeStmt.m_handle);
+    }
+
+    return SQLITE_DONE == ret;
+}
+
+bool FeedDatabase::QueryFeedByOffsetOrderByTitleASCInRange(long long limit, long long offset, FN_QUERY_FEED fnQueryFeed)
+{
+    ATL::CComCritSecLock lock(m_dbLock);
+    if (!m_queryFeedsOrderByTitleASCInRangeStmt.m_handle
+        || !fnQueryFeed)
+        return false;
+
+    int ret = SQLITE_OK;
+    if (SQLITE_OK == (ret = sqlite3_bind_int64(m_queryFeedsOrderByTitleASCInRangeStmt.m_handle, 1, limit))
+        && SQLITE_OK == (ret = sqlite3_bind_int64(m_queryFeedsOrderByTitleASCInRangeStmt.m_handle, 2, offset)))
+    {
+        Feed feed;
+        while (SQLITE_ROW == (ret = sqlite3_step(m_queryFeedsOrderByTitleASCInRangeStmt.m_handle)))
+        {
+            QueryFeed(feed, m_queryFeedsOrderByTitleASCInRangeStmt.m_handle);
+            fnQueryFeed(feed);
+        }
+        sqlite3_reset(m_queryFeedsOrderByTitleASCInRangeStmt.m_handle);
+    }
+
+    return SQLITE_DONE == ret;
+}
+
+bool FeedDatabase::QueryFeedByOffsetOrderByTitleDESCInRange(long long limit, long long offset, FN_QUERY_FEED fnQueryFeed)
+{
+    ATL::CComCritSecLock lock(m_dbLock);
+    if (!m_queryFeedsOrderByTitleDESCInRangeStmt.m_handle
+        || !fnQueryFeed)
+        return false;
+
+    int ret = SQLITE_OK;
+    if (SQLITE_OK == (ret = sqlite3_bind_int64(m_queryFeedsOrderByTitleDESCInRangeStmt.m_handle, 1, limit))
+        && SQLITE_OK == (ret = sqlite3_bind_int64(m_queryFeedsOrderByTitleDESCInRangeStmt.m_handle, 2, offset)))
+    {
+        Feed feed;
+        while (SQLITE_ROW == (ret = sqlite3_step(m_queryFeedsOrderByTitleDESCInRangeStmt.m_handle)))
+        {
+            QueryFeed(feed, m_queryFeedsOrderByTitleDESCInRangeStmt.m_handle);
+            fnQueryFeed(feed);
+        }
+        sqlite3_reset(m_queryFeedsOrderByTitleDESCInRangeStmt.m_handle);
     }
 
     return SQLITE_DONE == ret;

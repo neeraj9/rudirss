@@ -166,6 +166,8 @@ public:
     bool QueryFeed(long long feedId, FN_QUERY_FEED fnQueryFeed);
     bool QueryFeedByGuid(const std::string& guid, FN_QUERY_FEED fnQueryFeed);
     bool QueryAllFeeds(FN_QUERY_FEED fnQueryFeed);
+    bool QueryAllFeedsOrderByTitleASC(FN_QUERY_FEED fnQueryFeed);
+    bool QueryAllFeedsOrderByTitleDESC(FN_QUERY_FEED fnQueryFeed);
     bool QueryFeedDataByFeedId(long long feedid, FN_QUERY_FEED_DATA fnQueryFeedData);
     bool QueryFeedDataOrderByTimestamp(long long feedid, FN_QUERY_FEED_DATA fnQueryFeedData);
     bool QueryFeedDataByOffsetOrderByTimestamp(long long offset, FN_QUERY_FEED_DATA fnQueryFeedData);
@@ -184,6 +186,8 @@ public:
     bool QueryFeedTableCount(long long &count);
     bool QueryFeedByOffset(long long offset, FN_QUERY_FEED fnQueryFeed);
     bool QueryFeedByOffsetInRange(long long limit, long long offset, FN_QUERY_FEED fnQueryFeed);
+    bool QueryFeedByOffsetOrderByTitleASCInRange(long long limit, long long offset, FN_QUERY_FEED fnQueryFeed);
+    bool QueryFeedByOffsetOrderByTitleDESCInRange(long long limit, long long offset, FN_QUERY_FEED fnQueryFeed);
     bool QueryFeedDataByOffset(long long offset, FN_QUERY_FEED_DATA fnQueryFeedData);
     bool QueryFeedDataOrderByTimestampInRange(long long limit, long long offset, FN_QUERY_FEED_DATA fnQueryFeedData);
     bool QueryFeedDataByFeedIdOrderByTimestampInRange(long long feedid, long long limit, long long offset, FN_QUERY_FEED_DATA fnQueryFeedData);
@@ -227,6 +231,10 @@ protected:
     SQLite3StmtHandle m_queryFeedDataByTitleOrderByTimestampInRangeStmt;
     SQLite3StmtHandle m_queryFeedDataCountByFeedIdByTitle;
     SQLite3StmtHandle m_queryFeedDataByFeedIdByTitleOrderByTimestampInRangeStmt;
+    SQLite3StmtHandle m_queryAllFeedsOrderByTitleASCStmt;
+    SQLite3StmtHandle m_queryAllFeedsOrderByTitleDESCStmt;
+    SQLite3StmtHandle m_queryFeedsOrderByTitleASCInRangeStmt;
+    SQLite3StmtHandle m_queryFeedsOrderByTitleDESCInRangeStmt;
 
     ATL::CComCriticalSection m_dbLock;
 

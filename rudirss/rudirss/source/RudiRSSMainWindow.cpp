@@ -324,6 +324,7 @@ void RudiRSSMainWindow::InittializeControl()
     m_rudiRSSClient.LoadDisplayConfiguration(displayConfig);
 
     m_feedListView.Initialize(m_hWnd, m_hInstance, (HMENU)IDC_FEED_LIST_VIEW, 0, y, displayConfig.feedWidth, height);
+    m_feedListView.SetFeedSortMethod(displayConfig.feedSortMethod);
     SendMessage(m_feedListView.m_hWnd, WM_SETFONT, (WPARAM)m_font, TRUE);
     GetClientRect(m_feedListView.m_hWnd, &rc);
     viewerX += rc.right - rc.left;

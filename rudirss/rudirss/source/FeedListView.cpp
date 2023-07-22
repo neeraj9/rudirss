@@ -8,12 +8,13 @@
 #include <CommCtrl.h>
 
 FeedListView::FeedListView() : m_mainWindow{ nullptr }, m_lastSelectedFeedId{ FeedDatabase::INVALID_FEED_ID }, m_lastSelectedFeedIndex{ -1 },
-m_lastRighClickedItem{ -1 }
+m_lastRighClickedItem{ -1 }, m_feedSortMethod{ DisplayConfiguration::FeedSortMethod::ASC }
 {
 }
 
 FeedListView::FeedListView(RudiRSSMainWindow* mainWindow) : m_mainWindow{ mainWindow }, 
-m_lastSelectedFeedId{ FeedDatabase::INVALID_FEED_ID }, m_lastSelectedFeedIndex{ -1 }, m_lastRighClickedItem{ -1 }
+m_lastSelectedFeedId{ FeedDatabase::INVALID_FEED_ID }, m_lastSelectedFeedIndex{ -1 }, m_lastRighClickedItem{ -1 },
+m_feedSortMethod{ DisplayConfiguration::FeedSortMethod::ASC }
 {
 
 }
@@ -230,8 +231,27 @@ ListViewCache<FeedDatabase::Feed>::iterator FeedListView::GetRightClickedFeedIte
 void FeedListView::QueryFeedByOffsetInRange(long long from, long long to)
 {
     long long idx = from;
-    m_mainWindow->GetRudiRSSClient().QueryFeedByOffsetInRange(to - from + 1,
-        from, [&](const FeedDatabase::Feed& feed) {
-            m_cache.insert(std::pair<long long, FeedDatabase::Feed>(idx++, feed));
-        });
+    switch (m_feedSortMethod)
+    {
+    case DisplayConfiguration::FeedSortMethod::ASC:
+        m_mainWindow->GetRudiRSSClient().QueryFeedByOffsetOrderByTitleASCInRange(to - from + 1,
+            from, [&](const FeedDatabase::Feed& feed) {
+                m_cache.insert(std::pair<long long, FeedDatabase::Feed>(idx++, feed));
+            });
+        break;
+
+    case DisplayConfiguration::FeedSortMethod::DESC:
+        m_mainWindow->GetRudiRSSClient().QueryFeedByOffsetOrderByTitleDESCInRange(to - from + 1,
+            from, [&](const FeedDatabase::Feed& feed) {
+                m_cache.insert(std::pair<long long, FeedDatabase::Feed>(idx++, feed));
+            });
+        break;
+
+    default:
+        m_mainWindow->GetRudiRSSClient().QueryFeedByOffsetInRange(to - from + 1,
+            from, [&](const FeedDatabase::Feed& feed) {
+                m_cache.insert(std::pair<long long, FeedDatabase::Feed>(idx++, feed));
+            });
+        break;
+    }
 }

@@ -233,6 +233,16 @@ bool RudiRSSClient::QueryAllFeeds(FeedDatabase::FN_QUERY_FEED fnQueryFeed)
     return m_db.QueryAllFeeds(fnQueryFeed);
 }
 
+bool RudiRSSClient::QueryAllFeedsOrderByTitleASC(FeedDatabase::FN_QUERY_FEED fnQueryFeed)
+{
+    return m_db.QueryAllFeedsOrderByTitleASC(fnQueryFeed);
+}
+
+bool RudiRSSClient::QueryAllFeedsOrderByTitleDESC(FeedDatabase::FN_QUERY_FEED fnQueryFeed)
+{
+    return m_db.QueryAllFeedsOrderByTitleDESC(fnQueryFeed);
+}
+
 bool RudiRSSClient::QueryFeedDataByFeedId(long long feedid, FeedDatabase::FN_QUERY_FEED_DATA fnQueryFeedData)
 {
     return m_db.QueryFeedDataByFeedId(feedid, fnQueryFeedData);
@@ -320,6 +330,16 @@ bool RudiRSSClient::QueryFeedByOffset(long long offset, FeedDatabase::FN_QUERY_F
 bool RudiRSSClient::QueryFeedByOffsetInRange(long long limit, long long offset, FeedDatabase::FN_QUERY_FEED fnQueryFeed)
 {
     return m_db.QueryFeedByOffsetInRange(limit, offset, fnQueryFeed);
+}
+
+bool RudiRSSClient::QueryFeedByOffsetOrderByTitleASCInRange(long long limit, long long offset, FeedDatabase::FN_QUERY_FEED fnQueryFeed)
+{
+    return m_db.QueryFeedByOffsetOrderByTitleASCInRange(limit, offset, fnQueryFeed);
+}
+
+bool RudiRSSClient::QueryFeedByOffsetOrderByTitleDESCInRange(long long limit, long long offset, FeedDatabase::FN_QUERY_FEED fnQueryFeed)
+{
+    return m_db.QueryFeedByOffsetOrderByTitleDESCInRange(limit, offset, fnQueryFeed);
 }
 
 bool RudiRSSClient::QueryFeedDataOrderByTimestampInRange(long long limit, long long offset, FeedDatabase::FN_QUERY_FEED_DATA fnQueryFeedData)
@@ -473,6 +493,8 @@ void RudiRSSClient::LoadDisplayConfiguration(DisplayConfiguration& displayConfig
     displayConfig.feedWidth = GetPrivateProfileInt(L"Display", L"FeedWidth", 300, m_rudirssIni.c_str());
     displayConfig.feedItemTitleColumnWidth = GetPrivateProfileInt(L"Display", L"FeedItemTitleColumnWidth", 250, m_rudirssIni.c_str());
     displayConfig.feedItemUpdatedColumnWidth = GetPrivateProfileInt(L"Display", L"FeedItemUpdatedColumnWidth", 150, m_rudirssIni.c_str());
+    displayConfig.feedSortMethod = static_cast<DisplayConfiguration::FeedSortMethod>(GetPrivateProfileInt(L"Display", L"FeedSortMethod",
+        static_cast<INT>(DisplayConfiguration::FeedSortMethod::ASC), m_rudirssIni.c_str()));
 }
 
 void RudiRSSClient::SaveDisplayConfiguration(const DisplayConfiguration& displayConfig)
@@ -483,6 +505,8 @@ void RudiRSSClient::SaveDisplayConfiguration(const DisplayConfiguration& display
         std::to_wstring(static_cast<unsigned>(displayConfig.feedItemTitleColumnWidth)).c_str(), m_rudirssIni.c_str());
     WritePrivateProfileString(L"Display", L"FeedItemUpdatedColumnWidth",
         std::to_wstring(static_cast<unsigned>(displayConfig.feedItemUpdatedColumnWidth)).c_str(), m_rudirssIni.c_str());
+    WritePrivateProfileString(L"Display", L"FeedSortMethod",
+        std::to_wstring(static_cast<unsigned>(displayConfig.feedSortMethod)).c_str(), m_rudirssIni.c_str());
 }
 
 void RudiRSSClient::RefreshFeedByOffset(long long offset)

@@ -27,14 +27,24 @@ struct DatabaseConfiguration
 
 struct DisplayConfiguration
 {
+    enum class FeedSortMethod
+    {
+        NONE,
+        ASC,
+        DESC,
+    };
+
     int feedWidth;
     int feedItemTitleColumnWidth;
     int feedItemUpdatedColumnWidth;
-    DisplayConfiguration() : feedWidth{ 0 }, feedItemTitleColumnWidth{ 0 }, feedItemUpdatedColumnWidth{ 0 } {}
+    FeedSortMethod feedSortMethod;
+    DisplayConfiguration() : feedWidth{ 0 }, feedItemTitleColumnWidth{ 0 }, feedItemUpdatedColumnWidth{ 0 }, feedSortMethod{ FeedSortMethod::ASC } {}
     DisplayConfiguration(const DisplayConfiguration& rhs) : feedWidth{ rhs.feedWidth },
-        feedItemTitleColumnWidth{ rhs.feedItemTitleColumnWidth }, feedItemUpdatedColumnWidth{ rhs.feedItemUpdatedColumnWidth } {}
+        feedItemTitleColumnWidth{ rhs.feedItemTitleColumnWidth }, feedItemUpdatedColumnWidth{ rhs.feedItemUpdatedColumnWidth },
+        feedSortMethod{ rhs.feedSortMethod } {}
     DisplayConfiguration(DisplayConfiguration&& rhs) noexcept : feedWidth{ rhs.feedWidth },
-        feedItemTitleColumnWidth{ rhs.feedItemTitleColumnWidth }, feedItemUpdatedColumnWidth{ rhs.feedItemUpdatedColumnWidth } {}
+        feedItemTitleColumnWidth{ rhs.feedItemTitleColumnWidth }, feedItemUpdatedColumnWidth{ rhs.feedItemUpdatedColumnWidth },
+        feedSortMethod{ rhs.feedSortMethod } {}
     DisplayConfiguration& operator=(const DisplayConfiguration& rhs)
     {
         if (this != &rhs)
@@ -42,6 +52,7 @@ struct DisplayConfiguration
             feedWidth = rhs.feedWidth;
             feedItemTitleColumnWidth = rhs.feedItemTitleColumnWidth;
             feedItemUpdatedColumnWidth = rhs.feedItemUpdatedColumnWidth;
+            feedSortMethod = rhs.feedSortMethod;
         }
 
         return *this;
