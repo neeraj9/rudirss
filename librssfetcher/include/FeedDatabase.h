@@ -237,8 +237,8 @@ protected:
     SQLite3StmtHandle m_queryFeedDataByFeedIdByTitleOrderByTimestampInRangeStmt;
     SQLite3StmtHandle m_queryAllFeedsOrderByTitleASCStmt;
     SQLite3StmtHandle m_queryAllFeedsOrderByTitleDESCStmt;
-    SQLite3StmtHandle m_queryFeedsOrderByTitleASCInRangeStmt;
-    SQLite3StmtHandle m_queryFeedsOrderByTitleDESCInRangeStmt;
+    SQLite3StmtHandle m_queryFeedOrderByTitleASCInRangeStmt;
+    SQLite3StmtHandle m_queryFeedOrderByTitleDESCInRangeStmt;
     SQLite3StmtHandle m_queryFeedCountByTitleStmt;
     SQLite3StmtHandle m_queryFeedByTitleByOffsetInRangeStmt;
     SQLite3StmtHandle m_queryFeedByTitleByOffsetOrderByTitleASCInRangeStmt;

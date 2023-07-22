@@ -189,12 +189,12 @@ void FeedDatabase::Initialize()
         throw std::runtime_error("Error: cannot prepare query statement by limit and offset for feed.");
 
     stmt = "SELECT * FROM Feed ORDER BY title ASC LIMIT ? OFFSET ?";
-    ret = sqlite3_prepare_v2(m_sql.m_handle, stmt.c_str(), stmt.length(), &m_queryFeedsOrderByTitleASCInRangeStmt.m_handle, nullptr);
+    ret = sqlite3_prepare_v2(m_sql.m_handle, stmt.c_str(), stmt.length(), &m_queryFeedOrderByTitleASCInRangeStmt.m_handle, nullptr);
     if (0 != ret)
         throw std::runtime_error("Error: cannot prepare query statement by limit and offset for feeds order by title ASC.");
 
     stmt = "SELECT * FROM Feed ORDER BY title DESC LIMIT ? OFFSET ?";
-    ret = sqlite3_prepare_v2(m_sql.m_handle, stmt.c_str(), stmt.length(), &m_queryFeedsOrderByTitleDESCInRangeStmt.m_handle, nullptr);
+    ret = sqlite3_prepare_v2(m_sql.m_handle, stmt.c_str(), stmt.length(), &m_queryFeedOrderByTitleDESCInRangeStmt.m_handle, nullptr);
     if (0 != ret)
         throw std::runtime_error("Error: cannot prepare query statement by limit and offset for feeds order by title DESC.");
 
@@ -289,8 +289,8 @@ void FeedDatabase::Close()
     m_queryFeedDataByFeedIdByTitleOrderByTimestampInRangeStmt.Close();
     m_queryAllFeedsOrderByTitleASCStmt.Close();
     m_queryAllFeedsOrderByTitleDESCStmt.Close();
-    m_queryFeedsOrderByTitleASCInRangeStmt.Close();
-    m_queryFeedsOrderByTitleDESCInRangeStmt.Close();
+    m_queryFeedOrderByTitleASCInRangeStmt.Close();
+    m_queryFeedOrderByTitleDESCInRangeStmt.Close();
     m_queryFeedCountByTitleStmt.Close();
     m_queryFeedByTitleByOffsetInRangeStmt.Close();
     m_queryFeedByTitleByOffsetOrderByTitleASCInRangeStmt.Close();
@@ -789,21 +789,21 @@ bool FeedDatabase::QueryFeedByOffsetInRange(long long limit, long long offset, F
 bool FeedDatabase::QueryFeedByOffsetOrderByTitleASCInRange(long long limit, long long offset, FN_QUERY_FEED fnQueryFeed)
 {
     ATL::CComCritSecLock lock(m_dbLock);
-    if (!m_queryFeedsOrderByTitleASCInRangeStmt.m_handle
+    if (!m_queryFeedOrderByTitleASCInRangeStmt.m_handle
         || !fnQueryFeed)
         return false;
 
     int ret = SQLITE_OK;
-    if (SQLITE_OK == (ret = sqlite3_bind_int64(m_queryFeedsOrderByTitleASCInRangeStmt.m_handle, 1, limit))
-        && SQLITE_OK == (ret = sqlite3_bind_int64(m_queryFeedsOrderByTitleASCInRangeStmt.m_handle, 2, offset)))
+    if (SQLITE_OK == (ret = sqlite3_bind_int64(m_queryFeedOrderByTitleASCInRangeStmt.m_handle, 1, limit))
+        && SQLITE_OK == (ret = sqlite3_bind_int64(m_queryFeedOrderByTitleASCInRangeStmt.m_handle, 2, offset)))
     {
         Feed feed;
-        while (SQLITE_ROW == (ret = sqlite3_step(m_queryFeedsOrderByTitleASCInRangeStmt.m_handle)))
+        while (SQLITE_ROW == (ret = sqlite3_step(m_queryFeedOrderByTitleASCInRangeStmt.m_handle)))
         {
-            QueryFeed(feed, m_queryFeedsOrderByTitleASCInRangeStmt.m_handle);
+            QueryFeed(feed, m_queryFeedOrderByTitleASCInRangeStmt.m_handle);
             fnQueryFeed(feed);
         }
-        sqlite3_reset(m_queryFeedsOrderByTitleASCInRangeStmt.m_handle);
+        sqlite3_reset(m_queryFeedOrderByTitleASCInRangeStmt.m_handle);
     }
 
     return SQLITE_DONE == ret;
@@ -812,21 +812,21 @@ bool FeedDatabase::QueryFeedByOffsetOrderByTitleASCInRange(long long limit, long
 bool FeedDatabase::QueryFeedByOffsetOrderByTitleDESCInRange(long long limit, long long offset, FN_QUERY_FEED fnQueryFeed)
 {
     ATL::CComCritSecLock lock(m_dbLock);
-    if (!m_queryFeedsOrderByTitleDESCInRangeStmt.m_handle
+    if (!m_queryFeedOrderByTitleDESCInRangeStmt.m_handle
         || !fnQueryFeed)
         return false;
 
     int ret = SQLITE_OK;
-    if (SQLITE_OK == (ret = sqlite3_bind_int64(m_queryFeedsOrderByTitleDESCInRangeStmt.m_handle, 1, limit))
-        && SQLITE_OK == (ret = sqlite3_bind_int64(m_queryFeedsOrderByTitleDESCInRangeStmt.m_handle, 2, offset)))
+    if (SQLITE_OK == (ret = sqlite3_bind_int64(m_queryFeedOrderByTitleDESCInRangeStmt.m_handle, 1, limit))
+        && SQLITE_OK == (ret = sqlite3_bind_int64(m_queryFeedOrderByTitleDESCInRangeStmt.m_handle, 2, offset)))
     {
         Feed feed;
-        while (SQLITE_ROW == (ret = sqlite3_step(m_queryFeedsOrderByTitleDESCInRangeStmt.m_handle)))
+        while (SQLITE_ROW == (ret = sqlite3_step(m_queryFeedOrderByTitleDESCInRangeStmt.m_handle)))
         {
-            QueryFeed(feed, m_queryFeedsOrderByTitleDESCInRangeStmt.m_handle);
+            QueryFeed(feed, m_queryFeedOrderByTitleDESCInRangeStmt.m_handle);
             fnQueryFeed(feed);
         }
-        sqlite3_reset(m_queryFeedsOrderByTitleDESCInRangeStmt.m_handle);
+        sqlite3_reset(m_queryFeedOrderByTitleDESCInRangeStmt.m_handle);
     }
 
     return SQLITE_DONE == ret;
