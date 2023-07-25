@@ -50,6 +50,7 @@ namespace FeedCommon
     std::wstring GetUUID();
 
     long long ConvertDatetimeToTimestamp(FeedSpecification spec, const std::string& datetime);
+    long long ConvertDatetimeToTimestamp(const std::string& datetime);
 
     bool LoadFeedUrlsFromOPML(const std::wstring &opml, std::vector<std::wstring> &feedUrls);
     bool LoadFeedUrlsFromListFile(const std::wstring &listFile, std::vector<std::wstring> &feedUrls);

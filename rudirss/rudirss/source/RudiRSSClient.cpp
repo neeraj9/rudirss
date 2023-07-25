@@ -193,6 +193,8 @@ void RudiRSSClient::PushDBConsumptionUnit(const std::unique_ptr<Feed>& feed)
         FeedCommon::ConvertWideStringToString(feedData.GetValue(L"title"), dbFeedData.title);
         FeedCommon::ConvertWideStringToString(feedData.GetValue(FeedCommon::FeedSpecification::RSS == spec ? L"pubDate" : L"updated"), dbFeedData.datetime);
         dbFeedData.timestamp = FeedCommon::ConvertDatetimeToTimestamp(spec, dbFeedData.datetime);
+        if (0 == dbFeedData.timestamp)
+            dbFeedData.timestamp = FeedCommon::ConvertDatetimeToTimestamp(dbFeedData.datetime);
         dbFeedData.createdtime = time(nullptr);
         consumptionUnit.feedDataContainer.push_back(std::move(dbFeedData));
         return true;

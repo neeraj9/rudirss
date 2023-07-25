@@ -225,6 +225,29 @@ long long FeedCommon::ConvertDatetimeToTimestamp(FeedSpecification spec, const s
     return timestamp;
 }
 
+long long FeedCommon::ConvertDatetimeToTimestamp(const std::string& datetime)
+{
+    char text[4]{};
+    long long timestamp = 0;
+    if (1 == sscanf_s(datetime.c_str(), "%*d-%*d-%*d%1s", text, static_cast<unsigned int>(sizeof(text)))
+        && 0 == strcmp(text, "T"))
+    {
+        int year;
+        int month;
+        int day;
+        int hour;
+        int minute;
+        int second;
+        if (6 == sscanf_s(datetime.c_str(), "%d-%d-%dT%d:%d:%d", &year, &month, &day, &hour, &minute, &second))
+        {
+            CTime tmpTimestamp(year, month, day, hour, minute, second);
+            timestamp = tmpTimestamp.GetTime();
+        }
+    }
+
+    return timestamp;
+}
+
 bool FeedCommon::LoadFeedUrlsFromOPML(const std::wstring& opml, std::vector<std::wstring>& feedUrls)
 {
     bool result = false;
