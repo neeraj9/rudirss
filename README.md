@@ -60,6 +60,9 @@ FeedSortMethod=1                 ;0: unsorted; 1: ascending sorting order 2: des
 ### Update interval
 By default, each feed will update every `30` minutes. By design, each feed have its own updated interval and can be set differently, however, the implementation doesn't provide its configuration so far. An other approach to configure it is by modifying its `updateinterval` value in `Feed` table in `rudirss.db`, where `rudirss.db` is a SQLite database, any SQLite browsing tool could modify it.
 
+## Download
+- Executable binaries can be downloaded on [latest release](https://github.com/lambertlulala/rudirss/releases/latest) page.
+
 ## Future plan
 I might implement some other features:
 - Plugin system that allow users to script or load their custom libraries
