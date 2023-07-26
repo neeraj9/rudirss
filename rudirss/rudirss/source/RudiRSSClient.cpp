@@ -42,6 +42,14 @@ bool RudiRSSClient::Initialize()
         LoadDatabaseConfiguration(dbConfig);
         if (dbConfig.allowDeleteOutdatedFeedItems)
             DeleteOutdatedFeedData(dbConfig.reserveDays);
+
+#if 0
+        int n = 0;
+        m_db.QueryFeedByTitleByOffsetInRange("%emacs%", 4, 0, [&](const FeedDatabase::Feed& feed) {
+            n++;
+            });
+        n = 0;
+#endif
     }
     catch (const std::exception& e)
     {
@@ -185,6 +193,8 @@ void RudiRSSClient::PushDBConsumptionUnit(const std::unique_ptr<Feed>& feed)
         FeedCommon::ConvertWideStringToString(feedData.GetValue(L"title"), dbFeedData.title);
         FeedCommon::ConvertWideStringToString(feedData.GetValue(FeedCommon::FeedSpecification::RSS == spec ? L"pubDate" : L"updated"), dbFeedData.datetime);
         dbFeedData.timestamp = FeedCommon::ConvertDatetimeToTimestamp(spec, dbFeedData.datetime);
+        if (0 == dbFeedData.timestamp)
+            dbFeedData.timestamp = FeedCommon::ConvertDatetimeToTimestamp(dbFeedData.datetime);
         dbFeedData.createdtime = time(nullptr);
         consumptionUnit.feedDataContainer.push_back(std::move(dbFeedData));
         return true;
@@ -231,6 +241,16 @@ bool RudiRSSClient::QueryFeedByGuid(const std::string& guid, FeedDatabase::FN_QU
 bool RudiRSSClient::QueryAllFeeds(FeedDatabase::FN_QUERY_FEED fnQueryFeed)
 {
     return m_db.QueryAllFeeds(fnQueryFeed);
+}
+
+bool RudiRSSClient::QueryAllFeedsOrderByTitleASC(FeedDatabase::FN_QUERY_FEED fnQueryFeed)
+{
+    return m_db.QueryAllFeedsOrderByTitleASC(fnQueryFeed);
+}
+
+bool RudiRSSClient::QueryAllFeedsOrderByTitleDESC(FeedDatabase::FN_QUERY_FEED fnQueryFeed)
+{
+    return m_db.QueryAllFeedsOrderByTitleDESC(fnQueryFeed);
 }
 
 bool RudiRSSClient::QueryFeedDataByFeedId(long long feedid, FeedDatabase::FN_QUERY_FEED_DATA fnQueryFeedData)
@@ -322,6 +342,16 @@ bool RudiRSSClient::QueryFeedByOffsetInRange(long long limit, long long offset, 
     return m_db.QueryFeedByOffsetInRange(limit, offset, fnQueryFeed);
 }
 
+bool RudiRSSClient::QueryFeedByOffsetOrderByTitleASCInRange(long long limit, long long offset, FeedDatabase::FN_QUERY_FEED fnQueryFeed)
+{
+    return m_db.QueryFeedByOffsetOrderByTitleASCInRange(limit, offset, fnQueryFeed);
+}
+
+bool RudiRSSClient::QueryFeedByOffsetOrderByTitleDESCInRange(long long limit, long long offset, FeedDatabase::FN_QUERY_FEED fnQueryFeed)
+{
+    return m_db.QueryFeedByOffsetOrderByTitleDESCInRange(limit, offset, fnQueryFeed);
+}
+
 bool RudiRSSClient::QueryFeedDataOrderByTimestampInRange(long long limit, long long offset, FeedDatabase::FN_QUERY_FEED_DATA fnQueryFeedData)
 {
     return m_db.QueryFeedDataOrderByTimestampInRange(limit, offset, fnQueryFeedData);
@@ -345,6 +375,48 @@ bool RudiRSSClient::DeleteAllFeeds()
 bool RudiRSSClient::DeleteAllFeedData()
 {
     return m_db.DeleteAllFeedData();
+}
+
+bool RudiRSSClient::QueryFeedDataCountByTitle(const std::string& title, long long& count)
+{
+    return m_db.QueryFeedDataCountByTitle(title, count);
+}
+
+bool RudiRSSClient::QueryFeedDataByTitleOrderByTimestampInRange(const std::string& title, long long limit, long long offset,
+    FeedDatabase::FN_QUERY_FEED_DATA fnQueryFeedData)
+{
+    return m_db.QueryFeedDataByTitleOrderByTimestampInRange(title, limit, offset, fnQueryFeedData);
+}
+
+bool RudiRSSClient::QueryFeedDataCountByFeedIdByTitle(long long feedid, const std::string& title, long long& count)
+{
+    return m_db.QueryFeedDataCountByFeedIdByTitle(feedid, title, count);
+}
+
+bool RudiRSSClient::QueryFeedDataByFeedIdByTitleOrderByTimestampInRange(long long feedid, const std::string& title, long long limit, long long offset,
+    FeedDatabase::FN_QUERY_FEED_DATA fnQueryFeedData)
+{
+    return m_db.QueryFeedDataByFeedIdByTitleOrderByTimestampInRange(feedid, title, limit, offset, fnQueryFeedData);
+}
+
+bool RudiRSSClient::QueryFeedCountByTitle(const std::string& title, long long& count)
+{
+    return m_db.QueryFeedCountByTitle(title, count);
+}
+
+bool RudiRSSClient::QueryFeedByTitleByOffsetInRange(const std::string& title, long long limit, long long offset, FeedDatabase::FN_QUERY_FEED fnQueryFeed)
+{
+    return m_db.QueryFeedByTitleByOffsetInRange(title, limit, offset, fnQueryFeed);
+}
+
+bool RudiRSSClient::QueryFeedByTitleByOffsetOrderByTitleASCInRange(const std::string& title, long long limit, long long offset, FeedDatabase::FN_QUERY_FEED fnQueryFeed)
+{
+    return m_db.QueryFeedByTitleByOffsetOrderByTitleASCInRange(title, limit, offset, fnQueryFeed);
+}
+
+bool RudiRSSClient::QueryFeedByTitleByOffsetOrderByTitleDESCInRange(const std::string& title, long long limit, long long offset, FeedDatabase::FN_QUERY_FEED fnQueryFeed)
+{
+    return m_db.QueryFeedByTitleByOffsetOrderByTitleDESCInRange(title, limit, offset, fnQueryFeed);
 }
 
 VOID CALLBACK RudiRSSClient::WaitOrTimerCallback(PVOID param, BOOLEAN TimerOrWaitFired)
@@ -446,14 +518,16 @@ void RudiRSSClient::SaveDatabaseConfiguration(const DatabaseConfiguration& dbCon
     WritePrivateProfileString(L"Database", L"ReserveDays", std::to_wstring(dbConfig.reserveDays).c_str(), m_rudirssIni.c_str());
 }
 
-void RudiRSSClient::LoadDisplayConfiguration(DisplayConfiguration &displayConfig)
+void RudiRSSClient::LoadDisplayConfiguration(DisplayConfiguration& displayConfig)
 {
     displayConfig.feedWidth = GetPrivateProfileInt(L"Display", L"FeedWidth", 300, m_rudirssIni.c_str());
     displayConfig.feedItemTitleColumnWidth = GetPrivateProfileInt(L"Display", L"FeedItemTitleColumnWidth", 250, m_rudirssIni.c_str());
     displayConfig.feedItemUpdatedColumnWidth = GetPrivateProfileInt(L"Display", L"FeedItemUpdatedColumnWidth", 150, m_rudirssIni.c_str());
+    displayConfig.feedSortMethod = static_cast<DisplayConfiguration::FeedSortMethod>(GetPrivateProfileInt(L"Display", L"FeedSortMethod",
+        static_cast<INT>(DisplayConfiguration::FeedSortMethod::ASC), m_rudirssIni.c_str()));
 }
 
-void RudiRSSClient::SaveDisplayConfiguration(const DisplayConfiguration &displayConfig)
+void RudiRSSClient::SaveDisplayConfiguration(const DisplayConfiguration& displayConfig)
 {
     WritePrivateProfileString(L"Display", L"FeedWidth",
         std::to_wstring(static_cast<unsigned>(displayConfig.feedWidth)).c_str(), m_rudirssIni.c_str());
@@ -461,75 +535,62 @@ void RudiRSSClient::SaveDisplayConfiguration(const DisplayConfiguration &display
         std::to_wstring(static_cast<unsigned>(displayConfig.feedItemTitleColumnWidth)).c_str(), m_rudirssIni.c_str());
     WritePrivateProfileString(L"Display", L"FeedItemUpdatedColumnWidth",
         std::to_wstring(static_cast<unsigned>(displayConfig.feedItemUpdatedColumnWidth)).c_str(), m_rudirssIni.c_str());
+    WritePrivateProfileString(L"Display", L"FeedSortMethod",
+        std::to_wstring(static_cast<unsigned>(displayConfig.feedSortMethod)).c_str(), m_rudirssIni.c_str());
 }
 
 void RudiRSSClient::RefreshFeedByOffset(long long offset)
 {
     long long feedid = FeedDatabase::INVALID_FEED_ID;
-    do
+    std::wstring guid;
+    unsigned duetime = FeedDatabase::Feed::DEFAULT_FEED_UPDATE_DUETIME;
+    unsigned updateinterval = FeedDatabase::Feed::DEFAULT_FEED_UPDATE_INTERVAL;
+    QueryFeedByOffset(offset, [&](const FeedDatabase::Feed& feed) {
+        FeedCommon::ConvertStringToWideString(feed.guid, guid);
+        duetime = feed.duetime;
+        updateinterval = feed.updateinterval;
+        });
+
+    if (!guid.empty())
     {
-        std::wstring guid;
-        unsigned duetime = FeedDatabase::Feed::DEFAULT_FEED_UPDATE_DUETIME;
-        unsigned updateinterval = FeedDatabase::Feed::DEFAULT_FEED_UPDATE_INTERVAL;
-        QueryFeedByOffset(offset, [&](const FeedDatabase::Feed& feed) {
-            FeedCommon::ConvertStringToWideString(feed.guid, guid);
-            duetime = feed.duetime;
-            updateinterval = feed.updateinterval;
-            });
-
-        if (guid.empty())
-            break;
-
         auto it = m_refreshTimer.find(guid);
         if (it != m_refreshTimer.end())
         {
             it->second.Create(WaitOrTimerCallback, &it->second, duetime, updateinterval, WT_EXECUTEDEFAULT);
         }
-    } while (0);
+    }
 }
 
 void RudiRSSClient::RefreshAllFeeds()
 {
-    do
-    {
-        std::vector<FeedDatabase::Feed> feeds;
-        QueryAllFeeds([&](const FeedDatabase::Feed& feed) {
-            feeds.push_back(feed);
-            });
-
+    QueryAllFeeds([&](const FeedDatabase::Feed& feed) {
         std::wstring guid;
-        for (const auto& feed : feeds)
+        FeedCommon::ConvertStringToWideString(feed.guid, guid);
+        auto it = m_refreshTimer.find(guid);
+        if (it != m_refreshTimer.end())
         {
-            FeedCommon::ConvertStringToWideString(feed.guid, guid);
-            auto it = m_refreshTimer.find(guid);
-            if (it != m_refreshTimer.end())
-            {
-                it->second.Create(WaitOrTimerCallback, &it->second, feed.duetime, feed.updateinterval, WT_EXECUTEDEFAULT);
-            }
+            it->second.Create(WaitOrTimerCallback, &it->second, feed.duetime, feed.updateinterval, WT_EXECUTEDEFAULT);
         }
-    } while (0);
+        });
 }
 
 void RudiRSSClient::DeleteFeedByOffset(long long offset)
 {
     long long feedid = FeedDatabase::INVALID_FEED_ID;
-    do
+    std::wstring guid;
+    QueryFeedByOffset(offset, [&](const FeedDatabase::Feed& feed) {
+        feedid = feed.feedid;
+        FeedCommon::ConvertStringToWideString(feed.guid, guid);
+        });
+
+    if (FeedDatabase::INVALID_FEED_ID != feedid)
     {
-        std::wstring guid;
-        QueryFeedByOffset(offset, [&](const FeedDatabase::Feed& feed) {
-            feedid = feed.feedid;
-            FeedCommon::ConvertStringToWideString(feed.guid, guid);
-            });
-
-        if (FeedDatabase::INVALID_FEED_ID == feedid)
-            break;
-
         // Stop and remove its refresh timer
         m_refreshTimer.erase(guid);
 
         DeleteFeedDataByFeedId(feedid);
         DeleteFeedByFeedId(feedid);
-    } while (0);
+    }
 }
 
 void RudiRSSClient::DeleteAllFeedsAndAllFeedData()

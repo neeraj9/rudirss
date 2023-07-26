@@ -21,6 +21,8 @@ public:
     bool QueryFeed(long long feedId, FeedDatabase::FN_QUERY_FEED fnQueryFeed);
     bool QueryFeedByGuid(const std::string &guid, FeedDatabase::FN_QUERY_FEED fnQueryFeed);
     bool QueryAllFeeds(FeedDatabase::FN_QUERY_FEED fnQueryFeed);
+    bool QueryAllFeedsOrderByTitleASC(FeedDatabase::FN_QUERY_FEED fnQueryFeed);
+    bool QueryAllFeedsOrderByTitleDESC(FeedDatabase::FN_QUERY_FEED fnQueryFeed);
     bool QueryFeedDataByFeedId(long long feedid, FeedDatabase::FN_QUERY_FEED_DATA fnQueryFeedData);
     bool QueryFeedDataOrderByTimestamp(long long feedid, FeedDatabase::FN_QUERY_FEED_DATA fnQueryFeedData);
     bool QueryFeedDataByOffsetOrderByTimestamp(long long offset, FeedDatabase::FN_QUERY_FEED_DATA fnQueryFeedData);
@@ -38,11 +40,22 @@ public:
     bool QueryFeedTableCount(long long &count);
     bool QueryFeedByOffset(long long offset, FeedDatabase::FN_QUERY_FEED fnQueryFeed);
     bool QueryFeedByOffsetInRange(long long limit, long long offset, FeedDatabase::FN_QUERY_FEED fnQueryFeed);
+    bool QueryFeedByOffsetOrderByTitleASCInRange(long long limit, long long offset, FeedDatabase::FN_QUERY_FEED fnQueryFeed);
+    bool QueryFeedByOffsetOrderByTitleDESCInRange(long long limit, long long offset, FeedDatabase::FN_QUERY_FEED fnQueryFeed);
     bool QueryFeedDataOrderByTimestampInRange(long long limit, long long offset, FeedDatabase::FN_QUERY_FEED_DATA fnQueryFeedData);
     bool QueryFeedDataByFeedIdOrderByTimestampInRange(long long feedid, long long limit, long long offset, FeedDatabase::FN_QUERY_FEED_DATA fnQueryFeedData);
     bool QueryFeedExistByGuid(const std::string& guid, long long& exist);
     bool DeleteAllFeeds();
     bool DeleteAllFeedData();
+    bool QueryFeedDataCountByTitle(const std::string& title, long long &count);
+    bool QueryFeedDataByTitleOrderByTimestampInRange(const std::string &title, long long limit, long long offset, FeedDatabase::FN_QUERY_FEED_DATA fnQueryFeedData);
+    bool QueryFeedDataCountByFeedIdByTitle(long long feedid, const std::string& title, long long &count);
+    bool QueryFeedDataByFeedIdByTitleOrderByTimestampInRange(long long feedid, const std::string &title, long long limit, long long offset,
+        FeedDatabase::FN_QUERY_FEED_DATA fnQueryFeedData);
+    bool QueryFeedCountByTitle(const std::string& title, long long &count);
+    bool QueryFeedByTitleByOffsetInRange(const std::string &title, long long limit, long long offset, FeedDatabase::FN_QUERY_FEED fnQueryFeed);
+    bool QueryFeedByTitleByOffsetOrderByTitleASCInRange(const std::string &title, long long limit, long long offset, FeedDatabase::FN_QUERY_FEED fnQueryFeed);
+    bool QueryFeedByTitleByOffsetOrderByTitleDESCInRange(const std::string &title, long long limit, long long offset, FeedDatabase::FN_QUERY_FEED fnQueryFeed);
 
     using FN_ON_DB_NOTIFICATION = std::function<void(const FeedDatabase::FeedConsumptionUnit &)>;
     void StartRefreshFeedTimer(FN_ON_DB_NOTIFICATION fnOnDbNotification);

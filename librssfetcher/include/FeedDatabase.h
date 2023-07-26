@@ -10,38 +10,6 @@
 
 class FeedDatabase
 {
-protected:
-    SQLite3Handle m_sql;
-    SQLite3StmtHandle m_insertFeedStmt;
-    SQLite3StmtHandle m_insertFeedDataStmt;
-    SQLite3StmtHandle m_queryFeedStmt;
-    SQLite3StmtHandle m_queryFeedByGuidStmt;
-    SQLite3StmtHandle m_queryAllFeedsStmt;
-    SQLite3StmtHandle m_queryFeedDataByFeedIdStmt;
-    SQLite3StmtHandle m_queryFeedDataByFeedDataIdStmt;
-    SQLite3StmtHandle m_queryFeedDataByFeedIdOrderByTimestampStmt;
-    SQLite3StmtHandle m_queryFeedDataByOffsetOrderByTimestampStmt;
-    SQLite3StmtHandle m_queryFeedDataByFeedIdByOffsetOrderByTimestampStmt;
-    SQLite3StmtHandle m_queryAllFeedDataOrderByTimestampStmt;
-    SQLite3StmtHandle m_deleteAllFeedStmt;
-    SQLite3StmtHandle m_deleteAllFeedDataStmt;
-    SQLite3StmtHandle m_deleteOutdatedFeedDataStmt;
-    SQLite3StmtHandle m_deleteFeedByFeedIdStmt;
-    SQLite3StmtHandle m_deleteFeedDataByFeedIdStmt;
-    SQLite3StmtHandle m_updateFeedDataReadStmt;
-    SQLite3StmtHandle m_queryFeedTableDataExistStmt;
-    SQLite3StmtHandle m_queryFeedDataTableCountStmt;
-    SQLite3StmtHandle m_queryFeedDataTableCountByFeedIdStmt;
-    SQLite3StmtHandle m_queryFeedDataByOffsetStmt;
-    SQLite3StmtHandle m_queryFeedTableCountStmt;
-    SQLite3StmtHandle m_queryFeedByOffsetStmt;
-    SQLite3StmtHandle m_queryFeedByOffsetInRangeStmt;
-    SQLite3StmtHandle m_queryFeedDataOrderByTimestampInRangeStmt;
-    SQLite3StmtHandle m_queryFeedDataByFeedIdOrderByTimestampInRangeStmt;
-    SQLite3StmtHandle m_queryFeedExistByGuid;
-
-    ATL::CComCriticalSection m_dbLock;
-
 public:
     FeedDatabase();
     virtual ~FeedDatabase();
@@ -73,6 +41,20 @@ public:
                 guid = std::move(rhs.guid);
                 url = std::move(rhs.url);
                 title = std::move(rhs.title);
+                duetime = rhs.duetime;
+                updateinterval = rhs.updateinterval;
+            }
+
+            return *this;
+        }
+        Feed& operator=(const Feed& rhs)
+        {
+            if (this != &rhs)
+            {
+                feedid = rhs.feedid;
+                guid = rhs.guid;
+                url = rhs.url;
+                title = rhs.title;
                 duetime = rhs.duetime;
                 updateinterval = rhs.updateinterval;
             }
@@ -184,6 +166,8 @@ public:
     bool QueryFeed(long long feedId, FN_QUERY_FEED fnQueryFeed);
     bool QueryFeedByGuid(const std::string& guid, FN_QUERY_FEED fnQueryFeed);
     bool QueryAllFeeds(FN_QUERY_FEED fnQueryFeed);
+    bool QueryAllFeedsOrderByTitleASC(FN_QUERY_FEED fnQueryFeed);
+    bool QueryAllFeedsOrderByTitleDESC(FN_QUERY_FEED fnQueryFeed);
     bool QueryFeedDataByFeedId(long long feedid, FN_QUERY_FEED_DATA fnQueryFeedData);
     bool QueryFeedDataOrderByTimestamp(long long feedid, FN_QUERY_FEED_DATA fnQueryFeedData);
     bool QueryFeedDataByOffsetOrderByTimestamp(long long offset, FN_QUERY_FEED_DATA fnQueryFeedData);
@@ -202,8 +186,66 @@ public:
     bool QueryFeedTableCount(long long &count);
     bool QueryFeedByOffset(long long offset, FN_QUERY_FEED fnQueryFeed);
     bool QueryFeedByOffsetInRange(long long limit, long long offset, FN_QUERY_FEED fnQueryFeed);
+    bool QueryFeedByOffsetOrderByTitleASCInRange(long long limit, long long offset, FN_QUERY_FEED fnQueryFeed);
+    bool QueryFeedByOffsetOrderByTitleDESCInRange(long long limit, long long offset, FN_QUERY_FEED fnQueryFeed);
     bool QueryFeedDataByOffset(long long offset, FN_QUERY_FEED_DATA fnQueryFeedData);
     bool QueryFeedDataOrderByTimestampInRange(long long limit, long long offset, FN_QUERY_FEED_DATA fnQueryFeedData);
     bool QueryFeedDataByFeedIdOrderByTimestampInRange(long long feedid, long long limit, long long offset, FN_QUERY_FEED_DATA fnQueryFeedData);
     bool QueryFeedExistByGuid(const std::string& guid, long long& exist);
+    bool QueryFeedDataCountByTitle(const std::string& title, long long &count);
+    bool QueryFeedDataByTitleOrderByTimestampInRange(const std::string &title, long long limit, long long offset, FN_QUERY_FEED_DATA fnQueryFeedData);
+    bool QueryFeedDataCountByFeedIdByTitle(long long feedid, const std::string& title, long long &count);
+    bool QueryFeedDataByFeedIdByTitleOrderByTimestampInRange(long long feedid, const std::string &title, long long limit, long long offset,
+        FN_QUERY_FEED_DATA fnQueryFeedData);
+    bool QueryFeedCountByTitle(const std::string& title, long long &count);
+    bool QueryFeedByTitleByOffsetInRange(const std::string &title, long long limit, long long offset, FN_QUERY_FEED fnQueryFeed);
+    bool QueryFeedByTitleByOffsetOrderByTitleASCInRange(const std::string &title, long long limit, long long offset, FN_QUERY_FEED fnQueryFeed);
+    bool QueryFeedByTitleByOffsetOrderByTitleDESCInRange(const std::string &title, long long limit, long long offset, FN_QUERY_FEED fnQueryFeed);
+
+protected:
+    SQLite3Handle m_sql;
+    SQLite3StmtHandle m_insertFeedStmt;
+    SQLite3StmtHandle m_insertFeedDataStmt;
+    SQLite3StmtHandle m_queryFeedStmt;
+    SQLite3StmtHandle m_queryFeedByGuidStmt;
+    SQLite3StmtHandle m_queryAllFeedsStmt;
+    SQLite3StmtHandle m_queryFeedDataByFeedIdStmt;
+    SQLite3StmtHandle m_queryFeedDataByFeedDataIdStmt;
+    SQLite3StmtHandle m_queryFeedDataByFeedIdOrderByTimestampStmt;
+    SQLite3StmtHandle m_queryFeedDataByOffsetOrderByTimestampStmt;
+    SQLite3StmtHandle m_queryFeedDataByFeedIdByOffsetOrderByTimestampStmt;
+    SQLite3StmtHandle m_queryAllFeedDataOrderByTimestampStmt;
+    SQLite3StmtHandle m_deleteAllFeedStmt;
+    SQLite3StmtHandle m_deleteAllFeedDataStmt;
+    SQLite3StmtHandle m_deleteOutdatedFeedDataStmt;
+    SQLite3StmtHandle m_deleteFeedByFeedIdStmt;
+    SQLite3StmtHandle m_deleteFeedDataByFeedIdStmt;
+    SQLite3StmtHandle m_updateFeedDataReadStmt;
+    SQLite3StmtHandle m_queryFeedTableDataExistStmt;
+    SQLite3StmtHandle m_queryFeedDataTableCountStmt;
+    SQLite3StmtHandle m_queryFeedDataTableCountByFeedIdStmt;
+    SQLite3StmtHandle m_queryFeedDataByOffsetStmt;
+    SQLite3StmtHandle m_queryFeedTableCountStmt;
+    SQLite3StmtHandle m_queryFeedByOffsetStmt;
+    SQLite3StmtHandle m_queryFeedByOffsetInRangeStmt;
+    SQLite3StmtHandle m_queryFeedDataOrderByTimestampInRangeStmt;
+    SQLite3StmtHandle m_queryFeedDataByFeedIdOrderByTimestampInRangeStmt;
+    SQLite3StmtHandle m_queryFeedExistByGuidStmt;
+    SQLite3StmtHandle m_queryFeedDataCountByTitle;
+    SQLite3StmtHandle m_queryFeedDataByTitleOrderByTimestampInRangeStmt;
+    SQLite3StmtHandle m_queryFeedDataCountByFeedIdByTitle;
+    SQLite3StmtHandle m_queryFeedDataByFeedIdByTitleOrderByTimestampInRangeStmt;
+    SQLite3StmtHandle m_queryAllFeedsOrderByTitleASCStmt;
+    SQLite3StmtHandle m_queryAllFeedsOrderByTitleDESCStmt;
+    SQLite3StmtHandle m_queryFeedOrderByTitleASCInRangeStmt;
+    SQLite3StmtHandle m_queryFeedOrderByTitleDESCInRangeStmt;
+    SQLite3StmtHandle m_queryFeedCountByTitleStmt;
+    SQLite3StmtHandle m_queryFeedByTitleByOffsetInRangeStmt;
+    SQLite3StmtHandle m_queryFeedByTitleByOffsetOrderByTitleASCInRangeStmt;
+    SQLite3StmtHandle m_queryFeedByTitleByOffsetOrderByTitleDESCInRangeStmt;
+
+    ATL::CComCriticalSection m_dbLock;
+
+    void QueryFeedData(FeedData& feedData, sqlite3_stmt *stmt);
+    void QueryFeed(Feed& feed, sqlite3_stmt *stmt);
 };

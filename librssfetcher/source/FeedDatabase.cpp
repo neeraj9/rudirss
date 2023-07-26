@@ -12,6 +12,33 @@ FeedDatabase::~FeedDatabase()
 
 }
 
+void FeedDatabase::QueryFeedData(FeedData& feedData, sqlite3_stmt* stmt)
+{
+    int col = 0;
+    feedData.feeddataid = sqlite3_column_int64(stmt, col++);
+    feedData.guid = (const char*)sqlite3_column_text(stmt, col++);;
+    feedData.feedid = sqlite3_column_int64(stmt, col++);
+    feedData.link = (const char*)sqlite3_column_text(stmt, col++);
+    feedData.title = (const char*)sqlite3_column_text(stmt, col++);
+    feedData.datetime = (const char*)sqlite3_column_text(stmt, col++);
+    feedData.timestamp = sqlite3_column_int64(stmt, col++);
+    feedData.createdtime = sqlite3_column_int64(stmt, col++);
+    feedData.read = sqlite3_column_int64(stmt, col++);
+    feedData.tag = (const char*)sqlite3_column_text(stmt, col++);
+    feedData.misc = (const char*)sqlite3_column_text(stmt, col++);
+}
+
+void FeedDatabase::QueryFeed(Feed& feed, sqlite3_stmt* stmt)
+{
+    int col = 0;
+    feed.feedid = sqlite3_column_int64(stmt, col++);
+    feed.guid = (const char*)sqlite3_column_text(stmt, col++);
+    feed.url = (const char*)sqlite3_column_text(stmt, col++);
+    feed.title = (const char*)sqlite3_column_text(stmt, col++);
+    feed.duetime = static_cast<unsigned>(sqlite3_column_int64(stmt, col++));
+    feed.updateinterval = static_cast<unsigned>(sqlite3_column_int64(stmt, col++));
+}
+
 bool FeedDatabase::Open(const std::wstring& dbPath)
 {
     return SQLITE_OK == sqlite3_open16(dbPath.c_str(), &m_sql.m_handle);
@@ -55,6 +82,16 @@ void FeedDatabase::Initialize()
     ret = sqlite3_prepare_v2(m_sql.m_handle, stmt.c_str(), stmt.length(), &m_queryAllFeedsStmt.m_handle, nullptr);
     if (0 != ret)
         throw std::runtime_error("Error: cannot prepare query statement for all feeds.");
+
+    stmt = "SELECT * FROM Feed ORDER BY title ASC";
+    ret = sqlite3_prepare_v2(m_sql.m_handle, stmt.c_str(), stmt.length(), &m_queryAllFeedsOrderByTitleASCStmt.m_handle, nullptr);
+    if (0 != ret)
+        throw std::runtime_error("Error: cannot prepare query statement for all feeds order by title ASC.");
+
+    stmt = "SELECT * FROM Feed ORDER BY title DESC";
+    ret = sqlite3_prepare_v2(m_sql.m_handle, stmt.c_str(), stmt.length(), &m_queryAllFeedsOrderByTitleDESCStmt.m_handle, nullptr);
+    if (0 != ret)
+        throw std::runtime_error("Error: cannot prepare query statement for all feeds order by title DESC.");
 
     stmt = "SELECT * FROM FeedData WHERE feedid = ?";
     ret = sqlite3_prepare_v2(m_sql.m_handle, stmt.c_str(), stmt.length(), &m_queryFeedDataByFeedIdStmt.m_handle, nullptr);
@@ -151,6 +188,16 @@ void FeedDatabase::Initialize()
     if (0 != ret)
         throw std::runtime_error("Error: cannot prepare query statement by limit and offset for feed.");
 
+    stmt = "SELECT * FROM Feed ORDER BY title ASC LIMIT ? OFFSET ?";
+    ret = sqlite3_prepare_v2(m_sql.m_handle, stmt.c_str(), stmt.length(), &m_queryFeedOrderByTitleASCInRangeStmt.m_handle, nullptr);
+    if (0 != ret)
+        throw std::runtime_error("Error: cannot prepare query statement by limit and offset for feeds order by title ASC.");
+
+    stmt = "SELECT * FROM Feed ORDER BY title DESC LIMIT ? OFFSET ?";
+    ret = sqlite3_prepare_v2(m_sql.m_handle, stmt.c_str(), stmt.length(), &m_queryFeedOrderByTitleDESCInRangeStmt.m_handle, nullptr);
+    if (0 != ret)
+        throw std::runtime_error("Error: cannot prepare query statement by limit and offset for feeds order by title DESC.");
+
     stmt = "SELECT * FROM FeedData ORDER BY timestamp DESC LIMIT ? OFFSET ?";
     ret = sqlite3_prepare_v2(m_sql.m_handle, stmt.c_str(), stmt.length(), &m_queryFeedDataOrderByTimestampInRangeStmt.m_handle, nullptr);
     if (0 != ret)
@@ -162,9 +209,49 @@ void FeedDatabase::Initialize()
         throw std::runtime_error("Error: cannot prepare query statement by feedid, limit and offset for feed data order by timestamp.");
 
     stmt = "SELECT EXISTS (SELECT 1 FROM Feed WHERE guid = ?)";
-    ret = sqlite3_prepare_v2(m_sql.m_handle, stmt.c_str(), stmt.length(), &m_queryFeedExistByGuid.m_handle, nullptr);
+    ret = sqlite3_prepare_v2(m_sql.m_handle, stmt.c_str(), stmt.length(), &m_queryFeedExistByGuidStmt.m_handle, nullptr);
     if (0 != ret)
         throw std::runtime_error("Error: cannot prepare query statement of checking whether the feed exists.");
+
+    stmt = "SELECT COUNT(*) FROM FeedData WHERE title LIKE ?";
+    ret = sqlite3_prepare_v2(m_sql.m_handle, stmt.c_str(), stmt.length(), &m_queryFeedDataCountByTitle.m_handle, nullptr);
+    if (0 != ret)
+        throw std::runtime_error("Error: cannot prepare query statement by title for feed data count.");
+
+    stmt = "SELECT * FROM FeedData WHERE title LIKE ? ORDER BY timestamp DESC LIMIT ? OFFSET ?";
+    ret = sqlite3_prepare_v2(m_sql.m_handle, stmt.c_str(), stmt.length(), &m_queryFeedDataByTitleOrderByTimestampInRangeStmt.m_handle, nullptr);
+    if (0 != ret)
+        throw std::runtime_error("Error: cannot prepare query statement by title, limit and offset for feed data order by timestamp.");
+
+    stmt = "SELECT COUNT(*) FROM FeedData WHERE feedid = ? AND title LIKE ?";
+    ret = sqlite3_prepare_v2(m_sql.m_handle, stmt.c_str(), stmt.length(), &m_queryFeedDataCountByFeedIdByTitle.m_handle, nullptr);
+    if (0 != ret)
+        throw std::runtime_error("Error: cannot prepare query statement by feedid and title for feed data count.");
+
+    stmt = "SELECT * FROM FeedData WHERE feedid = ? AND title LIKE ? ORDER BY timestamp DESC LIMIT ? OFFSET ?";
+    ret = sqlite3_prepare_v2(m_sql.m_handle, stmt.c_str(), stmt.length(), &m_queryFeedDataByFeedIdByTitleOrderByTimestampInRangeStmt.m_handle, nullptr);
+    if (0 != ret)
+        throw std::runtime_error("Error: cannot prepare query statement by feedid and title for feed data order by timestamp.");
+
+    stmt = "SELECT COUNT(*) FROM Feed WHERE title LIKE ?";
+    ret = sqlite3_prepare_v2(m_sql.m_handle, stmt.c_str(), stmt.length(), &m_queryFeedCountByTitleStmt.m_handle, nullptr);
+    if (0 != ret)
+        throw std::runtime_error("Error: cannot prepare query statement by title for feed count.");
+
+    stmt = "SELECT * FROM Feed WHERE title LIKE ? LIMIT ? OFFSET ?";
+    ret = sqlite3_prepare_v2(m_sql.m_handle, stmt.c_str(), stmt.length(), &m_queryFeedByTitleByOffsetInRangeStmt.m_handle, nullptr);
+    if (0 != ret)
+        throw std::runtime_error("Error: cannot prepare query statement by title, limit and offset for feed.");
+
+    stmt = "SELECT * FROM Feed WHERE title LIKE ?  ORDER BY title ASC LIMIT ? OFFSET ?";
+    ret = sqlite3_prepare_v2(m_sql.m_handle, stmt.c_str(), stmt.length(), &m_queryFeedByTitleByOffsetOrderByTitleASCInRangeStmt.m_handle, nullptr);
+    if (0 != ret)
+        throw std::runtime_error("Error: cannot prepare query statement by title, limit and offset for feed order by title ASC.");
+
+    stmt = "SELECT * FROM Feed WHERE title LIKE ?  ORDER BY title DESC LIMIT ? OFFSET ?";
+    ret = sqlite3_prepare_v2(m_sql.m_handle, stmt.c_str(), stmt.length(), &m_queryFeedByTitleByOffsetOrderByTitleDESCInRangeStmt.m_handle, nullptr);
+    if (0 != ret)
+        throw std::runtime_error("Error: cannot prepare query statement by title, limit and offset for feed order by title DESC.");
 }
 
 void FeedDatabase::Close()
@@ -195,7 +282,19 @@ void FeedDatabase::Close()
     m_queryFeedByOffsetInRangeStmt.Close();
     m_queryFeedDataOrderByTimestampInRangeStmt.Close();
     m_queryFeedDataByFeedIdOrderByTimestampInRangeStmt.Close();
-    m_queryFeedExistByGuid.Close();
+    m_queryFeedExistByGuidStmt.Close();
+    m_queryFeedDataCountByTitle.Close();
+    m_queryFeedDataByTitleOrderByTimestampInRangeStmt.Close();
+    m_queryFeedDataCountByFeedIdByTitle.Close();
+    m_queryFeedDataByFeedIdByTitleOrderByTimestampInRangeStmt.Close();
+    m_queryAllFeedsOrderByTitleASCStmt.Close();
+    m_queryAllFeedsOrderByTitleDESCStmt.Close();
+    m_queryFeedOrderByTitleASCInRangeStmt.Close();
+    m_queryFeedOrderByTitleDESCInRangeStmt.Close();
+    m_queryFeedCountByTitleStmt.Close();
+    m_queryFeedByTitleByOffsetInRangeStmt.Close();
+    m_queryFeedByTitleByOffsetOrderByTitleASCInRangeStmt.Close();
+    m_queryFeedByTitleByOffsetOrderByTitleDESCInRangeStmt.Close();
 
     m_sql.Close();
 }
@@ -262,13 +361,7 @@ bool FeedDatabase::QueryFeed(long long feedId, FN_QUERY_FEED fnQueryFeed)
         Feed feed;
         while (SQLITE_ROW == (ret = sqlite3_step(m_queryFeedStmt.m_handle)))
         {
-            int col = 0;
-            feed.feedid = sqlite3_column_int64(m_queryFeedStmt.m_handle, col++);
-            feed.guid = (const char*)sqlite3_column_text(m_queryFeedStmt.m_handle, col++);
-            feed.url = (const char*)sqlite3_column_text(m_queryFeedStmt.m_handle, col++);
-            feed.title = (const char*)sqlite3_column_text(m_queryFeedStmt.m_handle, col++);
-            feed.duetime = static_cast<unsigned>(sqlite3_column_int64(m_queryFeedStmt.m_handle, col++));
-            feed.updateinterval = static_cast<unsigned>(sqlite3_column_int64(m_queryFeedStmt.m_handle, col++));
+            QueryFeed(feed, m_queryFeedStmt.m_handle);
             fnQueryFeed(feed);
         }
         sqlite3_reset(m_queryFeedStmt.m_handle);
@@ -290,13 +383,7 @@ bool FeedDatabase::QueryFeedByGuid(const std::string& guid, FN_QUERY_FEED fnQuer
         Feed feed;
         while (SQLITE_ROW == (ret = sqlite3_step(m_queryFeedByGuidStmt.m_handle)))
         {
-            int col = 0;
-            feed.feedid = sqlite3_column_int64(m_queryFeedByGuidStmt.m_handle, col++);
-            feed.guid = (const char*)sqlite3_column_text(m_queryFeedByGuidStmt.m_handle, col++);
-            feed.url = (const char*)sqlite3_column_text(m_queryFeedByGuidStmt.m_handle, col++);
-            feed.title = (const char*)sqlite3_column_text(m_queryFeedByGuidStmt.m_handle, col++);
-            feed.duetime = static_cast<unsigned>(sqlite3_column_int64(m_queryFeedByGuidStmt.m_handle, col++));
-            feed.updateinterval = static_cast<unsigned>(sqlite3_column_int64(m_queryFeedByGuidStmt.m_handle, col++));
+            QueryFeed(feed, m_queryFeedByGuidStmt.m_handle);
             fnQueryFeed(feed);
         }
         sqlite3_reset(m_queryFeedByGuidStmt.m_handle);
@@ -316,16 +403,48 @@ bool FeedDatabase::QueryAllFeeds(FN_QUERY_FEED fnQueryFeed)
     int ret = SQLITE_OK;
     while (SQLITE_ROW == (ret = sqlite3_step(m_queryAllFeedsStmt.m_handle)))
     {
-        int col = 0;
-        feed.feedid = sqlite3_column_int64(m_queryAllFeedsStmt.m_handle, col++);
-        feed.guid = (const char*)sqlite3_column_text(m_queryAllFeedsStmt.m_handle, col++);
-        feed.url = (const char*)sqlite3_column_text(m_queryAllFeedsStmt.m_handle, col++);
-        feed.title = (const char*)sqlite3_column_text(m_queryAllFeedsStmt.m_handle, col++);
-        feed.duetime = static_cast<unsigned>(sqlite3_column_int64(m_queryAllFeedsStmt.m_handle, col++));
-        feed.updateinterval = static_cast<unsigned>(sqlite3_column_int64(m_queryAllFeedsStmt.m_handle, col++));
+        QueryFeed(feed, m_queryAllFeedsStmt.m_handle);
         fnQueryFeed(feed);
     }
     sqlite3_reset(m_queryAllFeedsStmt.m_handle);
+
+    return SQLITE_DONE == ret;
+}
+
+bool FeedDatabase::QueryAllFeedsOrderByTitleASC(FN_QUERY_FEED fnQueryFeed)
+{
+    ATL::CComCritSecLock lock(m_dbLock);
+    if (!m_queryAllFeedsOrderByTitleASCStmt.m_handle
+        || !fnQueryFeed)
+        return false;
+
+    Feed feed;
+    int ret = SQLITE_OK;
+    while (SQLITE_ROW == (ret = sqlite3_step(m_queryAllFeedsOrderByTitleASCStmt.m_handle)))
+    {
+        QueryFeed(feed, m_queryAllFeedsOrderByTitleASCStmt.m_handle);
+        fnQueryFeed(feed);
+    }
+    sqlite3_reset(m_queryAllFeedsOrderByTitleASCStmt.m_handle);
+
+    return SQLITE_DONE == ret;
+}
+
+bool FeedDatabase::QueryAllFeedsOrderByTitleDESC(FN_QUERY_FEED fnQueryFeed)
+{
+    ATL::CComCritSecLock lock(m_dbLock);
+    if (!m_queryAllFeedsOrderByTitleDESCStmt.m_handle
+        || !fnQueryFeed)
+        return false;
+
+    Feed feed;
+    int ret = SQLITE_OK;
+    while (SQLITE_ROW == (ret = sqlite3_step(m_queryAllFeedsOrderByTitleDESCStmt.m_handle)))
+    {
+        QueryFeed(feed, m_queryAllFeedsOrderByTitleDESCStmt.m_handle);
+        fnQueryFeed(feed);
+    }
+    sqlite3_reset(m_queryAllFeedsOrderByTitleDESCStmt.m_handle);
 
     return SQLITE_DONE == ret;
 }
@@ -343,18 +462,7 @@ bool FeedDatabase::QueryFeedDataByFeedId(long long feedid, FN_QUERY_FEED_DATA fn
         FeedData feedData;
         while (SQLITE_ROW == (ret = sqlite3_step(m_queryFeedDataByFeedIdStmt.m_handle)))
         {
-            int col = 0;
-            feedData.feeddataid = sqlite3_column_int64(m_queryFeedDataByFeedIdStmt.m_handle, col++);
-            feedData.guid = (const char*)sqlite3_column_text(m_queryFeedDataByFeedIdStmt.m_handle, col++);;
-            feedData.feedid = sqlite3_column_int64(m_queryFeedDataByFeedIdStmt.m_handle, col++);
-            feedData.link = (const char*)sqlite3_column_text(m_queryFeedDataByFeedIdStmt.m_handle, col++);
-            feedData.title = (const char*)sqlite3_column_text(m_queryFeedDataByFeedIdStmt.m_handle, col++);
-            feedData.datetime = (const char*)sqlite3_column_text(m_queryFeedDataByFeedIdStmt.m_handle, col++);
-            feedData.timestamp = sqlite3_column_int64(m_queryFeedDataByFeedIdStmt.m_handle, col++);
-            feedData.createdtime = sqlite3_column_int64(m_queryFeedDataByFeedIdStmt.m_handle, col++);
-            feedData.read = sqlite3_column_int64(m_queryFeedDataByFeedIdStmt.m_handle, col++);
-            feedData.tag = (const char*)sqlite3_column_text(m_queryFeedDataByFeedIdStmt.m_handle, col++);
-            feedData.misc = (const char*)sqlite3_column_text(m_queryFeedDataByFeedIdStmt.m_handle, col++);
+            QueryFeedData(feedData, m_queryFeedDataByFeedIdStmt.m_handle);
             fnQueryFeedData(feedData);
         }
         sqlite3_reset(m_queryFeedDataByFeedIdStmt.m_handle);
@@ -376,18 +484,7 @@ bool FeedDatabase::QueryFeedDataOrderByTimestamp(long long feedid, FN_QUERY_FEED
         FeedData feedData;
         while (SQLITE_ROW == (ret = sqlite3_step(m_queryFeedDataByFeedIdOrderByTimestampStmt.m_handle)))
         {
-            int col = 0;
-            feedData.feeddataid = sqlite3_column_int64(m_queryFeedDataByFeedIdOrderByTimestampStmt.m_handle, col++);
-            feedData.guid = (const char*)sqlite3_column_text(m_queryFeedDataByFeedIdOrderByTimestampStmt.m_handle, col++);;
-            feedData.feedid = sqlite3_column_int64(m_queryFeedDataByFeedIdOrderByTimestampStmt.m_handle, col++);
-            feedData.link = (const char*)sqlite3_column_text(m_queryFeedDataByFeedIdOrderByTimestampStmt.m_handle, col++);
-            feedData.title = (const char*)sqlite3_column_text(m_queryFeedDataByFeedIdOrderByTimestampStmt.m_handle, col++);
-            feedData.datetime = (const char*)sqlite3_column_text(m_queryFeedDataByFeedIdOrderByTimestampStmt.m_handle, col++);
-            feedData.timestamp = sqlite3_column_int64(m_queryFeedDataByFeedIdOrderByTimestampStmt.m_handle, col++);
-            feedData.createdtime = sqlite3_column_int64(m_queryFeedDataByFeedIdOrderByTimestampStmt.m_handle, col++);
-            feedData.read = sqlite3_column_int64(m_queryFeedDataByFeedIdOrderByTimestampStmt.m_handle, col++);
-            feedData.tag = (const char*)sqlite3_column_text(m_queryFeedDataByFeedIdOrderByTimestampStmt.m_handle, col++);
-            feedData.misc = (const char*)sqlite3_column_text(m_queryFeedDataByFeedIdOrderByTimestampStmt.m_handle, col++);
+            QueryFeedData(feedData, m_queryFeedDataByFeedIdOrderByTimestampStmt.m_handle);
             fnQueryFeedData(feedData);
         }
         sqlite3_reset(m_queryFeedDataByFeedIdOrderByTimestampStmt.m_handle);
@@ -409,18 +506,7 @@ bool FeedDatabase::QueryFeedDataByOffsetOrderByTimestamp(long long offset, FN_QU
         FeedData feedData;
         while (SQLITE_ROW == (ret = sqlite3_step(m_queryFeedDataByOffsetOrderByTimestampStmt.m_handle)))
         {
-            int col = 0;
-            feedData.feeddataid = sqlite3_column_int64(m_queryFeedDataByOffsetOrderByTimestampStmt.m_handle, col++);
-            feedData.guid = (const char*)sqlite3_column_text(m_queryFeedDataByOffsetOrderByTimestampStmt.m_handle, col++);;
-            feedData.feedid = sqlite3_column_int64(m_queryFeedDataByOffsetOrderByTimestampStmt.m_handle, col++);
-            feedData.link = (const char*)sqlite3_column_text(m_queryFeedDataByOffsetOrderByTimestampStmt.m_handle, col++);
-            feedData.title = (const char*)sqlite3_column_text(m_queryFeedDataByOffsetOrderByTimestampStmt.m_handle, col++);
-            feedData.datetime = (const char*)sqlite3_column_text(m_queryFeedDataByOffsetOrderByTimestampStmt.m_handle, col++);
-            feedData.timestamp = sqlite3_column_int64(m_queryFeedDataByOffsetOrderByTimestampStmt.m_handle, col++);
-            feedData.createdtime = sqlite3_column_int64(m_queryFeedDataByOffsetOrderByTimestampStmt.m_handle, col++);
-            feedData.read = sqlite3_column_int64(m_queryFeedDataByOffsetOrderByTimestampStmt.m_handle, col++);
-            feedData.tag = (const char*)sqlite3_column_text(m_queryFeedDataByOffsetOrderByTimestampStmt.m_handle, col++);
-            feedData.misc = (const char*)sqlite3_column_text(m_queryFeedDataByOffsetOrderByTimestampStmt.m_handle, col++);
+            QueryFeedData(feedData, m_queryFeedDataByOffsetOrderByTimestampStmt.m_handle);
             fnQueryFeedData(feedData);
         }
         sqlite3_reset(m_queryFeedDataByOffsetOrderByTimestampStmt.m_handle);
@@ -443,18 +529,7 @@ bool FeedDatabase::QueryFeedDataByFeedIdByOffsetOrderByTimestamp(long long feedi
         FeedData feedData;
         while (SQLITE_ROW == (ret = sqlite3_step(m_queryFeedDataByFeedIdByOffsetOrderByTimestampStmt.m_handle)))
         {
-            int col = 0;
-            feedData.feeddataid = sqlite3_column_int64(m_queryFeedDataByFeedIdByOffsetOrderByTimestampStmt.m_handle, col++);
-            feedData.guid = (const char*)sqlite3_column_text(m_queryFeedDataByFeedIdByOffsetOrderByTimestampStmt.m_handle, col++);;
-            feedData.feedid = sqlite3_column_int64(m_queryFeedDataByFeedIdByOffsetOrderByTimestampStmt.m_handle, col++);
-            feedData.link = (const char*)sqlite3_column_text(m_queryFeedDataByFeedIdByOffsetOrderByTimestampStmt.m_handle, col++);
-            feedData.title = (const char*)sqlite3_column_text(m_queryFeedDataByFeedIdByOffsetOrderByTimestampStmt.m_handle, col++);
-            feedData.datetime = (const char*)sqlite3_column_text(m_queryFeedDataByFeedIdByOffsetOrderByTimestampStmt.m_handle, col++);
-            feedData.timestamp = sqlite3_column_int64(m_queryFeedDataByFeedIdByOffsetOrderByTimestampStmt.m_handle, col++);
-            feedData.createdtime = sqlite3_column_int64(m_queryFeedDataByFeedIdByOffsetOrderByTimestampStmt.m_handle, col++);
-            feedData.read = sqlite3_column_int64(m_queryFeedDataByFeedIdByOffsetOrderByTimestampStmt.m_handle, col++);
-            feedData.tag = (const char*)sqlite3_column_text(m_queryFeedDataByFeedIdByOffsetOrderByTimestampStmt.m_handle, col++);
-            feedData.misc = (const char*)sqlite3_column_text(m_queryFeedDataByFeedIdByOffsetOrderByTimestampStmt.m_handle, col++);
+            QueryFeedData(feedData, m_queryFeedDataByFeedIdByOffsetOrderByTimestampStmt.m_handle);
             fnQueryFeedData(feedData);
         }
         sqlite3_reset(m_queryFeedDataByFeedIdByOffsetOrderByTimestampStmt.m_handle);
@@ -475,18 +550,7 @@ bool FeedDatabase::QueryAllFeedDataOrderByTimestamp(FN_QUERY_FEED_DATA fnQueryFe
     FeedData feedData;
     while (SQLITE_ROW == (ret = sqlite3_step(m_queryAllFeedDataOrderByTimestampStmt.m_handle)))
     {
-        int col = 0;
-        feedData.feeddataid = sqlite3_column_int64(m_queryAllFeedDataOrderByTimestampStmt.m_handle, col++);
-        feedData.guid = (const char*)sqlite3_column_text(m_queryAllFeedDataOrderByTimestampStmt.m_handle, col++);;
-        feedData.feedid = sqlite3_column_int64(m_queryAllFeedDataOrderByTimestampStmt.m_handle, col++);
-        feedData.link = (const char*)sqlite3_column_text(m_queryAllFeedDataOrderByTimestampStmt.m_handle, col++);
-        feedData.title = (const char*)sqlite3_column_text(m_queryAllFeedDataOrderByTimestampStmt.m_handle, col++);
-        feedData.datetime = (const char*)sqlite3_column_text(m_queryAllFeedDataOrderByTimestampStmt.m_handle, col++);
-        feedData.timestamp = sqlite3_column_int64(m_queryAllFeedDataOrderByTimestampStmt.m_handle, col++);
-        feedData.createdtime = sqlite3_column_int64(m_queryAllFeedDataOrderByTimestampStmt.m_handle, col++);
-        feedData.read = sqlite3_column_int64(m_queryAllFeedDataOrderByTimestampStmt.m_handle, col++);
-        feedData.tag = (const char*)sqlite3_column_text(m_queryAllFeedDataOrderByTimestampStmt.m_handle, col++);
-        feedData.misc = (const char*)sqlite3_column_text(m_queryAllFeedDataOrderByTimestampStmt.m_handle, col++);
+        QueryFeedData(feedData, m_queryAllFeedDataOrderByTimestampStmt.m_handle);
         fnQueryFeedData(feedData);
     }
     sqlite3_reset(m_queryAllFeedDataOrderByTimestampStmt.m_handle);
@@ -507,18 +571,7 @@ bool FeedDatabase::QueryFeedDataByFeedDataId(long long feeddataid, FN_QUERY_FEED
         FeedData feedData;
         while (SQLITE_ROW == (ret = sqlite3_step(m_queryFeedDataByFeedDataIdStmt.m_handle)))
         {
-            int col = 0;
-            feedData.feeddataid = sqlite3_column_int64(m_queryFeedDataByFeedDataIdStmt.m_handle, col++);
-            feedData.guid = (const char*)sqlite3_column_text(m_queryFeedDataByFeedDataIdStmt.m_handle, col++);;
-            feedData.feedid = sqlite3_column_int64(m_queryFeedDataByFeedDataIdStmt.m_handle, col++);
-            feedData.link = (const char*)sqlite3_column_text(m_queryFeedDataByFeedDataIdStmt.m_handle, col++);
-            feedData.title = (const char*)sqlite3_column_text(m_queryFeedDataByFeedDataIdStmt.m_handle, col++);
-            feedData.datetime = (const char*)sqlite3_column_text(m_queryFeedDataByFeedDataIdStmt.m_handle, col++);
-            feedData.timestamp = sqlite3_column_int64(m_queryFeedDataByFeedDataIdStmt.m_handle, col++);
-            feedData.createdtime = sqlite3_column_int64(m_queryFeedDataByFeedDataIdStmt.m_handle, col++);
-            feedData.read = sqlite3_column_int64(m_queryFeedDataByFeedDataIdStmt.m_handle, col++);
-            feedData.tag = (const char*)sqlite3_column_text(m_queryFeedDataByFeedDataIdStmt.m_handle, col++);
-            feedData.misc = (const char*)sqlite3_column_text(m_queryFeedDataByFeedDataIdStmt.m_handle, col++);
+            QueryFeedData(feedData, m_queryFeedDataByFeedDataIdStmt.m_handle);
             fnQueryFeedData(feedData);
         }
         sqlite3_reset(m_queryFeedDataByFeedDataIdStmt.m_handle);
@@ -701,13 +754,7 @@ bool FeedDatabase::QueryFeedByOffset(long long offset, FN_QUERY_FEED fnQueryFeed
         Feed feed;
         while (SQLITE_ROW == (ret = sqlite3_step(m_queryFeedByOffsetStmt.m_handle)))
         {
-            int col = 0;
-            feed.feedid = sqlite3_column_int64(m_queryFeedByOffsetStmt.m_handle, col++);
-            feed.guid = (const char*)sqlite3_column_text(m_queryFeedByOffsetStmt.m_handle, col++);
-            feed.url = (const char*)sqlite3_column_text(m_queryFeedByOffsetStmt.m_handle, col++);
-            feed.title = (const char*)sqlite3_column_text(m_queryFeedByOffsetStmt.m_handle, col++);
-            feed.duetime = static_cast<unsigned>(sqlite3_column_int64(m_queryFeedByOffsetStmt.m_handle, col++));
-            feed.updateinterval = static_cast<unsigned>(sqlite3_column_int64(m_queryFeedByOffsetStmt.m_handle, col++));
+            QueryFeed(feed, m_queryFeedByOffsetStmt.m_handle);
             fnQueryFeed(feed);
         }
         sqlite3_reset(m_queryFeedByOffsetStmt.m_handle);
@@ -730,16 +777,56 @@ bool FeedDatabase::QueryFeedByOffsetInRange(long long limit, long long offset, F
         Feed feed;
         while (SQLITE_ROW == (ret = sqlite3_step(m_queryFeedByOffsetInRangeStmt.m_handle)))
         {
-            int col = 0;
-            feed.feedid = sqlite3_column_int64(m_queryFeedByOffsetInRangeStmt.m_handle, col++);
-            feed.guid = (const char*)sqlite3_column_text(m_queryFeedByOffsetInRangeStmt.m_handle, col++);
-            feed.url = (const char*)sqlite3_column_text(m_queryFeedByOffsetInRangeStmt.m_handle, col++);
-            feed.title = (const char*)sqlite3_column_text(m_queryFeedByOffsetInRangeStmt.m_handle, col++);
-            feed.duetime = static_cast<unsigned>(sqlite3_column_int64(m_queryFeedByOffsetInRangeStmt.m_handle, col++));
-            feed.updateinterval = static_cast<unsigned>(sqlite3_column_int64(m_queryFeedByOffsetInRangeStmt.m_handle, col++));
+            QueryFeed(feed, m_queryFeedByOffsetInRangeStmt.m_handle);
             fnQueryFeed(feed);
         }
         sqlite3_reset(m_queryFeedByOffsetInRangeStmt.m_handle);
+    }
+
+    return SQLITE_DONE == ret;
+}
+
+bool FeedDatabase::QueryFeedByOffsetOrderByTitleASCInRange(long long limit, long long offset, FN_QUERY_FEED fnQueryFeed)
+{
+    ATL::CComCritSecLock lock(m_dbLock);
+    if (!m_queryFeedOrderByTitleASCInRangeStmt.m_handle
+        || !fnQueryFeed)
+        return false;
+
+    int ret = SQLITE_OK;
+    if (SQLITE_OK == (ret = sqlite3_bind_int64(m_queryFeedOrderByTitleASCInRangeStmt.m_handle, 1, limit))
+        && SQLITE_OK == (ret = sqlite3_bind_int64(m_queryFeedOrderByTitleASCInRangeStmt.m_handle, 2, offset)))
+    {
+        Feed feed;
+        while (SQLITE_ROW == (ret = sqlite3_step(m_queryFeedOrderByTitleASCInRangeStmt.m_handle)))
+        {
+            QueryFeed(feed, m_queryFeedOrderByTitleASCInRangeStmt.m_handle);
+            fnQueryFeed(feed);
+        }
+        sqlite3_reset(m_queryFeedOrderByTitleASCInRangeStmt.m_handle);
+    }
+
+    return SQLITE_DONE == ret;
+}
+
+bool FeedDatabase::QueryFeedByOffsetOrderByTitleDESCInRange(long long limit, long long offset, FN_QUERY_FEED fnQueryFeed)
+{
+    ATL::CComCritSecLock lock(m_dbLock);
+    if (!m_queryFeedOrderByTitleDESCInRangeStmt.m_handle
+        || !fnQueryFeed)
+        return false;
+
+    int ret = SQLITE_OK;
+    if (SQLITE_OK == (ret = sqlite3_bind_int64(m_queryFeedOrderByTitleDESCInRangeStmt.m_handle, 1, limit))
+        && SQLITE_OK == (ret = sqlite3_bind_int64(m_queryFeedOrderByTitleDESCInRangeStmt.m_handle, 2, offset)))
+    {
+        Feed feed;
+        while (SQLITE_ROW == (ret = sqlite3_step(m_queryFeedOrderByTitleDESCInRangeStmt.m_handle)))
+        {
+            QueryFeed(feed, m_queryFeedOrderByTitleDESCInRangeStmt.m_handle);
+            fnQueryFeed(feed);
+        }
+        sqlite3_reset(m_queryFeedOrderByTitleDESCInRangeStmt.m_handle);
     }
 
     return SQLITE_DONE == ret;
@@ -758,18 +845,7 @@ bool FeedDatabase::QueryFeedDataByOffset(long long offset, FN_QUERY_FEED_DATA fn
         FeedData feedData;
         while (SQLITE_ROW == (ret = sqlite3_step(m_queryFeedDataByOffsetStmt.m_handle)))
         {
-            int col = 0;
-            feedData.feeddataid = sqlite3_column_int64(m_queryFeedDataByOffsetStmt.m_handle, col++);
-            feedData.guid = (const char*)sqlite3_column_text(m_queryFeedDataByOffsetStmt.m_handle, col++);;
-            feedData.feedid = sqlite3_column_int64(m_queryFeedDataByOffsetStmt.m_handle, col++);
-            feedData.link = (const char*)sqlite3_column_text(m_queryFeedDataByOffsetStmt.m_handle, col++);
-            feedData.title = (const char*)sqlite3_column_text(m_queryFeedDataByOffsetStmt.m_handle, col++);
-            feedData.datetime = (const char*)sqlite3_column_text(m_queryFeedDataByOffsetStmt.m_handle, col++);
-            feedData.timestamp = sqlite3_column_int64(m_queryFeedDataByOffsetStmt.m_handle, col++);
-            feedData.createdtime = sqlite3_column_int64(m_queryFeedDataByOffsetStmt.m_handle, col++);
-            feedData.read = sqlite3_column_int64(m_queryFeedDataByOffsetStmt.m_handle, col++);
-            feedData.tag = (const char*)sqlite3_column_text(m_queryFeedDataByOffsetStmt.m_handle, col++);
-            feedData.misc = (const char*)sqlite3_column_text(m_queryFeedDataByOffsetStmt.m_handle, col++);
+            QueryFeedData(feedData, m_queryFeedDataByOffsetStmt.m_handle);
             fnQueryFeedData(feedData);
         }
         sqlite3_reset(m_queryFeedDataByOffsetStmt.m_handle);
@@ -792,18 +868,7 @@ bool FeedDatabase::QueryFeedDataOrderByTimestampInRange(long long limit, long lo
         FeedData feedData;
         while (SQLITE_ROW == (ret = sqlite3_step(m_queryFeedDataOrderByTimestampInRangeStmt.m_handle)))
         {
-            int col = 0;
-            feedData.feeddataid = sqlite3_column_int64(m_queryFeedDataOrderByTimestampInRangeStmt.m_handle, col++);
-            feedData.guid = (const char*)sqlite3_column_text(m_queryFeedDataOrderByTimestampInRangeStmt.m_handle, col++);;
-            feedData.feedid = sqlite3_column_int64(m_queryFeedDataOrderByTimestampInRangeStmt.m_handle, col++);
-            feedData.link = (const char*)sqlite3_column_text(m_queryFeedDataOrderByTimestampInRangeStmt.m_handle, col++);
-            feedData.title = (const char*)sqlite3_column_text(m_queryFeedDataOrderByTimestampInRangeStmt.m_handle, col++);
-            feedData.datetime = (const char*)sqlite3_column_text(m_queryFeedDataOrderByTimestampInRangeStmt.m_handle, col++);
-            feedData.timestamp = sqlite3_column_int64(m_queryFeedDataOrderByTimestampInRangeStmt.m_handle, col++);
-            feedData.createdtime = sqlite3_column_int64(m_queryFeedDataOrderByTimestampInRangeStmt.m_handle, col++);
-            feedData.read = sqlite3_column_int64(m_queryFeedDataOrderByTimestampInRangeStmt.m_handle, col++);
-            feedData.tag = (const char*)sqlite3_column_text(m_queryFeedDataOrderByTimestampInRangeStmt.m_handle, col++);
-            feedData.misc = (const char*)sqlite3_column_text(m_queryFeedDataOrderByTimestampInRangeStmt.m_handle, col++);
+            QueryFeedData(feedData, m_queryFeedDataOrderByTimestampInRangeStmt.m_handle);
             fnQueryFeedData(feedData);
         }
         sqlite3_reset(m_queryFeedDataOrderByTimestampInRangeStmt.m_handle);
@@ -827,18 +892,7 @@ bool FeedDatabase::QueryFeedDataByFeedIdOrderByTimestampInRange(long long feedid
         FeedData feedData;
         while (SQLITE_ROW == (ret = sqlite3_step(m_queryFeedDataByFeedIdOrderByTimestampInRangeStmt.m_handle)))
         {
-            int col = 0;
-            feedData.feeddataid = sqlite3_column_int64(m_queryFeedDataByFeedIdOrderByTimestampInRangeStmt.m_handle, col++);
-            feedData.guid = (const char*)sqlite3_column_text(m_queryFeedDataByFeedIdOrderByTimestampInRangeStmt.m_handle, col++);;
-            feedData.feedid = sqlite3_column_int64(m_queryFeedDataByFeedIdOrderByTimestampInRangeStmt.m_handle, col++);
-            feedData.link = (const char*)sqlite3_column_text(m_queryFeedDataByFeedIdOrderByTimestampInRangeStmt.m_handle, col++);
-            feedData.title = (const char*)sqlite3_column_text(m_queryFeedDataByFeedIdOrderByTimestampInRangeStmt.m_handle, col++);
-            feedData.datetime = (const char*)sqlite3_column_text(m_queryFeedDataByFeedIdOrderByTimestampInRangeStmt.m_handle, col++);
-            feedData.timestamp = sqlite3_column_int64(m_queryFeedDataByFeedIdOrderByTimestampInRangeStmt.m_handle, col++);
-            feedData.createdtime = sqlite3_column_int64(m_queryFeedDataByFeedIdOrderByTimestampInRangeStmt.m_handle, col++);
-            feedData.read = sqlite3_column_int64(m_queryFeedDataByFeedIdOrderByTimestampInRangeStmt.m_handle, col++);
-            feedData.tag = (const char*)sqlite3_column_text(m_queryFeedDataByFeedIdOrderByTimestampInRangeStmt.m_handle, col++);
-            feedData.misc = (const char*)sqlite3_column_text(m_queryFeedDataByFeedIdOrderByTimestampInRangeStmt.m_handle, col++);
+            QueryFeedData(feedData, m_queryFeedDataByFeedIdOrderByTimestampInRangeStmt.m_handle);
             fnQueryFeedData(feedData);
         }
         sqlite3_reset(m_queryFeedDataByFeedIdOrderByTimestampInRangeStmt.m_handle);
@@ -850,17 +904,198 @@ bool FeedDatabase::QueryFeedDataByFeedIdOrderByTimestampInRange(long long feedid
 bool FeedDatabase::QueryFeedExistByGuid(const std::string& guid, long long& exist)
 {
     ATL::CComCritSecLock lock(m_dbLock);
-    if (!m_queryFeedExistByGuid.m_handle)
+    if (!m_queryFeedExistByGuidStmt.m_handle)
         return false;
 
     int ret = SQLITE_OK;
-    if (SQLITE_OK == (ret = sqlite3_bind_text(m_queryFeedExistByGuid.m_handle, 1, guid.c_str(), guid.length(), nullptr)))
+    if (SQLITE_OK == (ret = sqlite3_bind_text(m_queryFeedExistByGuidStmt.m_handle, 1, guid.c_str(), guid.length(), nullptr)))
     {
-        while (SQLITE_ROW == (ret = sqlite3_step(m_queryFeedExistByGuid.m_handle)))
+        while (SQLITE_ROW == (ret = sqlite3_step(m_queryFeedExistByGuidStmt.m_handle)))
         {
-            exist = sqlite3_column_int64(m_queryFeedExistByGuid.m_handle, 0);
+            exist = sqlite3_column_int64(m_queryFeedExistByGuidStmt.m_handle, 0);
         }
-        sqlite3_reset(m_queryFeedExistByGuid.m_handle);
+        sqlite3_reset(m_queryFeedExistByGuidStmt.m_handle);
+    }
+
+    return SQLITE_DONE == ret;
+}
+
+bool FeedDatabase::QueryFeedDataCountByTitle(const std::string& title, long long& count)
+{
+    ATL::CComCritSecLock lock(m_dbLock);
+    if (!m_queryFeedDataCountByTitle.m_handle)
+        return false;
+
+    int ret = SQLITE_OK;;
+    if (SQLITE_OK == (ret = sqlite3_bind_text(m_queryFeedDataCountByTitle.m_handle, 1, title.c_str(), title.length(), nullptr)))
+    {
+        while (SQLITE_ROW == (ret = sqlite3_step(m_queryFeedDataCountByTitle.m_handle)))
+        {
+            count = sqlite3_column_int64(m_queryFeedDataCountByTitle.m_handle, 0);
+        }
+        sqlite3_reset(m_queryFeedDataCountByTitle.m_handle);
+    }
+
+    return SQLITE_DONE == ret;
+}
+
+bool FeedDatabase::QueryFeedDataByTitleOrderByTimestampInRange(const std::string& title, long long limit, long long offset,
+    FN_QUERY_FEED_DATA fnQueryFeedData)
+{
+    ATL::CComCritSecLock lock(m_dbLock);
+    if (!m_queryFeedDataByTitleOrderByTimestampInRangeStmt.m_handle
+        || !fnQueryFeedData)
+        return false;
+
+    int ret = SQLITE_OK;
+    if (SQLITE_OK == (ret = sqlite3_bind_text(m_queryFeedDataByTitleOrderByTimestampInRangeStmt.m_handle, 1, title.c_str(), title.length(), nullptr))
+        && SQLITE_OK == (ret = sqlite3_bind_int64(m_queryFeedDataByTitleOrderByTimestampInRangeStmt.m_handle, 2, limit))
+        && SQLITE_OK == (ret = sqlite3_bind_int64(m_queryFeedDataByTitleOrderByTimestampInRangeStmt.m_handle, 3, offset)))
+    {
+        FeedData feedData;
+        while (SQLITE_ROW == (ret = sqlite3_step(m_queryFeedDataByTitleOrderByTimestampInRangeStmt.m_handle)))
+        {
+            QueryFeedData(feedData, m_queryFeedDataByTitleOrderByTimestampInRangeStmt.m_handle);
+            fnQueryFeedData(feedData);
+        }
+        sqlite3_reset(m_queryFeedDataByTitleOrderByTimestampInRangeStmt.m_handle);
+    }
+
+    return SQLITE_DONE == ret;
+}
+
+bool FeedDatabase::QueryFeedDataCountByFeedIdByTitle(long long feedid, const std::string& title, long long& count)
+{
+    ATL::CComCritSecLock lock(m_dbLock);
+    if (!m_queryFeedDataCountByFeedIdByTitle.m_handle)
+        return false;
+
+    int ret = SQLITE_OK;;
+    if (SQLITE_OK == (ret = sqlite3_bind_int64(m_queryFeedDataCountByFeedIdByTitle.m_handle, 1, feedid))
+        && SQLITE_OK == (ret = sqlite3_bind_text(m_queryFeedDataCountByFeedIdByTitle.m_handle, 2, title.c_str(), title.length(), nullptr)))
+    {
+        while (SQLITE_ROW == (ret = sqlite3_step(m_queryFeedDataCountByFeedIdByTitle.m_handle)))
+        {
+            count = sqlite3_column_int64(m_queryFeedDataCountByFeedIdByTitle.m_handle, 0);
+        }
+        sqlite3_reset(m_queryFeedDataCountByFeedIdByTitle.m_handle);
+    }
+
+    return SQLITE_DONE == ret;
+}
+
+bool FeedDatabase::QueryFeedDataByFeedIdByTitleOrderByTimestampInRange(long long feedid, const std::string& title, long long limit, long long offset,
+    FN_QUERY_FEED_DATA fnQueryFeedData)
+{
+    ATL::CComCritSecLock lock(m_dbLock);
+    if (!m_queryFeedDataByFeedIdByTitleOrderByTimestampInRangeStmt.m_handle
+        || !fnQueryFeedData)
+        return false;
+
+    int ret = SQLITE_OK;
+    if (SQLITE_OK == (ret = sqlite3_bind_int64(m_queryFeedDataByFeedIdByTitleOrderByTimestampInRangeStmt.m_handle, 1, feedid))
+        && SQLITE_OK == (ret = sqlite3_bind_text(m_queryFeedDataByFeedIdByTitleOrderByTimestampInRangeStmt.m_handle, 2, title.c_str(), title.length(), nullptr))
+        && SQLITE_OK == (ret = sqlite3_bind_int64(m_queryFeedDataByFeedIdByTitleOrderByTimestampInRangeStmt.m_handle, 3, limit))
+        && SQLITE_OK == (ret = sqlite3_bind_int64(m_queryFeedDataByFeedIdByTitleOrderByTimestampInRangeStmt.m_handle, 4, offset)))
+    {
+        FeedData feedData;
+        while (SQLITE_ROW == (ret = sqlite3_step(m_queryFeedDataByFeedIdByTitleOrderByTimestampInRangeStmt.m_handle)))
+        {
+            QueryFeedData(feedData, m_queryFeedDataByFeedIdByTitleOrderByTimestampInRangeStmt.m_handle);
+            fnQueryFeedData(feedData);
+        }
+        sqlite3_reset(m_queryFeedDataByFeedIdByTitleOrderByTimestampInRangeStmt.m_handle);
+    }
+
+    return SQLITE_DONE == ret;
+}
+
+bool FeedDatabase::QueryFeedCountByTitle(const std::string& title, long long& count)
+{
+    ATL::CComCritSecLock lock(m_dbLock);
+    if (!m_queryFeedCountByTitleStmt.m_handle)
+        return false;
+
+    int ret = SQLITE_OK;;
+    if (SQLITE_OK == (ret = sqlite3_bind_text(m_queryFeedCountByTitleStmt.m_handle, 1, title.c_str(), title.length(), nullptr)))
+    {
+        while (SQLITE_ROW == (ret = sqlite3_step(m_queryFeedCountByTitleStmt.m_handle)))
+        {
+            count = sqlite3_column_int64(m_queryFeedCountByTitleStmt.m_handle, 0);
+        }
+        sqlite3_reset(m_queryFeedCountByTitleStmt.m_handle);
+    }
+
+    return SQLITE_DONE == ret;
+}
+
+bool FeedDatabase::QueryFeedByTitleByOffsetInRange(const std::string& title, long long limit, long long offset, FN_QUERY_FEED fnQueryFeed)
+{
+    ATL::CComCritSecLock lock(m_dbLock);
+    if (!m_queryFeedByTitleByOffsetInRangeStmt.m_handle
+        || !fnQueryFeed)
+        return false;
+
+    int ret = SQLITE_OK;
+    if (SQLITE_OK == (ret = sqlite3_bind_text(m_queryFeedByTitleByOffsetInRangeStmt.m_handle, 1, title.c_str(), title.length(), nullptr))
+        && SQLITE_OK == (ret = sqlite3_bind_int64(m_queryFeedByTitleByOffsetInRangeStmt.m_handle, 2, limit))
+        && SQLITE_OK == (ret = sqlite3_bind_int64(m_queryFeedByTitleByOffsetInRangeStmt.m_handle, 3, offset)))
+    {
+        Feed feed;
+        while (SQLITE_ROW == (ret = sqlite3_step(m_queryFeedByTitleByOffsetInRangeStmt.m_handle)))
+        {
+            QueryFeed(feed, m_queryFeedByTitleByOffsetInRangeStmt.m_handle);
+            fnQueryFeed(feed);
+        }
+        sqlite3_reset(m_queryFeedByTitleByOffsetInRangeStmt.m_handle);
+    }
+
+    return SQLITE_DONE == ret;
+}
+
+bool FeedDatabase::QueryFeedByTitleByOffsetOrderByTitleASCInRange(const std::string& title, long long limit, long long offset, FN_QUERY_FEED fnQueryFeed)
+{
+    ATL::CComCritSecLock lock(m_dbLock);
+    if (!m_queryFeedByTitleByOffsetOrderByTitleASCInRangeStmt.m_handle
+        || !fnQueryFeed)
+        return false;
+
+    int ret = SQLITE_OK;
+    if (SQLITE_OK == (ret = sqlite3_bind_text(m_queryFeedByTitleByOffsetOrderByTitleASCInRangeStmt.m_handle, 1, title.c_str(), title.length(), nullptr))
+        && SQLITE_OK == (ret = sqlite3_bind_int64(m_queryFeedByTitleByOffsetOrderByTitleASCInRangeStmt.m_handle, 2, limit))
+        && SQLITE_OK == (ret = sqlite3_bind_int64(m_queryFeedByTitleByOffsetOrderByTitleASCInRangeStmt.m_handle, 3, offset)))
+    {
+        Feed feed;
+        while (SQLITE_ROW == (ret = sqlite3_step(m_queryFeedByTitleByOffsetOrderByTitleASCInRangeStmt.m_handle)))
+        {
+            QueryFeed(feed, m_queryFeedByTitleByOffsetOrderByTitleASCInRangeStmt.m_handle);
+            fnQueryFeed(feed);
+        }
+        sqlite3_reset(m_queryFeedByTitleByOffsetOrderByTitleASCInRangeStmt.m_handle);
+    }
+
+    return SQLITE_DONE == ret;
+}
+
+bool FeedDatabase::QueryFeedByTitleByOffsetOrderByTitleDESCInRange(const std::string& title, long long limit, long long offset, FN_QUERY_FEED fnQueryFeed)
+{
+    ATL::CComCritSecLock lock(m_dbLock);
+    if (!m_queryFeedByTitleByOffsetOrderByTitleDESCInRangeStmt.m_handle
+        || !fnQueryFeed)
+        return false;
+
+    int ret = SQLITE_OK;
+    if (SQLITE_OK == (ret = sqlite3_bind_text(m_queryFeedByTitleByOffsetOrderByTitleDESCInRangeStmt.m_handle, 1, title.c_str(), title.length(), nullptr))
+        && SQLITE_OK == (ret = sqlite3_bind_int64(m_queryFeedByTitleByOffsetOrderByTitleDESCInRangeStmt.m_handle, 2, limit))
+        && SQLITE_OK == (ret = sqlite3_bind_int64(m_queryFeedByTitleByOffsetOrderByTitleDESCInRangeStmt.m_handle, 3, offset)))
+    {
+        Feed feed;
+        while (SQLITE_ROW == (ret = sqlite3_step(m_queryFeedByTitleByOffsetOrderByTitleDESCInRangeStmt.m_handle)))
+        {
+            QueryFeed(feed, m_queryFeedByTitleByOffsetOrderByTitleDESCInRangeStmt.m_handle);
+            fnQueryFeed(feed);
+        }
+        sqlite3_reset(m_queryFeedByTitleByOffsetOrderByTitleDESCInRangeStmt.m_handle);
     }
 
     return SQLITE_DONE == ret;

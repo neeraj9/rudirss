@@ -3,6 +3,7 @@
 #include "ListView.h"
 #include "FeedDatabase.h"
 #include "ListViewCache.h"
+#include "Configuration.h"
 
 #include <vector>
 
@@ -33,6 +34,9 @@ public:
     virtual void ClearCache();
 
     const int GetLastRightClickedItem() const { return m_lastRighClickedItem; }
+    ListViewCache<FeedDatabase::Feed>::iterator GetRightClickedFeedIteratorFromCache(bool &result);
+
+    void SetFeedSortMethod(const DisplayConfiguration::FeedSortMethod feedSortMethod) { m_feedSortMethod = feedSortMethod; }
 
 protected:
     long long m_lastSelectedFeedId;
@@ -40,4 +44,7 @@ protected:
     int m_lastRighClickedItem;
     RudiRSSMainWindow* m_mainWindow;
     ListViewCache<FeedDatabase::Feed> m_cache;
+    DisplayConfiguration::FeedSortMethod m_feedSortMethod;
+
+    void QueryFeedByOffsetInRange(long long from, long long to);
 };

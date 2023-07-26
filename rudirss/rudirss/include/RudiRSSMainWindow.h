@@ -6,6 +6,7 @@
 #include "FeedDatabase.h"
 #include "FeedListView.h"
 #include "FeedItemListView.h"
+#include "SearchBox.h"
 
 #include <string>
 
@@ -19,6 +20,11 @@ protected:
     Viewer m_viewer;
     BOOL m_initViewer;
     RudiRSSClient m_rudiRSSClient;
+    SearchBox m_searchBox;
+    std::string m_lastSearchText;
+    WindowHandle m_comboSearchType;
+    static const int DEFAULT_SEARCH_TPYE_COMBOBOX_WIDTH = 100;
+    static const int DEFAULT_SEARCH_TPYE_COMBOBOX_HEIGHT = 16;
 
     HFONT m_font;
     HFONT m_boldFont;
@@ -37,9 +43,6 @@ protected:
 
     LRESULT OnProcessListViewCommand(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
-    long long GetLastSelectedFeedDataId();
-    bool GetLastSelectedFeedData(FeedDatabase::FeedData &feedData);
-
 public:
     RudiRSSMainWindow();
     virtual ~RudiRSSMainWindow();
@@ -56,4 +59,10 @@ public:
 
     const HFONT GetDefaultFont() const { return m_font; }
     const HFONT GetBoldFont() const { return m_boldFont; }
+
+    const std::string &GetLastSearchText() const { return m_lastSearchText; }
+    void ClearLastSearchResult();
+    void ClearSearchBox();
+
+    SearchBox::SearchType GetSearchType();
 };
