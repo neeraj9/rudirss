@@ -63,8 +63,14 @@ By default, each feed will update every `30` minutes. By design, each feed have 
 ## Download
 - Executable binaries can be downloaded on [latest release](https://github.com/lambertlulala/rudirss/releases/latest) page.
 
+## How to build
+1. `git clone https://github.com/lambertlulala/rudirss.git`
+2. `git submodule update --init --recursive`
+3. Build with Visual Studio Community 2022
+
 ## Future plan
 I might implement some other features:
-- Plugin system that allow users to script or load their custom libraries
+- Plugin system that allows users to script or load their custom libraries
 - Dark mode
-- The filter that enables users to decide what feeds to be keep in the database
+- Filter that enables users to decide what feeds to be kept in the database
+- Add other configurations(in ini file or UI) to controll some internal parameters
