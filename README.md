@@ -73,4 +73,4 @@ I might implement some other features:
 - Plugin system that allows users to script or load their custom libraries
 - Dark mode
 - Filter that enables users to decide what feeds to be kept in the database
-- Add other configurations(in ini file or UI) to controll some internal parameters
+- Add other configurations(in ini file or UI) to control some internal parameters
