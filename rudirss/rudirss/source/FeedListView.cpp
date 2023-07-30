@@ -126,8 +126,7 @@ LRESULT FeedListView::OnProcessMessage(HWND hWnd, UINT message, WPARAM wParam, L
     case NM_RCLICK:
     {
         LPNMITEMACTIVATE itemActivate = (LPNMITEMACTIVATE)lParam;
-        if (FeedListView::ALL_FEEDS_LIST_INDEX != itemActivate->iItem
-            && -1 != itemActivate->iItem)
+        if (FeedListView::ALL_FEEDS_LIST_INDEX < itemActivate->iItem)
         {
             m_lastRighClickedItem = itemActivate->iItem;
             HMENU hPopupMenu = LoadMenu(m_mainWindow->GetHInstance(), MAKEINTRESOURCE(IDR_FEED_MENU));
@@ -137,6 +136,22 @@ LRESULT FeedListView::OnProcessMessage(HWND hWnd, UINT message, WPARAM wParam, L
                 if (GetCursorPos(&pt))
                 {
                     HMENU hMenu = GetSubMenu(hPopupMenu, 1);
+                    TrackPopupMenu(hMenu, TPM_TOPALIGN | TPM_LEFTALIGN, pt.x, pt.y, 0, hWnd, NULL);
+                }
+                DestroyMenu(hPopupMenu);
+            }
+        }
+        else if (FeedListView::ALL_FEEDS_LIST_INDEX == itemActivate->iItem)
+        {
+            HMENU hPopupMenu = LoadMenu(m_mainWindow->GetHInstance(), MAKEINTRESOURCE(IDR_FEED_MENU));
+            if (hPopupMenu)
+            {
+                POINT pt{};
+                if (GetCursorPos(&pt))
+                {
+                    HMENU hMenu = GetSubMenu(hPopupMenu, 1);
+                    EnableMenuItem(hMenu, ID_FEED_MENU_DELETE_THIS_FEED, MF_GRAYED);
+                    EnableMenuItem(hMenu, ID_FEED_MENU_REFRESH, MF_GRAYED);
                     TrackPopupMenu(hMenu, TPM_TOPALIGN | TPM_LEFTALIGN, pt.x, pt.y, 0, hWnd, NULL);
                 }
                 DestroyMenu(hPopupMenu);
