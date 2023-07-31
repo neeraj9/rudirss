@@ -71,7 +71,7 @@ jobs:
       uses: softprops/action-gh-release@v1
       if: startsWith(github.ref, 'refs/tags/')
       with:
-        name: Pre-release ${{ github.ref_name }}
+        name: ${{ github.ref_name }}
         prerelease: false
         files: |
           ${{ env.RELEASE_X64_FOLDER }}/RudiRSS_x64_${{ github.ref_name }}_${{ github.sha }}.zip
