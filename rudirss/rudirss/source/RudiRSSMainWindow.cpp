@@ -249,53 +249,23 @@ LRESULT RudiRSSMainWindow::OnCommand(HWND hWnd, UINT message, WPARAM wParam, LPA
         {
         case EN_CHANGE:
         {
-            m_lastSearchText = std::move(m_searchBox.GetSearchText());
-            if (!m_lastSearchText.empty())
-            {
-                std::string query = std::format("%{}%", m_lastSearchText);
-                long long cnt = 0;
-                if (SearchBox::SearchType::FEED_ITEMS == GetSearchType())
-                {
-                    if (FeedListView::ALL_FEEDS_LIST_INDEX == m_feedListView.GetLastSelectedFeedIndex())
-                        m_rudiRSSClient.QueryFeedDataCountByTitle(query, cnt);
-                    else
-                        m_rudiRSSClient.QueryFeedDataCountByFeedIdByTitle(m_feedListView.GetLastSelectedFeedId(), query, cnt);
+            OnEditSearchBox();
+        }
+        break;
 
-                    m_feedItemListView.DeleteAllItems();
-                    if (cnt > 0)
-                    {
-                        ListView_SetItemCount(m_feedItemListView.m_hWnd, cnt);
-                    }
-                }
-                else
-                {
-                    m_rudiRSSClient.QueryFeedCountByTitle(query, cnt);
-                    m_feedListView.DeleteAllItems();
-                    if (cnt > 0)
-                    {
-                        ListView_SetItemCount(m_feedListView.m_hWnd, cnt + 1);
-                    }
-                }
-            }
-            // Recover normal results
-            else
-            {
-                if (SearchBox::SearchType::FEED_ITEMS == GetSearchType())
-                {
-                    if (FeedListView::ALL_FEEDS_LIST_INDEX == m_feedListView.GetLastSelectedFeedIndex())
-                    {
-                        m_feedItemListView.UpdateAllFeeds();
-                    }
-                    else
-                    {
-                        m_feedItemListView.UpdateSelectedFeed(m_feedListView.GetLastSelectedFeedId());
-                    }
-                }
-                else
-                {
-                    m_feedListView.UpdateFeedListFromDatabase();
-                }
-            }
+        default:
+            break;
+        }
+    }
+    break;
+
+    case IDC_SEARCH_TYPE_COMBOBOX:
+    {
+        switch (HIWORD(wParam))
+        {
+        case CBN_SELCHANGE:
+        {
+            OnEditSearchBox();
         }
         break;
 
@@ -332,7 +302,7 @@ void RudiRSSMainWindow::InittializeControl()
 
     m_comboSearchType.Attach(CreateWindow(WC_COMBOBOX, nullptr, CBS_DROPDOWNLIST | CBS_HASSTRINGS | WS_CHILD | WS_VISIBLE,
         rc.right - SearchBox::DEFAULT_WIDTH - DEFAULT_SEARCH_TPYE_COMBOBOX_WIDTH,
-        0, DEFAULT_SEARCH_TPYE_COMBOBOX_WIDTH, DEFAULT_SEARCH_TPYE_COMBOBOX_HEIGHT, m_hWnd, nullptr, m_hInstance, nullptr));
+        0, DEFAULT_SEARCH_TPYE_COMBOBOX_WIDTH, DEFAULT_SEARCH_TPYE_COMBOBOX_HEIGHT, m_hWnd, (HMENU)IDC_SEARCH_TYPE_COMBOBOX, m_hInstance, nullptr));
     SendMessage(m_comboSearchType.m_hWnd, CB_INSERTSTRING, static_cast<int>(SearchBox::SearchType::SOURCE_FEEDS), (LPARAM)L"Source feeds");
     SendMessage(m_comboSearchType.m_hWnd, CB_INSERTSTRING, static_cast<int>(SearchBox::SearchType::FEED_ITEMS), (LPARAM)L"Feed items");
     SendMessage(m_comboSearchType.m_hWnd, CB_SETCURSEL, static_cast<int>(SearchBox::SearchType::SOURCE_FEEDS), 0);
@@ -419,7 +389,7 @@ LRESULT RudiRSSMainWindow::OnProcessListViewCommand(HWND hWnd, UINT message, WPA
     }
     break;
 
-    case IDC_FEED_TITLE_LIST_VIEW:
+    case IDC_FEED_ITEM_LIST_VIEW:
     {
         return m_feedItemListView.OnProcessMessage(hWnd, message, wParam, lParam);
     }
@@ -481,4 +451,55 @@ void RudiRSSMainWindow::ClearSearchBox()
 SearchBox::SearchType RudiRSSMainWindow::GetSearchType()
 {
     return static_cast<SearchBox::SearchType>(SendMessage(m_comboSearchType.m_hWnd, CB_GETCURSEL, 0, 0));
+}
+
+void RudiRSSMainWindow::OnEditSearchBox()
+{
+    m_lastSearchText = std::move(m_searchBox.GetSearchText());
+    if (!m_lastSearchText.empty())
+    {
+        std::string query = std::format("%{}%", m_lastSearchText);
+        long long cnt = 0;
+        if (SearchBox::SearchType::FEED_ITEMS == GetSearchType())
+        {
+            if (FeedListView::ALL_FEEDS_LIST_INDEX == m_feedListView.GetLastSelectedFeedIndex())
+                m_rudiRSSClient.QueryFeedDataCountByTitle(query, cnt);
+            else
+                m_rudiRSSClient.QueryFeedDataCountByFeedIdByTitle(m_feedListView.GetLastSelectedFeedId(), query, cnt);
+
+            m_feedItemListView.DeleteAllItems();
+            if (cnt > 0)
+            {
+                ListView_SetItemCount(m_feedItemListView.m_hWnd, cnt);
+            }
+        }
+        else
+        {
+            m_rudiRSSClient.QueryFeedCountByTitle(query, cnt);
+            m_feedListView.DeleteAllItems();
+            if (cnt > 0)
+            {
+                ListView_SetItemCount(m_feedListView.m_hWnd, cnt + 1);
+            }
+        }
+    }
+    // Recover normal results
+    else
+    {
+        if (SearchBox::SearchType::FEED_ITEMS == GetSearchType())
+        {
+            if (FeedListView::ALL_FEEDS_LIST_INDEX == m_feedListView.GetLastSelectedFeedIndex())
+            {
+                m_feedItemListView.UpdateAllFeeds();
+            }
+            else
+            {
+                m_feedItemListView.UpdateSelectedFeed(m_feedListView.GetLastSelectedFeedId());
+            }
+        }
+        else
+        {
+            m_feedListView.UpdateFeedListFromDatabase();
+        }
+    }
 }

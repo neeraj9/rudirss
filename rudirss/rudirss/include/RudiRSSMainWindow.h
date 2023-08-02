@@ -43,6 +43,8 @@ protected:
 
     LRESULT OnProcessListViewCommand(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
+    void OnEditSearchBox();
+
 public:
     RudiRSSMainWindow();
     virtual ~RudiRSSMainWindow();

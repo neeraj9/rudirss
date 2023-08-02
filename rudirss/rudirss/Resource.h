@@ -6,8 +6,7 @@
 #define IDS_APP_TITLE                   103
 #define IDD_ABOUTBOX                    103
 #define IDM_ABOUT                       104
-#define IDM_EXIT                        105
-#define IDC_FEED_TITLE_LIST_VIEW        105
+#define IDC_SEARCH_TYPE_COMBOBOX        104
 #define IDC_FEED_ITEM_LIST_VIEW         105
 #define IDC_FEED_LIST_VIEW              106
 #define IDI_RUDIRSS                     107
