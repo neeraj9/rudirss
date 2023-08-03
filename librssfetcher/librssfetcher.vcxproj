@@ -35,7 +35,7 @@
     <ClInclude Include="include\HttpGetRequest.h" />
     <ClInclude Include="include\RSSFeed.h" />
     <ClInclude Include="include\SQLite3Handle.h" />
-    <ClInclude Include="include\SQLite3StmtHandle.h" />
+    <ClInclude Include="include\SQLite3Stmt.h" />
     <ClInclude Include="include\Task.h" />
     <ClInclude Include="include\Timer.h" />
     <ClInclude Include="include\Worker.h" />

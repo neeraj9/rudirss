@@ -69,7 +69,7 @@
     <ClInclude Include="include\SQLite3Handle.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\SQLite3StmtHandle.h">
+    <ClInclude Include="include\SQLite3Stmt.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Timer.h">
