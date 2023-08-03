@@ -42,14 +42,6 @@ bool RudiRSSClient::Initialize()
         LoadDatabaseConfiguration(dbConfig);
         if (dbConfig.allowDeleteOutdatedFeedItems)
             DeleteOutdatedFeedData(dbConfig.reserveDays);
-
-#if 0
-        int n = 0;
-        m_db.QueryFeedByTitleByOffsetInRange("%emacs%", 4, 0, [&](const FeedDatabase::Feed& feed) {
-            n++;
-            });
-        n = 0;
-#endif
     }
     catch (const std::exception& e)
     {
