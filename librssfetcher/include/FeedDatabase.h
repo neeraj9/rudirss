@@ -1,7 +1,7 @@
 #pragma once
 
 #include "SQLite3Handle.h"
-#include "SQLite3StmtHandle.h"
+#include "SQLite3Stmt.h"
 
 #include <string>
 #include <time.h>
@@ -204,45 +204,45 @@ public:
 
 protected:
     SQLite3Handle m_sql;
-    SQLite3StmtHandle m_insertFeedStmt;
-    SQLite3StmtHandle m_insertFeedDataStmt;
-    SQLite3StmtHandle m_queryFeedStmt;
-    SQLite3StmtHandle m_queryFeedByGuidStmt;
-    SQLite3StmtHandle m_queryAllFeedsStmt;
-    SQLite3StmtHandle m_queryFeedDataByFeedIdStmt;
-    SQLite3StmtHandle m_queryFeedDataByFeedDataIdStmt;
-    SQLite3StmtHandle m_queryFeedDataByFeedIdOrderByTimestampStmt;
-    SQLite3StmtHandle m_queryFeedDataByOffsetOrderByTimestampStmt;
-    SQLite3StmtHandle m_queryFeedDataByFeedIdByOffsetOrderByTimestampStmt;
-    SQLite3StmtHandle m_queryAllFeedDataOrderByTimestampStmt;
-    SQLite3StmtHandle m_deleteAllFeedStmt;
-    SQLite3StmtHandle m_deleteAllFeedDataStmt;
-    SQLite3StmtHandle m_deleteOutdatedFeedDataStmt;
-    SQLite3StmtHandle m_deleteFeedByFeedIdStmt;
-    SQLite3StmtHandle m_deleteFeedDataByFeedIdStmt;
-    SQLite3StmtHandle m_updateFeedDataReadStmt;
-    SQLite3StmtHandle m_queryFeedTableDataExistStmt;
-    SQLite3StmtHandle m_queryFeedDataTableCountStmt;
-    SQLite3StmtHandle m_queryFeedDataTableCountByFeedIdStmt;
-    SQLite3StmtHandle m_queryFeedDataByOffsetStmt;
-    SQLite3StmtHandle m_queryFeedTableCountStmt;
-    SQLite3StmtHandle m_queryFeedByOffsetStmt;
-    SQLite3StmtHandle m_queryFeedByOffsetInRangeStmt;
-    SQLite3StmtHandle m_queryFeedDataOrderByTimestampInRangeStmt;
-    SQLite3StmtHandle m_queryFeedDataByFeedIdOrderByTimestampInRangeStmt;
-    SQLite3StmtHandle m_queryFeedExistByGuidStmt;
-    SQLite3StmtHandle m_queryFeedDataCountByTitle;
-    SQLite3StmtHandle m_queryFeedDataByTitleOrderByTimestampInRangeStmt;
-    SQLite3StmtHandle m_queryFeedDataCountByFeedIdByTitle;
-    SQLite3StmtHandle m_queryFeedDataByFeedIdByTitleOrderByTimestampInRangeStmt;
-    SQLite3StmtHandle m_queryAllFeedsOrderByTitleASCStmt;
-    SQLite3StmtHandle m_queryAllFeedsOrderByTitleDESCStmt;
-    SQLite3StmtHandle m_queryFeedOrderByTitleASCInRangeStmt;
-    SQLite3StmtHandle m_queryFeedOrderByTitleDESCInRangeStmt;
-    SQLite3StmtHandle m_queryFeedCountByTitleStmt;
-    SQLite3StmtHandle m_queryFeedByTitleByOffsetInRangeStmt;
-    SQLite3StmtHandle m_queryFeedByTitleByOffsetOrderByTitleASCInRangeStmt;
-    SQLite3StmtHandle m_queryFeedByTitleByOffsetOrderByTitleDESCInRangeStmt;
+    SQLite3Stmt m_insertFeedStmt;
+    SQLite3Stmt m_insertFeedDataStmt;
+    SQLite3Stmt m_queryFeedStmt;
+    SQLite3Stmt m_queryFeedByGuidStmt;
+    SQLite3Stmt m_queryAllFeedsStmt;
+    SQLite3Stmt m_queryFeedDataByFeedIdStmt;
+    SQLite3Stmt m_queryFeedDataByFeedDataIdStmt;
+    SQLite3Stmt m_queryFeedDataByFeedIdOrderByTimestampStmt;
+    SQLite3Stmt m_queryFeedDataByOffsetOrderByTimestampStmt;
+    SQLite3Stmt m_queryFeedDataByFeedIdByOffsetOrderByTimestampStmt;
+    SQLite3Stmt m_queryAllFeedDataOrderByTimestampStmt;
+    SQLite3Stmt m_deleteAllFeedStmt;
+    SQLite3Stmt m_deleteAllFeedDataStmt;
+    SQLite3Stmt m_deleteOutdatedFeedDataStmt;
+    SQLite3Stmt m_deleteFeedByFeedIdStmt;
+    SQLite3Stmt m_deleteFeedDataByFeedIdStmt;
+    SQLite3Stmt m_updateFeedDataReadStmt;
+    SQLite3Stmt m_queryFeedTableDataExistStmt;
+    SQLite3Stmt m_queryFeedDataTableCountStmt;
+    SQLite3Stmt m_queryFeedDataTableCountByFeedIdStmt;
+    SQLite3Stmt m_queryFeedDataByOffsetStmt;
+    SQLite3Stmt m_queryFeedTableCountStmt;
+    SQLite3Stmt m_queryFeedByOffsetStmt;
+    SQLite3Stmt m_queryFeedByOffsetInRangeStmt;
+    SQLite3Stmt m_queryFeedDataOrderByTimestampInRangeStmt;
+    SQLite3Stmt m_queryFeedDataByFeedIdOrderByTimestampInRangeStmt;
+    SQLite3Stmt m_queryFeedExistByGuidStmt;
+    SQLite3Stmt m_queryFeedDataCountByTitle;
+    SQLite3Stmt m_queryFeedDataByTitleOrderByTimestampInRangeStmt;
+    SQLite3Stmt m_queryFeedDataCountByFeedIdByTitle;
+    SQLite3Stmt m_queryFeedDataByFeedIdByTitleOrderByTimestampInRangeStmt;
+    SQLite3Stmt m_queryAllFeedsOrderByTitleASCStmt;
+    SQLite3Stmt m_queryAllFeedsOrderByTitleDESCStmt;
+    SQLite3Stmt m_queryFeedOrderByTitleASCInRangeStmt;
+    SQLite3Stmt m_queryFeedOrderByTitleDESCInRangeStmt;
+    SQLite3Stmt m_queryFeedCountByTitleStmt;
+    SQLite3Stmt m_queryFeedByTitleByOffsetInRangeStmt;
+    SQLite3Stmt m_queryFeedByTitleByOffsetOrderByTitleASCInRangeStmt;
+    SQLite3Stmt m_queryFeedByTitleByOffsetOrderByTitleDESCInRangeStmt;
 
     ATL::CComCriticalSection m_dbLock;
 

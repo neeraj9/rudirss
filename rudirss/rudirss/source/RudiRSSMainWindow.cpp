@@ -217,10 +217,13 @@ LRESULT RudiRSSMainWindow::OnCommand(HWND hWnd, UINT message, WPARAM wParam, LPA
 
             if (IDYES == MessageBox(hWnd, std::format(L"Delete the feed '{}'?", title).c_str(), L"Delete the feed", MB_ICONWARNING | MB_YESNO))
             {
-                int lastRightClickedItem = it->first;
-                m_rudiRSSClient.DeleteFeedByFeedId(it->second.feedid);
+                std::wstring guid;
+                FeedCommon::ConvertStringToWideString(it->second.guid, guid);
+                m_rudiRSSClient.DeleteFeed(it->second.feedid, guid);
                 m_feedListView.UpdateFeedListFromDatabase();
-                if (lastRightClickedItem == m_feedListView.GetLastSelectedFeedIndex() - 1)
+                long long cnt = 0;
+                m_rudiRSSClient.QueryFeedTableCount(cnt);
+                if (0 == cnt)
                 {
                     m_feedListView.ResetLastSelectedFeedIndex();
                     m_feedItemListView.DeleteAllItems();

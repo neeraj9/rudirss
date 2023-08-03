@@ -6,7 +6,6 @@
 
 #include "FeedDatabase.h"
 
-
 TEST(TestFeedDatabaseCase, TestDBOperations)
 {
     try

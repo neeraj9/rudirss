@@ -600,3 +600,10 @@ void RudiRSSClient::DeleteAllFeedsAndAllFeedData()
     m_db.DeleteAllFeedData();
     m_db.DeleteAllFeeds();
 }
+
+void RudiRSSClient::DeleteFeed(long long feedid, const std::wstring& guid)
+{
+    m_refreshTimer.erase(guid);
+    DeleteFeedDataByFeedId(feedid);
+    DeleteFeedByFeedId(feedid);
+}
