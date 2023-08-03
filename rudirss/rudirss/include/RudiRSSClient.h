@@ -71,6 +71,7 @@ public:
     void RefreshAllFeeds();
     void DeleteFeedByOffset(long long offset);
     void DeleteAllFeedsAndAllFeedData();
+    void DeleteFeed(long long feedid, const std::wstring &guid);
 
     const std::wstring GetRudiRSSFolder() const { return m_rudirssDirectory; }
 
