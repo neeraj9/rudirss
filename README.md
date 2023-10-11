@@ -15,7 +15,7 @@ RudiRSS is a rudimentary RSS reader implemented in C++ on Windows.
 
 ## Why
 
-I read RSS feeds every day and have used many RSS readers, however, some are heavy and have too many features that I seldom use, some don't maintain anymore. And I just want a simple RSS reader that could render web content without issues. Therefore I spent some time implementing it on Windows in C++, and by pure Win32 APIs and build-in SDKs without 3rd party dependencies (except for the google-test framework to test core libraries.).
+I read RSS feeds every day and have used many RSS readers, however, some are heavy and have too many features that I seldom use, some don't maintain anymore. And I just want a simple RSS reader that could render web content without issues. Therefore I spent some time implementing it on Windows in C++, and by pure Win32 APIs and built-in SDKs without 3rd party dependencies (except for the google-test framework to test core libraries.).
 
 Before I implement RudiRSS, I implemented [libmsxml](https://github.com/lambertlulala/libmsxml) to parse feeds and [libWinHttp](https://github.com/lambertlulala/libWinHttp) to grab feeds from web. They are both used by RudiRSS.
 
@@ -69,8 +69,8 @@ By default, each feed will update every `30` minutes. By design, each feed have 
 3. Build with Visual Studio Community 2022
 
 ## Future plan
-I might implement some other features:
+- Implement console version of RudiRSS
 - Plugin system that allows users to script or load their custom libraries
-- Dark mode
 - Filter that enables users to decide what feeds to be kept in the database
 - Add other configurations(in ini file or UI) to control some internal parameters
+- Dark mode
