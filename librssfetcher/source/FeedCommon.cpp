@@ -12,6 +12,23 @@
 
 using namespace FeedCommon;
 
+/// SafeGetTimeSinceEpoch
+/// This function is used to get the time since epoch in seconds.
+/// The function will apply default values to the parameters if they are invalid.
+///
+/// apply default to not lose the data because CTime::GetTime will asset for wrong values
+inline time_t SafeGetTimeSinceEpoch(int year, int month, int day, int hour, int minute, int second)
+{
+    if (year < 1970) year = 2000;
+    if (month < 1 || month > 12) month = 1;
+    if (day < 1 || day > 31) day = 1;
+    if (hour < 0 || hour > 23) hour = 0;
+    if (minute < 0 || minute > 59) minute = 0;
+    if (second < 0 || second > 59) second = 0;
+    CTime time(year, month, day, hour, minute, second);
+    return time.GetTime();
+}
+
 void FeedCommon::IterateSiblingElements(const WinMSXML::XMLElement& element, FN_ON_ITERATE_ELEMENT onIterateElement)
 {
     if (!element)
@@ -202,8 +219,8 @@ long long FeedCommon::ConvertDatetimeToTimestamp(FeedSpecification spec, const s
             auto it = months.find(month);
             if (it != months.end())
             {
-                CTime tmpTimestamp(year, it->second, day, hour, minute, second);
-                timestamp = tmpTimestamp.GetTime();
+                int month = it->second;
+                return SafeGetTimeSinceEpoch(year, month, day, hour, minute, second);
             }
         }
     }
@@ -217,8 +234,7 @@ long long FeedCommon::ConvertDatetimeToTimestamp(FeedSpecification spec, const s
         int second;
         if (6 == sscanf_s(datetime.c_str(), "%d-%d-%dT%d:%d:%d", &year, &month, &day, &hour, &minute, &second))
         {
-            CTime tmpTimestamp(year, month, day, hour, minute, second);
-            timestamp = tmpTimestamp.GetTime();
+            return SafeGetTimeSinceEpoch(year, month, day, hour, minute, second);
         }
     }
 
@@ -240,8 +256,7 @@ long long FeedCommon::ConvertDatetimeToTimestamp(const std::string& datetime)
         int second;
         if (6 == sscanf_s(datetime.c_str(), "%d-%d-%dT%d:%d:%d", &year, &month, &day, &hour, &minute, &second))
         {
-            CTime tmpTimestamp(year, month, day, hour, minute, second);
-            timestamp = tmpTimestamp.GetTime();
+            return SafeGetTimeSinceEpoch(year, month, day, hour, minute, second);
         }
     }
 
