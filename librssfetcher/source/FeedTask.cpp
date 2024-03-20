@@ -20,10 +20,13 @@ void FeedTask::DoTask(void* param, OVERLAPPED* overlapped)
         try
         {
             auto feed = FeedCommon::CreateFeed(wsRawFeedData);
-            auto feedBase = reinterpret_cast<FeedBase*>(feed.get());
-            feedBase->SetFeedUrl(m_feedUrl);
-            auto feedClient = reinterpret_cast<FeedClient*>(param);
-            feedClient->OnFeedReady(feed);
+            if (feed)
+            {
+                auto feedBase = reinterpret_cast<FeedBase*>(feed.get());
+                feedBase->SetFeedUrl(m_feedUrl);
+                auto feedClient = reinterpret_cast<FeedClient*>(param);
+                feedClient->OnFeedReady(feed);
+            }
         }
         catch (const std::exception& e)
         {
