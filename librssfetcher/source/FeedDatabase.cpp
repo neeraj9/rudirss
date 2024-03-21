@@ -35,8 +35,13 @@ void FeedDatabase::QueryFeed(Feed& feed, sqlite3_stmt* stmt)
     feed.guid = (const char*)sqlite3_column_text(stmt, col++);
     feed.url = (const char*)sqlite3_column_text(stmt, col++);
     feed.title = (const char*)sqlite3_column_text(stmt, col++);
+#ifdef UPDATE_FEED_DUE_TIME_AND_INTERVAL_FROM_DB
     feed.duetime = static_cast<unsigned>(sqlite3_column_int64(stmt, col++));
     feed.updateinterval = static_cast<unsigned>(sqlite3_column_int64(stmt, col++));
+#else
+    // Dont change duetime and update interval from database
+    // Use the default value in FeedDatabase.h
+#endif
 }
 
 bool FeedDatabase::Open(const std::wstring& dbPath)

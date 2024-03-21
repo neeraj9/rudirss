@@ -20,15 +20,17 @@ public:
 
     struct Feed
     {
-        static const unsigned DEFAULT_FEED_UPDATE_DUETIME = 0;
-        static const unsigned DEFAULT_FEED_UPDATE_INTERVAL = 1800000;
+        static const unsigned DEFAULT_FEED_INITIAL_UPDATE_DUETIME = 2 * 60 * 60 * 1000; // milliseconds
+        static const unsigned DEFAULT_FEED_UPDATE_DUETIME = 0; // milliseconds
+        static const unsigned DEFAULT_FEED_UPDATE_INTERVAL = 12 * 60 * 60 * 1000; // milliseconds
+
         long long feedid;
         std::string guid;
         std::string url;
         std::string title;
         unsigned duetime;
         unsigned updateinterval;
-        Feed() : feedid{ 0 }, duetime{ DEFAULT_FEED_UPDATE_DUETIME }, updateinterval{ DEFAULT_FEED_UPDATE_INTERVAL } {}
+        Feed() : feedid{ 0 }, duetime{ DEFAULT_FEED_INITIAL_UPDATE_DUETIME }, updateinterval{ DEFAULT_FEED_UPDATE_INTERVAL } {}
         Feed(const Feed& rhs) : feedid{ rhs.feedid }, guid{ rhs.guid }, url{ rhs.url }, title{ rhs.title },
             duetime{ rhs.duetime }, updateinterval{ rhs.updateinterval } {}
         Feed(Feed&& rhs) noexcept : feedid{ rhs.feedid }, guid{ std::move(rhs.guid) }, url{ std::move(rhs.url) }, title{ rhs.title },
