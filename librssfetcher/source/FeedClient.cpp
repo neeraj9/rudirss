@@ -20,7 +20,7 @@ bool FeedClient::Initialize()
         {
             m_feedFetcher.Initialize([&](const FetchUnit* fetchUnit, bool result, DWORD statusCode, const char* data, size_t size,
                 const WINHTTP_ASYNC_RESULT* asyncResult) {
-                    if (result && HTTP_STATUS_OK == statusCode)
+                    if (result && HTTP_STATUS_OK == statusCode && size > 0)
                     {
                         auto feedTask = FeedCommon::CreateFeedTask<FeedTask>(data, size);
                         feedTask->SetFeedUrl(fetchUnit->FeedUrl());
